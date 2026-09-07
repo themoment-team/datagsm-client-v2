@@ -3,7 +3,30 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
+  "exports": {
+    "./entities/*": "./src/entities/*/index.ts",
+    "./shared": "./src/shared/index.ts",
+    "./shared/client": "./src/shared/index.client.ts",
+    "./shared/server": "./src/shared/index.server.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src --max-warnings 0",
+    "lint:fix": "eslint src --max-warnings 0 --fix"
+  },
+  "peerDependencies": {
+    "next": "16.3.1",
+    "react": "19.2.8"
+  },
+  "dependencies": {
+    "axios": "1.18.1",
+    "server-only": "0.0.1"
+  },
   "devDependencies": {
-    "@datagsm/typescript-config": "workspace:*"
+    "@datagsm/eslint-config": "workspace:*",
+    "@datagsm/typescript-config": "workspace:*",
+    "@types/node": "26.2.0",
+    "eslint": "10.8.1",
+    "typescript": "7.0.2"
   }
 }
