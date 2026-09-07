@@ -37,10 +37,10 @@ This example is set up to produce compiled styles for `ui` components into the `
 Another option is to consume `packages/ui` directly from source without building. Tailwind CSS v4 automatically detects class names in your source files, but it does not scan other packages in `node_modules`. If you use this option, add [`@source` directives](https://tailwindcss.com/docs/functions-and-directives#source-directive) to the CSS entry point in your apps so Tailwind can find the class names used in the `ui` package:
 
 ```css
-@import "tailwindcss";
-@import "@repo/tailwind-config";
+@import 'tailwindcss';
+@import '@repo/tailwind-config';
 
-@source "../../../packages/ui/src";
+@source '../../../packages/ui/src';
 ```
 
 If you choose this strategy, you can remove the `tailwindcss` dependency and the `build:styles` script from the `ui` package.

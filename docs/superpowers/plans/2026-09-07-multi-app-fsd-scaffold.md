@@ -25,12 +25,14 @@
 ### Task 1: Enable workspace-wide FSD validation
 
 **Files:**
+
 - Modify: `package.json`
 - Modify: `pnpm-lock.yaml`
 - Verify: `scripts/check-fsd-dependencies.mjs`
 - Verify: `steiger.config.mjs`
 
 **Interfaces:**
+
 - Consumes: source-root paths passed as positional arguments to `scripts/check-fsd-dependencies.mjs`.
 - Produces: root command `pnpm lint:fsd` that validates all app roots plus `packages/core/src`.
 
@@ -61,6 +63,7 @@ Run: `git add package.json pnpm-lock.yaml && git commit -m "add(global): FSD 구
 ### Task 2: Convert the starter applications to FSD roots
 
 **Files:**
+
 - Move: `apps/web` → `apps/client`
 - Move: `apps/client/app/*` → `apps/client/src/app/*`
 - Move: `apps/docs/app/*` → `apps/docs/src/app/*`
@@ -69,6 +72,7 @@ Run: `git add package.json pnpm-lock.yaml && git commit -m "add(global): FSD 구
 - Modify: `apps/docs/package.json`
 
 **Interfaces:**
+
 - Consumes: existing starter route files and `@repo/ui` public package exports.
 - Produces: independently runnable `client` and `docs` applications at ports 3000 and 3002, each with an FSD source root.
 
@@ -99,6 +103,7 @@ Expected: PASS.
 ### Task 3: Add admin, status, and OAuth starter applications
 
 **Files:**
+
 - Create: `apps/admin/{src/app,src/views,src/widgets,src/features,src/entities,src/shared}/`
 - Create: `apps/status/{src/app,src/views,src/widgets,src/features,src/entities,src/shared}/`
 - Create: `apps/oauth/{src/app,src/views,src/widgets,src/features,src/entities,src/shared}/`
@@ -106,6 +111,7 @@ Expected: PASS.
 - Create: `apps/{admin,status,oauth}/{next.config.ts,tsconfig.json,eslint.config.js,postcss.config.js,next-env.d.ts}`
 
 **Interfaces:**
+
 - Consumes: public `@repo/ui` exports and workspace configuration packages.
 - Produces: three standalone starter applications at ports 3001, 3003, and 3004.
 
@@ -134,6 +140,7 @@ Run: `git add apps && git commit -m "add(global): 다중 앱 FSD 골격 구성"`
 ### Task 4: Add the empty shared-core package
 
 **Files:**
+
 - Create: `packages/core/package.json`
 - Create: `packages/core/tsconfig.json`
 - Create: `packages/core/eslint.config.mjs`
@@ -142,6 +149,7 @@ Run: `git add apps && git commit -m "add(global): 다중 앱 FSD 골격 구성"`
 - Create: `packages/core/src/shared/.gitkeep`
 
 **Interfaces:**
+
 - Consumes: `@repo/typescript-config`, `@repo/eslint-config`, and the root FSD validation command.
 - Produces: the empty `packages/core/src` lower-layer root validated by Steiger.
 
@@ -166,11 +174,13 @@ Run: `git add packages/core && git commit -m "add(core): 공용 하위 계층 �
 ### Task 5: Run workspace verification
 
 **Files:**
+
 - Verify: `package.json`
 - Verify: `apps/{client,admin,docs,status,oauth}/package.json`
 - Verify: `packages/core`
 
 **Interfaces:**
+
 - Consumes: all workspace scripts created in Tasks 1–4.
 - Produces: a verified five-app scaffold.
 
