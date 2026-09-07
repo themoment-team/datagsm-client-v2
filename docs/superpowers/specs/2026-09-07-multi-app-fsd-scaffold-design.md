@@ -24,9 +24,9 @@ Only `src/app` contains starter application code. Empty FSD layers contain `.git
 
 ## Package boundaries
 
-`@repo/ui` remains the prebuilt design-system package and is consumed through its public exports. It is not added to `transpilePackages`.
+`@datagsm/ui` remains the prebuilt design-system package and is consumed through its public exports. It is not added to `transpilePackages`.
 
-`@repo/core` is introduced as a shared lower-layer scaffold with `src/entities` and `src/shared`. It has no domain implementation. Future cross-application entities move there only after a second application needs them; app-specific domains remain in their owning application.
+`@datagsm/core` is introduced as a shared lower-layer scaffold with `src/entities` and `src/shared`. It has no domain implementation. Future cross-application entities move there only after a second application needs them; app-specific domains remain in their owning application.
 
 Applications do not import one another. Future package imports use public package entry points only. Server-only exports, when introduced, use dedicated `index.server.ts` subpaths.
 

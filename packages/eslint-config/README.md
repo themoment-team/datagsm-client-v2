@@ -1,4 +1,4 @@
-# `@repo/eslint-config`
+# `@datagsm/eslint-config`
 
 Collection of internal ESLint flat configurations.
 

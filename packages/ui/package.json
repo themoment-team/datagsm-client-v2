@@ -1,5 +1,5 @@
 {
-  "name": "@repo/ui",
+  "name": "@datagsm/ui",
   "version": "0.0.0",
   "sideEffects": [
     "**/*.css"
@@ -25,9 +25,9 @@
     "react": "19.2.8"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/tailwind-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
+    "@datagsm/eslint-config": "workspace:*",
+    "@datagsm/tailwind-config": "workspace:*",
+    "@datagsm/typescript-config": "workspace:*",
     "@tailwindcss/cli": "4.3.3",
     "@types/react": "19.2.18",
     "eslint": "10.8.1",

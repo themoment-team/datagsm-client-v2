@@ -4,7 +4,7 @@
 
 **Goal:** Replace the single starter app with five independently runnable Next.js FSD application skeletons and their shared package boundaries.
 
-**Architecture:** Each application owns its `apps/<name>/src` FSD layers and has no imports from other applications. `@repo/ui` remains a prebuilt UI package; `@repo/core` provides the future shared `entities` and `shared` lower layers without placing an application domain there prematurely. Root validation checks all FSD source roots.
+**Architecture:** Each application owns its `apps/<name>/src` FSD layers and has no imports from other applications. `@datagsm/ui` remains a prebuilt UI package; `@datagsm/core` provides the future shared `entities` and `shared` lower layers without placing an application domain there prematurely. Root validation checks all FSD source roots.
 
 **Tech Stack:** pnpm workspaces, Turborepo, Next.js 16 App Router, React 19, TypeScript, ESLint, Tailwind CSS, Steiger.
 
@@ -15,8 +15,8 @@
 - Application source roots are `apps/*/src`; routes, layouts, metadata, and global CSS stay in `src/app`.
 - Application FSD dependency order is `app → views → widgets → features → entities → shared`.
 - Applications must not import another application.
-- `@repo/ui` remains prebuilt and must not be added to `transpilePackages`.
-- `@repo/core` contains only shared lower layers; app-specific domains remain in their app until two applications use them.
+- `@datagsm/ui` remains prebuilt and must not be added to `transpilePackages`.
+- `@datagsm/core` contains only shared lower layers; app-specific domains remain in their app until two applications use them.
 - Empty FSD layers contain `.gitkeep`; no domain, feature, or API implementation is added.
 - Ports are client 3000, admin 3001, docs 3002, status 3003, oauth 3004.
 
@@ -73,7 +73,7 @@ Run: `git add package.json pnpm-lock.yaml && git commit -m "add(global): FSD 구
 
 **Interfaces:**
 
-- Consumes: existing starter route files and `@repo/ui` public package exports.
+- Consumes: existing starter route files and `@datagsm/ui` public package exports.
 - Produces: independently runnable `client` and `docs` applications at ports 3000 and 3002, each with an FSD source root.
 
 - [x] **Step 1: Rename the user-facing starter application**
@@ -112,12 +112,12 @@ Expected: PASS.
 
 **Interfaces:**
 
-- Consumes: public `@repo/ui` exports and workspace configuration packages.
+- Consumes: public `@datagsm/ui` exports and workspace configuration packages.
 - Produces: three standalone starter applications at ports 3001, 3003, and 3004.
 
 - [x] **Step 1: Create a minimal App Router skeleton per application**
 
-For each app, add `src/app/layout.tsx`, `src/app/page.tsx`, and `src/app/globals.css`. The page renders its own application name and imports only `@repo/ui` public exports or local files.
+For each app, add `src/app/layout.tsx`, `src/app/page.tsx`, and `src/app/globals.css`. The page renders its own application name and imports only `@datagsm/ui` public exports or local files.
 
 - [x] **Step 2: Create empty FSD layers**
 
@@ -150,12 +150,12 @@ Run: `git add apps && git commit -m "add(global): 다중 앱 FSD 골격 구성"`
 
 **Interfaces:**
 
-- Consumes: `@repo/typescript-config`, `@repo/eslint-config`, and the root FSD validation command.
+- Consumes: `@datagsm/typescript-config`, `@datagsm/eslint-config`, and the root FSD validation command.
 - Produces: the empty `packages/core/src` lower-layer root validated by Steiger.
 
 - [x] **Step 1: Create the core workspace package metadata**
 
-Set the package name to `@repo/core`, mark it private, and configure it as a workspace-only package. Do not add application dependencies or runtime exports because there is no shared domain yet.
+Set the package name to `@datagsm/core`, mark it private, and configure it as a workspace-only package. Do not add application dependencies or runtime exports because there is no shared domain yet.
 
 - [x] **Step 2: Create only the two permitted lower FSD layers**
 
