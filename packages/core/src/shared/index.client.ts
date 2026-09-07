@@ -1,5 +1,4 @@
 'use client';
 
-export * from './api/client';
-export * from './api/methods';
+export * from './api';
 export * from './lib/cookie';
