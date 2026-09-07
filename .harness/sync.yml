@@ -1,44 +1,41 @@
+enabled: false
 groups: []
-
+language: ko
 overrides:
-  claude/skills/git-commit: true
-  claude/skills/write-pr: true
-  claude/skills/resolve-reviews: true
-  claude/skills/nextjs-fsd-architecture: true
-  claude/skills/nextjs-turborepo-fsd: true
-  claude/skills/nextjs-package-boundaries: true
-  claude/skills/tailwind-shadcn: true
-  claude/skills/tanstack-query-zod: true
   claude/agents/contradiction-finder: true
   claude/agents/doc-polisher: true
-  claude/agents/web-researcher: true
   claude/agents/frontend-convention-validator: true
-  claude/settings: true
+  claude/agents/web-researcher: true
   claude/hooks/dispatcher: true
   claude/hooks/eslint: true
   claude/hooks/prettier: true
   claude/hooks/ts-check: true
-
-  codex/skills/git-commit: true
-  codex/skills/write-pr: true
-  codex/skills/resolve-reviews: true
-  codex/skills/nextjs-fsd-architecture: true
-  codex/skills/nextjs-turborepo-fsd: true
-  codex/skills/nextjs-package-boundaries: true
-  codex/skills/tailwind-shadcn: true
-  codex/skills/tanstack-query-zod: true
+  claude/settings: true
+  claude/skills/git-commit: true
+  claude/skills/nextjs-fsd-architecture: true
+  claude/skills/nextjs-package-boundaries: true
+  claude/skills/nextjs-turborepo-fsd: true
+  claude/skills/resolve-reviews: true
+  claude/skills/tailwind-shadcn: true
+  claude/skills/tanstack-query-zod: true
+  claude/skills/write-pr: true
   codex/agents/contradiction-finder: true
   codex/agents/doc-polisher: true
-  codex/agents/web-researcher: true
   codex/agents/frontend-convention-validator: true
+  codex/agents/web-researcher: true
   codex/config: true
-  codex/hooks/dispatcher: true
   codex/hooks-json: true
+  codex/hooks/dispatcher: true
   codex/hooks/eslint: true
   codex/hooks/prettier: true
   codex/hooks/ts-check: true
-
-  nextjs/fsd/steiger-config: true
+  codex/skills/git-commit: true
+  codex/skills/nextjs-fsd-architecture: true
+  codex/skills/nextjs-package-boundaries: true
+  codex/skills/nextjs-turborepo-fsd: true
+  codex/skills/resolve-reviews: true
+  codex/skills/tailwind-shadcn: true
+  codex/skills/tanstack-query-zod: true
+  codex/skills/write-pr: true
   nextjs/fsd/dependency-check: true
-
-language: ko
+  nextjs/fsd/steiger-config: true
