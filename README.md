@@ -12,11 +12,17 @@ pnpm과 Turborepo로 관리하는 Next.js 멀티 앱 모노레포입니다.
 | `status` | `http://localhost:3003` |
 | `oauth`  | `http://localhost:3004` |
 
-각 앱은 `src/app`과 FSD 레이어(`entities`, `features`, `widgets`, `views`, `shared`)를 사용합니다.
+각 앱은 Next.js App Router와 FSD 레이어를 사용합니다.
+
+```text
+app → views → widgets → features → entities → shared
+```
+
+`app`은 라우팅·레이아웃·Provider를, 나머지 레이어는 앱별 도메인 코드를 담당합니다. 앱 간 직접 import는 허용하지 않습니다.
 
 ## 패키지
 
-- `@datagsm/core`: 공용 API 클라이언트, 인증, 환경 설정
+- `@datagsm/core`: 여러 앱이 함께 쓰는 하위 FSD 레이어(`entities`, `shared`)와 API 클라이언트, 인증, 환경 설정
 - `@datagsm/ui`: 공용 React UI와 스타일
 - `@datagsm/tailwind-config`: 공용 Tailwind·PostCSS 설정
 - `@datagsm/eslint-config`: 공용 ESLint 설정
@@ -24,7 +30,7 @@ pnpm과 Turborepo로 관리하는 Next.js 멀티 앱 모노레포입니다.
 
 ## 시작하기
 
-Node.js 24 이상과 pnpm 11을 사용합니다.
+Node.js 24 이상과 pnpm 12.3.4를 사용합니다.
 
 ```sh
 pnpm install
@@ -49,9 +55,12 @@ API_BASE_URL=http://localhost:8080 pnpm build
 # ESLint 검사
 pnpm lint
 
-# TypeScript 검사
-pnpm check-types
+# TypeScript 검사 (Next.js 설정에서 API_BASE_URL 필요)
+API_BASE_URL=http://localhost:8080 pnpm check-types
 
 # FSD 의존성 경계 검사
 pnpm lint:fsd
+
+# 포맷 검사
+pnpm format:check
 ```
