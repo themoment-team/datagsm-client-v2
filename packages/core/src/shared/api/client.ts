@@ -1,8 +1,8 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
+import { COOKIE_KEYS } from '../config/auth';
 import { deleteCookie, getCookie, setCookie } from '../lib/cookie';
 import { authUrl } from './endpoints';
-import { COOKIE_KEYS } from '../config/auth';
 
 type QueueEntry = {
   resolve: (token: string) => void;

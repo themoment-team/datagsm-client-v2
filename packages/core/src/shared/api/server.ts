@@ -2,9 +2,10 @@ import { cookies } from 'next/headers';
 
 import axios from 'axios';
 
-import 'server-only';
-import { API_BASE_URL } from '../config/env';
 import { COOKIE_KEYS } from '../config/auth';
+import { API_BASE_URL } from '../config/env';
+
+import 'server-only';
 
 export const serverAxiosInstance = axios.create({
   baseURL: API_BASE_URL,

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+
 import { Card, Gradient, TurborepoLogo } from '@datagsm/ui';
 
 const LINKS = [
