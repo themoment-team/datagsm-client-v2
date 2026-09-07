@@ -13,25 +13,25 @@
   "dependencies": {
     "@datagsm/core": "workspace:*",
     "@datagsm/ui": "workspace:*",
-    "@tanstack/react-query": "5.102.8",
-    "@tanstack/react-query-devtools": "5.102.8",
-    "geist": "1.7.2",
-    "next": "16.3.1",
-    "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "@tanstack/react-query": "catalog:",
+    "@tanstack/react-query-devtools": "catalog:",
+    "geist": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@datagsm/eslint-config": "workspace:*",
     "@datagsm/tailwind-config": "workspace:*",
     "@datagsm/typescript-config": "workspace:*",
-    "@next/eslint-plugin-next": "16.3.1",
-    "@tailwindcss/postcss": "4.3.3",
-    "@types/node": "26.2.0",
-    "@types/react": "19.2.18",
-    "@types/react-dom": "19.2.4",
-    "eslint": "10.8.1",
-    "postcss": "8.5.26",
-    "tailwindcss": "4.3.3",
+    "@next/eslint-plugin-next": "catalog:",
+    "@tailwindcss/postcss": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "eslint": "catalog:",
+    "postcss": "catalog:",
+    "tailwindcss": "catalog:",
     "typescript": "7.0.2"
   }
 }

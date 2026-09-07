@@ -22,16 +22,16 @@
     "lint": "eslint src --max-warnings 0"
   },
   "peerDependencies": {
-    "react": "19.2.8"
+    "react": "catalog:"
   },
   "devDependencies": {
     "@datagsm/eslint-config": "workspace:*",
     "@datagsm/tailwind-config": "workspace:*",
     "@datagsm/typescript-config": "workspace:*",
     "@tailwindcss/cli": "4.3.3",
-    "@types/react": "19.2.18",
-    "eslint": "10.8.1",
-    "tailwindcss": "4.3.3",
+    "@types/react": "catalog:",
+    "eslint": "catalog:",
+    "tailwindcss": "catalog:",
     "typescript": "7.0.2"
   }
 }

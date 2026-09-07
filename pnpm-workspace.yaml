@@ -2,5 +2,21 @@ packages:
   - 'apps/*'
   - 'packages/*'
 
+catalog:
+  '@next/eslint-plugin-next': 16.3.4
+  '@tailwindcss/postcss': 4.3.3
+  '@tanstack/react-query': 5.102.8
+  '@tanstack/react-query-devtools': 5.102.8
+  '@types/node': 26.4.1
+  '@types/react': 19.2.18
+  '@types/react-dom': 19.2.7
+  eslint: 10.10.0
+  geist: 1.7.2
+  next: 16.3.4
+  postcss: 8.5.28
+  react: 19.2.8
+  react-dom: 19.2.8
+  tailwindcss: 4.3.3
+
 allowBuilds:
   '@parcel/watcher': true
