@@ -2,29 +2,48 @@ name: CI
 
 on:
   pull_request:
-  push:
-    branches: [main]
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
-  verify:
+  lint-and-build:
+    name: Lint and Build
     runs-on: ubuntu-latest
     env:
       API_BASE_URL: http://localhost:8080
     steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v6
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          version: 11.22.0
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm format:check
-      - run: pnpm lint
-      - run: pnpm check-types
-      - run: pnpm lint:fsd
-      - run: pnpm build
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Prettier Check
+        run: pnpm format:check
+
+      - name: Run ESLint
+        run: pnpm lint
+
+      - name: Run FSD Lint
+        run: pnpm lint:fsd
+
+      - name: Type Check
+        run: pnpm check-types
+
+      - name: Build
+        run: pnpm build
