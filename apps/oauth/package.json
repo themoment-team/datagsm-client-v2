@@ -13,16 +13,18 @@
   "dependencies": {
     "@datagsm/core": "workspace:*",
     "@datagsm/ui": "workspace:*",
+    "@tanstack/react-query": "5.102.8",
+    "@tanstack/react-query-devtools": "5.102.8",
     "geist": "1.7.2",
     "next": "16.3.1",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "16.3.1",
     "@datagsm/eslint-config": "workspace:*",
     "@datagsm/tailwind-config": "workspace:*",
     "@datagsm/typescript-config": "workspace:*",
+    "@next/eslint-plugin-next": "16.3.1",
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "26.2.0",
     "@types/react": "19.2.18",

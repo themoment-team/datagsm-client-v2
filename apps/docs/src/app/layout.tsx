@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 
+import { Providers } from './providers';
+
 import '@datagsm/ui/styles.css';
 import './globals.css';
 
@@ -11,7 +13,9 @@ export const metadata: Metadata = {
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 };
