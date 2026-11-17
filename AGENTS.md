@@ -99,6 +99,7 @@ export { HomePage as default } from '@/_pages/home';
 ## 스타일링
 
 - Tailwind CSS v4다. 앱 진입점은 `src/_app/styles/globals.css`, 공통 디자인 토큰은 `@datagsm/tailwind-config/shared-styles.css`가 소유한다. 토큰은 `@theme`에 추가하고(`--color-background` → `bg-background`), 다른 전역 스타일 진입점을 만들지 않는다.
+- 글꼴은 본문 Pretendard(`font-sans`, 기본값), 코드 JetBrains Mono(`font-mono`)다. 둘 다 `@datagsm/tailwind-config/shared-styles.css`가 npm 패키지의 unicode-range 분할 CSS로 불러온다. 앱에서 `next/font`나 다른 글꼴 진입점을 따로 만들지 않는다.
 - 정적 클래스는 문자열 하나로 쓴다. `cn()`(`@datagsm/core/shared/lib`)은 조건부 클래스나 외부 `className` 병합이 있을 때만 쓴다.
 - 여러 곳에서 반복되는 클래스 조합은 컴포넌트로 뽑는다. 클래스 문자열을 상수로 빼지 않는다.
 - 크기·색 같은 variant가 있는 컴포넌트는 `cva`(class-variance-authority)로 정의하고 `VariantProps`로 props 타입을 만든다. 외부 `className`은 `cn(variants({ ... }), className)`으로 병합한다.
