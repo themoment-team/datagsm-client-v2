@@ -148,12 +148,13 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 
 - 서버 환경 변수는 `src/shared/config/env.ts` 한 곳에서 검증하고 `env`로 꺼내 쓴다. 앱 공통 변수와 오류 메시지는 `@datagsm/core/shared/config`의 `AppEnvSchema`가 소유하고, 앱은 `process.env` 값을 모아 `parseEnv`에 넘긴다. 앱 전용 변수는 `AppEnvSchema.extend({...})`로 더한다. 일반 기능은 `process.env`를 다른 곳에서 직접 읽지 않는다.
 - 새 변수를 추가하면 스키마(공통이면 core, 앱 전용이면 앱의 `extend`), `.env.example`, CI의 `env`를 함께 고친다.
-- 각 앱의 변수는 `API_BASE_URL`(필수, http(s) URL)이다. `API_BASE_URL`이 없으면 `dev`, `build`, `check-types`가 바로 실패한다.
+- status를 뺀 각 앱의 변수는 `API_BASE_URL`(필수, http(s) URL)이다. `API_BASE_URL`이 없으면 `dev`, `build`, `check-types`가 바로 실패한다.
+- status 앱은 상태를 확인할 서버 4개의 base URL(`STATUS_WEB_BASE_URL`, `STATUS_OPENAPI_BASE_URL`, `STATUS_OAUTH_AUTHORIZATION_BASE_URL`, `STATUS_OAUTH_RESOURCE_BASE_URL`, 모두 필수)만 받는다. DataGSM API를 호출하지 않으므로 `API_BASE_URL`, `/backend` rewrite, axios 인스턴스가 없다. 실제 주소는 공개하지 않으므로 `.env.example`과 CI에는 자리 표시용 값만 두고, 실제 값은 `.env.local`과 Vercel에만 넣는다. 상태 확인은 서버 컴포넌트에서 각 서버의 `GET /v1/health`를 요청해 2xx면 정상으로 보고, 응답 속도는 그 요청 앞뒤 시간만 잰다.
 - `env`는 서버에서만 읽는다. 클라이언트 컴포넌트에서 import하지 않는다.
 
 ## 보안 헤더와 배포
 
-- 모든 앱의 `next.config.ts`의 `headers()`가 모든 경로에 기본 보안 헤더(HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`)를 붙이고 `X-Powered-By`를 끈다. CSP는 넣지 않았다. 헤더를 바꾸거나 CSP를 더하면 모든 앱의 `e2e/security-headers.spec.ts`도 함께 고친다. 모든 앱의 `next.config.ts`는 같게 유지하고, 공통 부분을 바꾸면 모든 앱 파일에 똑같이 고친다.
+- 모든 앱의 `next.config.ts`의 `headers()`가 모든 경로에 기본 보안 헤더(HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`)를 붙이고 `X-Powered-By`를 끈다. CSP는 넣지 않았다. 헤더를 바꾸거나 CSP를 더하면 모든 앱의 `e2e/security-headers.spec.ts`도 함께 고친다. 모든 앱의 `next.config.ts`는 같게 유지하고, 공통 부분을 바꾸면 모든 앱 파일에 똑같이 고친다. 단 status는 `API_BASE_URL`을 쓰지 않아 `/backend` rewrite가 없다.
 - 앱을 추가하거나 지우면 앱 폴더 밖에서 앱 목록을 가진 곳도 함께 고친다: 루트 `package.json`의 `lint:fsd`, `.lintstagedrc.mjs`, `.prettierrc` overrides, 전용 스킬 `api-client`, 이 문서와 README. 새 앱은 기존 앱을 복제한 뒤 `package.json` 이름·포트, `playwright.config.ts` 포트, `layout.tsx` 메타, 홈 제목과 그 테스트를 바꾼다. 마지막에 `rg -n "oauth"`처럼 기존 앱 이름으로 검색해 빠진 곳이 없는지 확인한다.
 - 배포는 Vercel이다. 앱마다 Vercel 프로젝트를 하나씩 두고 Root Directory를 `apps/<앱>`으로 둔다. `API_BASE_URL`은 rewrite에 들어가 빌드 시 고정되므로 Vercel 프로젝트의 환경 변수로 넣고, 값을 바꾸면 다시 배포한다. Docker 이미지 빌드 설정은 두지 않는다.
 
@@ -184,7 +185,7 @@ pnpm test:e2e      # 처음에는 pnpm exec playwright install --with-deps chrom
 pnpm build         # API_BASE_URL 필요
 ```
 
-- `API_BASE_URL`은 `.env.local`이 있으면 거기서 읽힌다. 없으면 `API_BASE_URL=http://localhost:8080 pnpm build`처럼 명령 앞에 붙인다.
+- `API_BASE_URL`(status 앱은 `STATUS_*_BASE_URL` 4개)은 `.env.local`이 있으면 거기서 읽힌다. 없으면 `API_BASE_URL=http://localhost:8080 pnpm build`처럼 명령 앞에 붙인다.
 - FSD 경계, 공개 API, 서버·클라이언트 경계를 바꿨다면 최소한 `lint:fsd`, `check-types`, `build`를 확인한다.
 - 실행하지 못했거나 실패한 검사는 그대로 보고한다.
 

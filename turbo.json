@@ -6,29 +6,29 @@
     "dev": {
       "cache": false,
       "persistent": true,
-      "env": ["API_BASE_URL", "PORT"]
+      "env": ["API_BASE_URL", "STATUS_*", "PORT"]
     },
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**"],
-      "env": ["API_BASE_URL"]
+      "env": ["API_BASE_URL", "STATUS_*"]
     },
     "lint": {
       "dependsOn": ["^lint"]
     },
     "check-types": {
       "dependsOn": ["^check-types"],
-      "env": ["API_BASE_URL"]
+      "env": ["API_BASE_URL", "STATUS_*"]
     },
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"],
-      "env": ["API_BASE_URL"]
+      "env": ["API_BASE_URL", "STATUS_*"]
     },
     "test:e2e": {
       "dependsOn": ["^build"],
       "cache": false,
-      "env": ["API_BASE_URL", "CI"]
+      "env": ["API_BASE_URL", "STATUS_*", "CI"]
     }
   }
 }
