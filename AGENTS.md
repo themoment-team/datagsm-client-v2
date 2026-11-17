@@ -18,19 +18,16 @@ pnpm 12 / Next.js 16 (App Router, React Compiler) / React 19 / TypeScript 6 / Ta
 apps/{client,admin,docs,status,oauth,projects}/
 ├── app/                   얇은 Next 라우트 (layout, page, error, not-found, global-error)
 ├── src/
-│   ├── _app/              providers(TanStackProvider, MockProvider), global-error, styles/globals.css
+│   ├── _app/              providers(TanStackProvider), global-error, styles/globals.css
 │   ├── _pages/            home/ui/HomePage.tsx, error, not-found
 │   ├── widgets/           .gitkeep
 │   ├── features/          .gitkeep
 │   ├── entities/          .gitkeep
 │   └── shared/            api(앱별 연결), config(core 스키마로 env 검증)
-├── instrumentation.ts     서버 모킹 시작점
-├── public/mockServiceWorker.js
 └── e2e/                   Playwright 테스트
 packages/
 ├── core/                  widgets → features → entities → shared(앱 공유 FSD 레이어), API 팩토리·인터셉터·getQueryClient, env 스키마, cn
 ├── tailwind-config/       공통 CSS 토큰·@source, PostCSS
-├── mocks/                 handler, browser·node 시작 함수
 ├── typescript-config/     base, nextjs(앱), react-library(core)
 └── eslint-config/         base, next(앱), react(core)
 ```
@@ -145,19 +142,19 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 
 - 브라우저 요청은 `@/shared/api`, 서버(RSC, Server Function) 요청은 `@/shared/api/index.server`의 `get / post / patch / put / del`로 보낸다.
 - 요청 실패는 모두 `ApiError`로 던져진다. 401 응답에 연결할 동작은 `setOnUnauthorized`로 등록한다.
-- 개발 기본값은 MSW 모킹(`NEXT_PUBLIC_API_MOCKING=enabled`)이다. handler 추가, 모킹 배선, worker 재생성, 모킹 E2E는 [`api-mocking`](.agents/skills/api-mocking/SKILL.md) 스킬을 따른다.
+- API 모킹(MSW)은 두지 않는다. 개발은 `API_BASE_URL`로 실제 DataGSM 개발 서버에 붙는다. 컴포넌트 테스트에서 API 응답이 필요하면 `vi.mock`으로 API 함수를 바꾼다.
 
 ## 환경 변수
 
-- 서버 환경 변수는 `src/shared/config/env.ts` 한 곳에서 검증하고 `env`로 꺼내 쓴다. 앱 공통 변수와 오류 메시지는 `@datagsm/core/shared/config`의 `AppEnvSchema`가 소유하고, 앱은 `process.env` 값을 모아 `parseEnv`에 넘긴다. 앱 전용 변수는 `AppEnvSchema.extend({...})`로 더한다. 일반 기능은 `process.env`를 다른 곳에서 직접 읽지 않는다. 모킹 연결 파일의 `NEXT_PUBLIC_API_MOCKING` 빌드 시 분기만 예외이며 고치지 않는다(`api-mocking` 스킬).
+- 서버 환경 변수는 `src/shared/config/env.ts` 한 곳에서 검증하고 `env`로 꺼내 쓴다. 앱 공통 변수와 오류 메시지는 `@datagsm/core/shared/config`의 `AppEnvSchema`가 소유하고, 앱은 `process.env` 값을 모아 `parseEnv`에 넘긴다. 앱 전용 변수는 `AppEnvSchema.extend({...})`로 더한다. 일반 기능은 `process.env`를 다른 곳에서 직접 읽지 않는다.
 - 새 변수를 추가하면 스키마(공통이면 core, 앱 전용이면 앱의 `extend`), `.env.example`, CI의 `env`를 함께 고친다.
-- 각 앱의 변수는 `API_BASE_URL`(필수, http(s) URL)과 `NEXT_PUBLIC_API_MOCKING`(선택, `enabled` 또는 `disabled`)이다. `API_BASE_URL`이 없으면 `dev`, `build`, `check-types`가 바로 실패한다.
+- 각 앱의 변수는 `API_BASE_URL`(필수, http(s) URL)이다. `API_BASE_URL`이 없으면 `dev`, `build`, `check-types`가 바로 실패한다.
 - `env`는 서버에서만 읽는다. 클라이언트 컴포넌트에서 import하지 않는다.
 
 ## 보안 헤더와 배포
 
 - 모든 앱의 `next.config.ts`의 `headers()`가 모든 경로에 기본 보안 헤더(HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`)를 붙이고 `X-Powered-By`를 끈다. CSP는 넣지 않았다. 헤더를 바꾸거나 CSP를 더하면 모든 앱의 `e2e/security-headers.spec.ts`도 함께 고친다. 모든 앱의 `next.config.ts`는 같게 유지하고, 공통 부분을 바꾸면 모든 앱 파일에 똑같이 고친다.
-- 앱을 추가하거나 지우면 앱 폴더 밖에서 앱 목록을 가진 곳도 함께 고친다: 루트 `package.json`의 `lint:fsd`, `.lintstagedrc.mjs`, `.prettierrc` overrides, `packages/mocks/package.json`의 `msw.workerDirectory`, `Dockerfile`의 `APP` 검사와 `EXPOSE`, 전용 스킬 `api-client`·`api-mocking`, 이 문서와 README. 새 앱은 기존 앱을 복제한 뒤 `package.json` 이름·포트, `playwright.config.ts` 포트(앱 포트 + 100), `layout.tsx` 메타, 홈 제목과 그 테스트를 바꾼다. 마지막에 `rg -n "oauth"`처럼 기존 앱 이름으로 검색해 빠진 곳이 없는지 확인한다.
+- 앱을 추가하거나 지우면 앱 폴더 밖에서 앱 목록을 가진 곳도 함께 고친다: 루트 `package.json`의 `lint:fsd`, `.lintstagedrc.mjs`, `.prettierrc` overrides, `Dockerfile`의 `APP` 검사와 `EXPOSE`, 전용 스킬 `api-client`, 이 문서와 README. 새 앱은 기존 앱을 복제한 뒤 `package.json` 이름·포트, `playwright.config.ts` 포트, `layout.tsx` 메타, 홈 제목과 그 테스트를 바꾼다. 마지막에 `rg -n "oauth"`처럼 기존 앱 이름으로 검색해 빠진 곳이 없는지 확인한다.
 - 루트 `Dockerfile` 하나로 각 앱을 빌드한다(`--build-arg APP=client`, `admin`, `docs`, `status`, `oauth`, `projects`). `API_BASE_URL`은 rewrite에 들어가 빌드 시 고정되므로 `--build-arg`로 넘기고, 주소가 바뀌면 이미지를 다시 만든다. 빌드·실행 명령은 README에 있다.
 
 ## 데이터와 폼
@@ -170,7 +167,7 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 ## 테스트
 
 - 단위 테스트는 대상 파일 옆에 `*.test.ts(x)`로 둔다(Vitest, jsdom, Testing Library).
-- E2E 테스트는 `e2e/*.spec.ts`에 둔다(Playwright). 모킹을 끈 검사는 앱을 빌드해 띄운 뒤(3000~3005) 돌고 모킹을 켠 검사만 개발 서버(3100~3105)에서 돈다. 외부 API 없이 통과해야 한다.
+- E2E 테스트는 `e2e/*.spec.ts`에 둔다(Playwright). 앱을 빌드해 띄운 뒤(3000~3005) 돈다. CI에는 백엔드가 없으므로 E2E는 API 응답 없이 통과하는 화면(홈, 404, 보안 헤더 등)만 다룬다. 서버 데이터가 필요한 E2E를 CI에서 돌려야 하면 그때 모킹 도입을 결정한다.
 - 동작을 바꾸면 그 동작을 확인하는 테스트를 함께 고치거나 추가한다.
 
 ## 검증
@@ -187,7 +184,7 @@ pnpm test:e2e      # 처음에는 pnpm exec playwright install --with-deps chrom
 pnpm build         # API_BASE_URL 필요
 ```
 
-- `API_BASE_URL`은 `.env.local`이 있으면 거기서 읽힌다. 없으면 `API_BASE_URL=http://localhost:8080 NEXT_PUBLIC_API_MOCKING=disabled pnpm build`처럼 명령 앞에 붙인다.
+- `API_BASE_URL`은 `.env.local`이 있으면 거기서 읽힌다. 없으면 `API_BASE_URL=http://localhost:8080 pnpm build`처럼 명령 앞에 붙인다.
 - FSD 경계, 공개 API, 서버·클라이언트 경계를 바꿨다면 최소한 `lint:fsd`, `check-types`, `build`를 확인한다.
 - 실행하지 못했거나 실패한 검사는 그대로 보고한다.
 
@@ -197,7 +194,7 @@ pnpm build         # API_BASE_URL 필요
 - `.env.local`을 비롯한 환경·자격 증명 파일은 열거나 출력하지 않는다. 필요한 값은 `.env.example`과 `src/shared/config/env.ts`에서 확인한다.
 - 이 파일의 규칙 중 도구가 검사하는 것(ESLint, Prettier, steiger, tsc)은 도구 결과를 근거로 판단한다.
 - 작업 절차는 `.agents/skills/`(Codex)와 `.claude/skills/`(Claude Code)에 있다. 두 폴더와 `.codex/`, `.claude/agents`, `.claude/hooks`, `steiger.config.mjs`는 팀 하네스(themoment-ai-harness-sync)가 동기화하므로 이 레포에서 직접 고치지 않는다. 바꿀 내용은 하네스 레포에 반영한다.
-- 이 레포 전용 스킬은 `api-client`, `api-mocking` 두 개이며 두 폴더에 같은 내용으로 둔다.
+- 이 레포 전용 스킬은 `api-client`이며 두 폴더에 같은 내용으로 둔다.
 
 | 스킬                      | 쓰는 때                                                       |
 | ------------------------- | ------------------------------------------------------------- |
@@ -209,6 +206,5 @@ pnpm build         # API_BASE_URL 필요
 | `data-and-forms`          | 서버 데이터 조회·변경, 폼을 만들 때                           |
 | `tailwind-shadcn`         | Tailwind 클래스, 토큰, 공통 UI 위치를 정할 때                 |
 | `api-client`              | API 요청 코드·에러 처리를 쓰거나 401 처리에 인증을 붙일 때    |
-| `api-mocking`             | mock handler, 모킹 배선, 모킹 E2E를 바꿀 때                   |
 
 - 변경을 도구가 못 잡는 컨벤션 기준으로 검토할 때는 `frontend-convention-validator` 에이전트를 쓴다.

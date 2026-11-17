@@ -21,7 +21,7 @@ pnpm dev
 | oauth    | `http://localhost:3004` | OAuth       |
 | projects | `http://localhost:3005` | 프로젝트    |
 
-기본 환경에서는 MSW가 브라우저와 서버 요청을 모킹하므로 백엔드 없이 각 홈을 확인할 수 있다.
+API 모킹은 두지 않는다. 각 앱의 `.env.local`에서 `API_BASE_URL`을 사용할 DataGSM 백엔드(개발 서버 또는 로컬) 주소로 바꾼다.
 
 ## 구조
 
@@ -35,12 +35,10 @@ apps/
 └── projects/               프로젝트 (3005)
     ├── app/                얇은 Next 라우트, 오류 화면(error, not-found, global-error)
     ├── src/                _app → _pages → widgets → features → entities → shared
-    ├── instrumentation.ts  서버 모킹 시작점
-    └── e2e/                홈과 모킹 켜기·끄기 검사
+    └── e2e/                홈, 404, 보안 헤더 검사
 packages/
 ├── core/                   공통 widgets·features·entities·shared(API 팩토리와 QueryClient, 공통 env 스키마, cn)
 ├── tailwind-config/        공통 @theme·@source, PostCSS
-├── mocks/                  공통 handler와 브라우저·서버 모킹 시작 함수
 ├── typescript-config/      TypeScript 공통 설정(base, nextjs, react-library)
 └── eslint-config/          ESLint 공통 설정(base, next, react)
 ```
@@ -51,20 +49,11 @@ packages/
 
 앱마다 `.env.example`을 제공한다. 실제 환경 파일은 커밋하지 않는다.
 
-| 변수                      | 설명                                                              | 예시 / 기본값                                   |
-| ------------------------- | ----------------------------------------------------------------- | ----------------------------------------------- |
-| `API_BASE_URL`            | 필수 http(s) 백엔드 주소. 서버 요청과 `/backend/*` rewrite에 사용 | `http://localhost:8080`                         |
-| `NEXT_PUBLIC_API_MOCKING` | `enabled`일 때만 모킹. 선택 값은 `enabled`, `disabled`            | `.env.example`은 `enabled`, 미설정은 `disabled` |
+| 변수           | 설명                                                              | 예시 / 기본값           |
+| -------------- | ----------------------------------------------------------------- | ----------------------- |
+| `API_BASE_URL` | 필수 http(s) 백엔드 주소. 서버 요청과 `/backend/*` rewrite에 사용 | `http://localhost:8080` |
 
 검증은 앱별 `src/shared/config/env.ts`가 하고, 공통 스키마는 `@datagsm/core/shared/config`의 `AppEnvSchema`다. 브라우저 요청은 `@/shared/api`의 `/backend` 경로를 쓰고, 서버 요청은 `@/shared/api/index.server`를 쓴다. `/api/*`는 Next Route Handler용이다.
-
-## API 모킹
-
-- handler는 `packages/mocks/src/handlers.ts` 한 곳에 둔다. 모킹할 endpoint마다 handler를 추가한다. 기본 예시는 `GET /health` → `{ status: 'mocked' }` 하나다.
-- 앱의 MockProvider는 worker가 시작된 뒤 children을 렌더한다. `instrumentation.ts`는 Node 서버 모킹을 시작한다. mocks 패키지는 env를 읽지 않고 base URL을 인자로 받는다.
-- `NEXT_PUBLIC_API_MOCKING`은 빌드 시 고정된다. 운영에서는 변수를 빼거나 `disabled`로 설정하고 다시 빌드한다. 실행 시점에만 값을 바꿔서는 이미 만든 브라우저 번들을 바꿀 수 없다.
-- MSW를 올린 뒤 `pnpm --filter @datagsm/mocks exec msw init`으로 모든 앱의 `public/mockServiceWorker.js`를 재생성한다.
-- 홈의 `서버 요청: mocked`, `브라우저 요청: mocked`은 배선 확인용이다. 실제 화면·API를 붙이며 제거할 때 `mocking-on.spec.ts`도 함께 바꾼다.
 
 ## 오류 화면과 보안 헤더
 
@@ -85,7 +74,7 @@ docker run --rm -p 3000:3000 -e API_BASE_URL=https://api.example.com datagsm-cli
 다른 앱은 `APP`을 `admin`, `docs`, `status`, `oauth`, `projects`로 바꾸고 해당 포트(3001~3005)를 연결한다.
 
 - `API_BASE_URL`은 `/backend/*` rewrite에 들어가 빌드할 때 고정된다. API 주소가 바뀌면 이미지를 다시 만든다. 실행할 때도 환경 변수 검증에 필요하므로 같은 값을 넘긴다. 컨테이너 안에서 접근할 수 있는 주소여야 한다.
-- 이미지는 모킹을 끈 상태(`NEXT_PUBLIC_API_MOCKING=disabled`)로 빌드·실행된다. 컨테이너 포트는 앱 포트(3000~3005)와 같다.
+- 컨테이너 포트는 앱 포트(3000~3005)와 같다.
 - Node 24, pnpm 12.18.0 기반 다단계 빌드(`turbo prune --docker`)이며 `node` 사용자로 `pnpm start`를 실행한다. `output: 'standalone'`은 쓰지 않는다.
 
 ## 의존성 업데이트
@@ -112,14 +101,14 @@ pnpm test:e2e
 pnpm build
 ```
 
-`check-types`, `build`에는 `API_BASE_URL`이 필요하다. 환경 파일 없이 검사하려면 `API_BASE_URL=http://localhost:8080 NEXT_PUBLIC_API_MOCKING=disabled pnpm build`처럼 명령 앞에 전달한다. `.github/workflows/ci.yml`은 같은 게이트를 실행하며 운영 빌드의 모킹을 명시적으로 끈다.
+`check-types`, `build`에는 `API_BASE_URL`이 필요하다. 환경 파일 없이 검사하려면 `API_BASE_URL=http://localhost:8080 pnpm build`처럼 명령 앞에 전달한다. `.github/workflows/ci.yml`은 같은 게이트를 실행한다.
 
 - `lint:fsd`: 모든 앱과 core의 FSD 경계 검사.
 - `test`: Vitest 단위 테스트.
-- `test:e2e`: 앱마다 Playwright가 서버 두 개를 직접 띄운다. `chromium` 프로젝트는 모킹을 끈 빌드·운영 서버(3000~3005), `mocking` 프로젝트는 모킹을 켠 개발 서버(3100~3105)를 사용한다. 백엔드는 필요 없으며 이 포트들은 비워 둔다.
+- `test:e2e`: 앱마다 Playwright가 빌드한 운영 서버(3000~3005)를 직접 띄운다. 백엔드 없이 통과하는 화면만 검사하며 이 포트들은 비워 둔다.
 - `build`: 모든 앱 빌드와 core 클래스·앱 전용 토큰이 CSS에 포함됐는지 검사.
 - `format`: Prettier 자동 수정.
 
 ## 에이전트와 작업 양식
 
-규칙은 `AGENTS.md`, Claude 진입점은 `CLAUDE.md`다. 스킬·에이전트·hook과 `steiger.config.mjs`는 팀 하네스([themoment-ai-harness-sync](https://github.com/themoment-team/themoment-ai-harness-sync))가 `.harness/sync.yml` 설정대로 동기화한다. 이 레포 전용 스킬은 `api-client`, `api-mocking`이다.
+규칙은 `AGENTS.md`, Claude 진입점은 `CLAUDE.md`다. 스킬·에이전트·hook과 `steiger.config.mjs`는 팀 하네스([themoment-ai-harness-sync](https://github.com/themoment-team/themoment-ai-harness-sync))가 `.harness/sync.yml` 설정대로 동기화한다. 이 레포 전용 스킬은 `api-client`다.
