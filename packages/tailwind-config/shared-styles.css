@@ -1,8 +1,19 @@
 @import 'tailwindcss';
+/* 본문은 Pretendard, 코드는 JetBrains Mono를 쓴다. 둘 다 unicode-range로 나뉜 파일이라 화면에 쓰인 글자의 조각만 받는다.
+   Pretendard는 한글 전체가 든 파일 하나가 2MB라 next/font/local 대신 dynamic subset CSS를 쓴다. */
+@import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+@import '@fontsource-variable/jetbrains-mono';
 
 @source '../core/src';
 
 @theme {
   --color-background: #ffffff;
   --color-foreground: #171717;
+
+  --font-sans:
+    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui,
+    'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --font-mono:
+    'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono',
+    monospace;
 }
