@@ -7,12 +7,19 @@ const STATUS_BASE_URLS = {
   STATUS_OAUTH_RESOURCE_BASE_URL: 'http://localhost:8084',
 };
 
+const APP_URLS = {
+  APP_CLIENT_URL: 'http://localhost:3000',
+  APP_DOCS_URL: 'http://localhost:3002',
+  APP_STATUS_URL: 'http://localhost:3003',
+  APP_PROJECTS_URL: 'http://localhost:3005',
+};
+
 // env.ts는 불러오는 시점에 검증하므로, 케이스마다 모듈을 새로 불러온다.
 // 케이스마다 올바른 값을 먼저 넣어 두고, 확인할 변수 하나만 바꾼다.
 beforeEach(() => {
   vi.resetModules();
 
-  for (const [key, value] of Object.entries(STATUS_BASE_URLS)) {
+  for (const [key, value] of Object.entries({ ...STATUS_BASE_URLS, ...APP_URLS })) {
     vi.stubEnv(key, value);
   }
 });
@@ -20,7 +27,7 @@ beforeEach(() => {
 it('상태 서버 base URL이 모두 올바르면 값을 그대로 준다', async () => {
   const { env } = await import('./env');
 
-  expect(env).toEqual(STATUS_BASE_URLS);
+  expect(env).toEqual({ ...STATUS_BASE_URLS, ...APP_URLS });
 });
 
 it.each(Object.keys(STATUS_BASE_URLS))('%s가 없으면 throw한다', async (key) => {
@@ -43,4 +50,10 @@ it('API_BASE_URL은 받지 않는다', async () => {
   const { env } = await import('./env');
 
   expect(env).not.toHaveProperty('API_BASE_URL');
+});
+
+it('사이드바 앱 주소가 없으면 throw한다', async () => {
+  vi.stubEnv('APP_PROJECTS_URL', undefined);
+
+  await expect(import('./env')).rejects.toThrow('APP_PROJECTS_URL: 값이 없습니다');
 });

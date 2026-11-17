@@ -23,6 +23,10 @@ export default defineConfig({
     command: `pnpm build && pnpm start --port ${port}`,
     url: baseURL,
     env: {
+      APP_CLIENT_URL: 'http://localhost:3000',
+      APP_DOCS_URL: 'http://localhost:3002',
+      APP_STATUS_URL: 'http://localhost:3003',
+      APP_PROJECTS_URL: 'http://localhost:3005',
       // 상태 서버는 띄우지 않는다. 화면은 모든 서버를 장애로 표시하고, 검사는 그 상태에서도 통과해야 한다.
       STATUS_WEB_BASE_URL: 'http://localhost:8081',
       STATUS_OPENAPI_BASE_URL: 'http://localhost:8082',
