@@ -37,7 +37,7 @@ apps/
     ├── src/                _app → _pages → widgets → features → entities → shared
     └── e2e/                홈, 404, 보안 헤더 검사
 packages/
-├── core/                   공통 widgets·features·entities·shared(API 팩토리와 QueryClient, 공통 env 스키마, cn)
+├── core/                   공통 widgets·features·entities·shared(공용 사이드바 레이아웃, API 팩토리와 QueryClient, 공통 env 스키마, cn)
 ├── tailwind-config/        공통 @theme·@source, PostCSS
 ├── typescript-config/      TypeScript 공통 설정(base, nextjs, react-library)
 └── eslint-config/          ESLint 공통 설정(base, next, react)
@@ -49,10 +49,11 @@ packages/
 
 앱마다 `.env.example`을 제공한다. 실제 환경 파일은 커밋하지 않는다.
 
-| 변수                | 설명                                                                                                                                                                       | 예시 / 기본값                                   |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `API_BASE_URL`      | 필수 http(s) 백엔드 주소. 서버 요청과 `/backend/*` rewrite에 사용                                                                                                          | `http://localhost:8080`                         |
-| `STATUS_*_BASE_URL` | status 앱만 쓴다(status는 `API_BASE_URL`을 쓰지 않는다). 상태를 확인할 서버 4개(Web, OpenAPI, OAuth Authorization, OAuth Resource)의 base URL. 실제 주소는 공개하지 않는다 | `.env.example`은 `http://localhost:8081`~`8084` |
+| 변수                | 설명                                                                                                                                                                       | 예시 / 기본값                                                                                                  |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `API_BASE_URL`      | 필수 http(s) 백엔드 주소. 서버 요청과 `/backend/*` rewrite에 사용                                                                                                          | `http://localhost:8080`                                                                                        |
+| `STATUS_*_BASE_URL` | status 앱만 쓴다(status는 `API_BASE_URL`을 쓰지 않는다). 상태를 확인할 서버 4개(Web, OpenAPI, OAuth Authorization, OAuth Resource)의 base URL. 실제 주소는 공개하지 않는다 | `.env.example`은 `http://localhost:8081`~`8084`                                                                |
+| `APP_*_URL`         | client·docs·status·projects. 공용 사이드바에서 서로 이동할 앱 주소 4개(`APP_CLIENT_URL`, `APP_DOCS_URL`, `APP_STATUS_URL`, `APP_PROJECTS_URL`)                             | 로컬은 `http://localhost:3000`·`3002`·`3003`·`3005`, 운영은 `https://datagsm.kr`, `https://docs.datagsm.kr` 등 |
 
 검증은 앱별 `src/shared/config/env.ts`가 하고, 공통 스키마는 `@datagsm/core/shared/config`의 `AppEnvSchema`다. 브라우저 요청은 `@/shared/api`의 `/backend` 경로를 쓰고, 서버 요청은 `@/shared/api/index.server`를 쓴다. `/api/*`는 Next Route Handler용이다.
 
@@ -69,7 +70,7 @@ Vercel에 앱마다 프로젝트를 하나씩 만들어 배포한다.
 
 - 같은 저장소를 연결하고 Root Directory를 `apps/client`, `apps/admin`처럼 앱 폴더로 지정한다. Framework Preset은 Next.js, Node.js는 24다.
 - 설치는 Vercel이 저장소 루트의 pnpm workspace를 인식해 처리한다. 빌드 명령은 앱의 `build` 스크립트(`next build`와 빌드 CSS 검사)를 그대로 쓴다.
-- `API_BASE_URL`을 각 프로젝트의 Environment Variables에 환경(Production, Preview)별로 넣는다. status 프로젝트에는 대신 `STATUS_*_BASE_URL` 4개를 넣는다. `/backend/*` rewrite에 들어가 빌드할 때 고정되므로, 값을 바꾸면 다시 배포해야 반영된다.
+- `API_BASE_URL`을 각 프로젝트의 Environment Variables에 환경(Production, Preview)별로 넣는다. status 프로젝트에는 대신 `STATUS_*_BASE_URL` 4개를 넣는다. client·docs·status·projects 프로젝트에는 `APP_*_URL` 4개도 넣는다. `/backend/*` rewrite에 들어가 빌드할 때 고정되므로, 값을 바꾸면 다시 배포해야 반영된다.
 
 ## 의존성 업데이트
 
