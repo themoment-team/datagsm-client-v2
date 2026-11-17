@@ -106,4 +106,4 @@ pnpm build
 
 ## 에이전트와 작업 양식
 
-규칙은 `AGENTS.md`, Claude 진입점은 `CLAUDE.md`다. 스킬·에이전트·hook과 `steiger.config.mjs`는 팀 하네스([themoment-ai-harness-sync](https://github.com/themoment-team/themoment-ai-harness-sync))가 `.harness/sync.yml` 설정대로 동기화한다. 이 레포 전용 스킬은 `api-client`다.
+규칙은 `AGENTS.md`, Claude 진입점은 `CLAUDE.md`다. 스킬·에이전트·hook과 `steiger.config.mjs`는 팀 하네스([themoment-ai-harness-sync](https://github.com/themoment-team/themoment-ai-harness-sync))가 `.harness/sync.yml` 설정대로 동기화한다.

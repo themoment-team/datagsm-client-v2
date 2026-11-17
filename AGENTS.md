@@ -157,7 +157,7 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 ## 보안 헤더와 배포
 
 - 모든 앱의 `next.config.ts`의 `headers()`가 모든 경로에 기본 보안 헤더(HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`)를 붙이고 `X-Powered-By`를 끈다. CSP는 넣지 않았다. 헤더를 바꾸거나 CSP를 더하면 모든 앱의 `e2e/security-headers.spec.ts`도 함께 고친다. 모든 앱의 `next.config.ts`는 같게 유지하고, 공통 부분을 바꾸면 모든 앱 파일에 똑같이 고친다. 단 status는 `API_BASE_URL`을 쓰지 않아 `/backend` rewrite가 없다.
-- 앱을 추가하거나 지우면 앱 폴더 밖에서 앱 목록을 가진 곳도 함께 고친다: 루트 `package.json`의 `lint:fsd`, `.lintstagedrc.mjs`, `.prettierrc` overrides, 사이드바로 오가는 앱이면 core의 `AppId`·`AppUrlsEnvSchema`·사용자 메뉴와 CI·Playwright의 `APP_*_URL`, 전용 스킬 `api-client`, 이 문서와 README. 새 앱은 기존 앱을 복제한 뒤 `package.json` 이름·포트, `playwright.config.ts` 포트, `layout.tsx` 메타, 홈 제목과 그 테스트를 바꾼다. 마지막에 `rg -n "oauth"`처럼 기존 앱 이름으로 검색해 빠진 곳이 없는지 확인한다.
+- 앱을 추가하거나 지우면 앱 폴더 밖에서 앱 목록을 가진 곳도 함께 고친다: 루트 `package.json`의 `lint:fsd`, `.lintstagedrc.mjs`, `.prettierrc` overrides, 사이드바로 오가는 앱이면 core의 `AppId`·`AppUrlsEnvSchema`·사용자 메뉴와 CI·Playwright의 `APP_*_URL`, 이 문서와 README. 새 앱은 기존 앱을 복제한 뒤 `package.json` 이름·포트, `playwright.config.ts` 포트, `layout.tsx` 메타, 홈 제목과 그 테스트를 바꾼다. 마지막에 `rg -n "oauth"`처럼 기존 앱 이름으로 검색해 빠진 곳이 없는지 확인한다.
 - 배포는 Vercel이다. 앱마다 Vercel 프로젝트를 하나씩 두고 Root Directory를 `apps/<앱>`으로 둔다. `API_BASE_URL`은 rewrite에 들어가 빌드 시 고정되므로 Vercel 프로젝트의 환경 변수로 넣고, 값을 바꾸면 다시 배포한다. Docker 이미지 빌드 설정은 두지 않는다.
 
 ## 데이터와 폼
@@ -194,20 +194,23 @@ pnpm build         # API_BASE_URL 필요
 ## 에이전트 작업 규칙
 
 - 커밋, 푸시, PR 생성, 리뷰 답글은 사용자가 요청한 경우에만 한다. 기존 브랜치와 작업 트리의 변경을 보존한다.
+- 기본 작업 브랜치는 `develop`이다. 새 작업은 `develop`에서 브랜치를 만들어 `develop`으로 PR을 올린다(`git-commit`, `write-pr` 스킬의 Git Flow).
 - `.env.local`을 비롯한 환경·자격 증명 파일은 열거나 출력하지 않는다. 필요한 값은 `.env.example`과 `src/shared/config/env.ts`에서 확인한다.
 - 이 파일의 규칙 중 도구가 검사하는 것(ESLint, Prettier, steiger, tsc)은 도구 결과를 근거로 판단한다.
-- 작업 절차는 `.agents/skills/`(Codex)와 `.claude/skills/`(Claude Code)에 있다. 두 폴더와 `.codex/`, `.claude/agents`, `.claude/hooks`, `steiger.config.mjs`는 팀 하네스(themoment-ai-harness-sync)가 동기화하므로 이 레포에서 직접 고치지 않는다. 바꿀 내용은 하네스 레포에 반영한다.
-- 이 레포 전용 스킬은 `api-client`이며 두 폴더에 같은 내용으로 둔다.
+- 작업 절차는 `.agents/skills/`(Codex)와 `.claude/skills/`(Claude Code)에 있다. Gemini CLI는 `.gemini/settings.json`에 따라 이 파일을 읽는다. 이 폴더들과 `.codex/`, `.claude/agents`, `.claude/hooks`, `.claude/settings.json`, `.gemini/`, `steiger.config.mjs`는 팀 하네스(themoment-ai-harness-sync)가 `.harness/sync.yml` 설정대로 동기화하므로 이 레포에서 직접 고치지 않는다. 바꿀 내용은 하네스 레포에 반영한다.
 
-| 스킬                      | 쓰는 때                                                       |
-| ------------------------- | ------------------------------------------------------------- |
-| `git-commit`              | 변경을 논리 단위로 나눠 커밋할 때                             |
-| `write-pr`                | 커밋을 바탕으로 PR을 만들 때                                  |
-| `resolve-reviews`         | PR 리뷰 코멘트를 판단하고 반영할 때                           |
-| `nextjs-fsd-architecture` | 레이어·slice를 정하거나 구조, 앱과 패키지 사이 공유를 바꿀 때 |
-| `react-conventions`       | 파일·타입 이름, 컴포넌트 모양을 정할 때                       |
-| `data-and-forms`          | 서버 데이터 조회·변경, 폼을 만들 때                           |
-| `tailwind-shadcn`         | Tailwind 클래스, 토큰, 공통 UI 위치를 정할 때                 |
-| `api-client`              | API 요청 코드·에러 처리를 쓰거나 401 처리에 인증을 붙일 때    |
+| 스킬                      | 쓰는 때                                                         |
+| ------------------------- | --------------------------------------------------------------- |
+| `git-commit`              | 변경을 논리 단위로 나눠 커밋할 때                               |
+| `write-pr`                | 커밋을 바탕으로 PR을 만들 때                                    |
+| `resolve-reviews`         | PR 리뷰 코멘트를 판단하고 반영할 때                             |
+| `nextjs-fsd-architecture` | 레이어·slice를 정하거나 구조, 앱과 패키지 사이 공유를 바꿀 때   |
+| `react-conventions`       | 파일·타입 이름, 컴포넌트 모양을 정할 때                         |
+| `data-and-forms`          | 서버 데이터 조회·변경, 폼을 만들 때                             |
+| `tailwind-shadcn`         | Tailwind 클래스, 토큰, 공통 UI 위치를 정할 때                   |
+| `react-best-practices`    | React·Next 코드의 렌더링·데이터 요청·번들 성능을 볼 때          |
+| `ponytail`                | 가장 작은 변경으로 해결하고 과한 설계를 줄일 때                 |
+| `ponytail-audit`          | 레포 전체의 버그·보안·지울 코드를 점검할 때(코드는 바꾸지 않음) |
+| `humanizer`               | 문서·PR 본문 같은 글에서 AI 문투를 걷어낼 때                    |
 
 - 변경을 도구가 못 잡는 컨벤션 기준으로 검토할 때는 `frontend-convention-validator` 에이전트를 쓴다.
