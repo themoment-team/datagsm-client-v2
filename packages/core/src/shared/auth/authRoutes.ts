@@ -1,11 +1,19 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import type { OauthEnv } from '../config';
-import { CALLBACK_PATH, LOGIN_FLOW_COOKIE, LOGIN_FLOW_MAX_AGE_SECONDS } from './authCookies';
-import { buildAuthorizeUrl, exchangeCodeForTokens } from './oauthClient';
-import { createCodeChallenge, createRandomToken } from './pkce';
-import { toSafeReturnTo } from './returnTo';
-import { clearTokenCookies, setTokenCookies } from './tokenCookies';
+import {
+  CALLBACK_PATH,
+  clearTokenCookies,
+  cookieOptions,
+  LOGIN_FLOW_COOKIE,
+  setTokenCookies,
+} from './cookies';
+import {
+  buildAuthorizeUrl,
+  createCodeChallenge,
+  createRandomToken,
+  exchangeCodeForTokens,
+} from './oauth';
 
 interface LoginFlow {
   state: string;
@@ -13,25 +21,28 @@ interface LoginFlow {
   returnTo: string;
 }
 
-const isHttps = (request: NextRequest) => request.nextUrl.protocol === 'https:';
+// 로그인 뒤 돌아갈 경로는 같은 앱 안의 경로만 허용한다. 외부 주소로 보내는 open redirect를 막는다.
+export const toSafeReturnTo = (value: unknown) =>
+  typeof value === 'string' &&
+  value.startsWith('/') &&
+  !value.startsWith('//') &&
+  !value.startsWith('/\\')
+    ? value
+    : '/';
 
 const readLoginFlow = (request: NextRequest): LoginFlow | null => {
-  const raw = request.cookies.get(LOGIN_FLOW_COOKIE)?.value;
-
-  if (!raw) {
-    return null;
-  }
-
   try {
-    const flow = JSON.parse(raw) as Partial<LoginFlow>;
+    const flow = JSON.parse(request.cookies.get(LOGIN_FLOW_COOKIE)?.value ?? '');
 
-    return typeof flow.state === 'string' && typeof flow.codeVerifier === 'string'
-      ? {
-          state: flow.state,
-          codeVerifier: flow.codeVerifier,
-          returnTo: toSafeReturnTo(flow.returnTo),
-        }
-      : null;
+    if (typeof flow.state !== 'string' || typeof flow.codeVerifier !== 'string') {
+      return null;
+    }
+
+    return {
+      state: flow.state,
+      codeVerifier: flow.codeVerifier,
+      returnTo: toSafeReturnTo(flow.returnTo),
+    };
   } catch {
     return null;
   }
@@ -40,6 +51,16 @@ const readLoginFlow = (request: NextRequest): LoginFlow | null => {
 // 콜백 주소는 요청이 들어온 앱 주소로 만든다. 인가 서버의 client에 앱마다 이 주소를 등록해 둔다.
 const callbackUrl = (request: NextRequest) =>
   new URL(CALLBACK_PATH, request.nextUrl.origin).toString();
+
+// 콜백의 응답이다. 임시 쿠키는 일회성이라 성공·실패와 상관없이 지운다.
+const callbackResponse = (response: NextResponse) => {
+  response.cookies.delete({ name: LOGIN_FLOW_COOKIE, path: CALLBACK_PATH });
+
+  return response;
+};
+
+const callbackFailure = (message: string, status: number) =>
+  callbackResponse(new NextResponse(message, { status }));
 
 // client·admin이 같은 동작을 쓰므로 core가 Route Handler를 만들고, 앱은 검증한 env만 넘긴다.
 export const createAuthRoutes = (env: OauthEnv) => {
@@ -55,13 +76,11 @@ export const createAuthRoutes = (env: OauthEnv) => {
     });
 
     const response = NextResponse.redirect(authorizeUrl);
-    response.cookies.set(LOGIN_FLOW_COOKIE, JSON.stringify({ state, codeVerifier, returnTo }), {
-      httpOnly: true,
-      secure: isHttps(request),
-      sameSite: 'lax',
-      path: CALLBACK_PATH,
-      maxAge: LOGIN_FLOW_MAX_AGE_SECONDS,
-    });
+    response.cookies.set(
+      LOGIN_FLOW_COOKIE,
+      JSON.stringify({ state, codeVerifier, returnTo }),
+      cookieOptions(request, 600, CALLBACK_PATH),
+    );
 
     return response;
   };
@@ -73,45 +92,38 @@ export const createAuthRoutes = (env: OauthEnv) => {
     const { searchParams } = request.nextUrl;
     const code = searchParams.get('code');
     const error = searchParams.get('error');
-    const state = searchParams.get('state');
-
-    // 임시 쿠키는 일회성이다. 결과와 상관없이 응답마다 지운다.
-    const finish = (response: NextResponse) => {
-      response.cookies.delete({ name: LOGIN_FLOW_COOKIE, path: CALLBACK_PATH });
-
-      return response;
-    };
-    const fail = (message: string, status: number) => finish(new NextResponse(message, { status }));
 
     // state를 먼저 확인한다. 다른 사이트가 만든 콜백(오류 콜백 포함)은 여기서 걸러진다.
-    if (!flow || !state || state !== flow.state) {
-      return fail('로그인 요청이 만료되었거나 올바르지 않습니다. 다시 시도해 주세요.', 400);
+    if (!flow || searchParams.get('state') !== flow.state) {
+      return callbackFailure(
+        '로그인 요청이 만료되었거나 올바르지 않습니다. 다시 시도해 주세요.',
+        400,
+      );
     }
 
     if (error === 'access_denied') {
-      return fail('권한에 동의해야 로그인할 수 있습니다. 다시 시도해 주세요.', 403);
+      return callbackFailure('권한에 동의해야 로그인할 수 있습니다. 다시 시도해 주세요.', 403);
     }
 
     if (error || !code) {
-      return fail('로그인에 실패했습니다. 다시 시도해 주세요.', 400);
+      return callbackFailure('로그인에 실패했습니다. 다시 시도해 주세요.', 400);
     }
 
-    let tokens;
-
     try {
-      tokens = await exchangeCodeForTokens(env, {
+      const tokens = await exchangeCodeForTokens(env, {
         code,
         codeVerifier: flow.codeVerifier,
         redirectUri: callbackUrl(request),
       });
+      const response = callbackResponse(
+        NextResponse.redirect(new URL(flow.returnTo, request.nextUrl.origin)),
+      );
+      setTokenCookies(request, response, tokens);
+
+      return response;
     } catch {
-      return fail('로그인을 완료하지 못했습니다. 잠시 뒤 다시 시도해 주세요.', 502);
+      return callbackFailure('로그인을 완료하지 못했습니다. 잠시 뒤 다시 시도해 주세요.', 502);
     }
-
-    const response = finish(NextResponse.redirect(new URL(flow.returnTo, request.nextUrl.origin)));
-    setTokenCookies(response, tokens, isHttps(request));
-
-    return response;
   };
 
   // POST /api/logout → 이 앱의 토큰 쿠키(access, refresh)만 지운다. 인가 서버(IdP) 세션 종료는 아직 하지 않는다.

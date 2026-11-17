@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createAuthProxy } from './authProxy';
-import { resetRefreshSingleFlight } from './refreshSingleFlight';
+import { clearRefreshingForTest } from './oauth';
 
 const env = {
   API_BASE_URL: 'https://api.example/base',
@@ -21,7 +21,7 @@ const refreshed = () =>
   Response.json({ access_token: 'access-2', refresh_token: 'refresh-2', expires_in: 3600 });
 
 beforeEach(() => {
-  resetRefreshSingleFlight();
+  clearRefreshingForTest();
   vi.stubGlobal(
     'fetch',
     vi.fn(async () => refreshed()),

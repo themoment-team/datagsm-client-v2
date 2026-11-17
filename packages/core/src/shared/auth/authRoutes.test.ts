@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createAuthRoutes } from './authRoutes';
+import { createAuthRoutes, toSafeReturnTo } from './authRoutes';
 
 const env = {
   OAUTH_AUTHORIZATION_BASE_URL: 'https://oauth.example',
@@ -192,4 +192,16 @@ describe('logout', () => {
 
     expect(response.status).toBe(403);
   });
+});
+
+it.each([
+  ['/api-keys?page=2', '/api-keys?page=2'],
+  ['/', '/'],
+  [null, '/'],
+  ['', '/'],
+  ['https://evil.example', '/'],
+  ['//evil.example', '/'],
+  ['/\\evil.example', '/'],
+])('돌아갈 경로 %s는 %s로 바꾼다', (input, expected) => {
+  expect(toSafeReturnTo(input)).toBe(expected);
 });
