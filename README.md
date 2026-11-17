@@ -62,20 +62,13 @@ packages/
 - 모든 응답에 `Strict-Transport-Security`, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`가 붙고 `X-Powered-By`는 꺼져 있다. 값은 각 앱 `next.config.ts`의 `headers()`에 있다.
 - CSP는 서비스마다 허용 출처가 달라 넣지 않았다. 추가할 때는 `headers()`에 `Content-Security-Policy`를 더하고 모든 앱의 `e2e/security-headers.spec.ts`의 CSP 부재 검사를 함께 바꾼다.
 
-## 컨테이너
+## 배포
 
-루트 `Dockerfile` 하나를 `APP` 인자로 앱마다 빌드한다.
+Vercel에 앱마다 프로젝트를 하나씩 만들어 배포한다.
 
-```bash
-docker build --build-arg APP=client --build-arg API_BASE_URL=https://api.example.com -t datagsm-client .
-docker run --rm -p 3000:3000 -e API_BASE_URL=https://api.example.com datagsm-client
-```
-
-다른 앱은 `APP`을 `admin`, `docs`, `status`, `oauth`, `projects`로 바꾸고 해당 포트(3001~3005)를 연결한다.
-
-- `API_BASE_URL`은 `/backend/*` rewrite에 들어가 빌드할 때 고정된다. API 주소가 바뀌면 이미지를 다시 만든다. 실행할 때도 환경 변수 검증에 필요하므로 같은 값을 넘긴다. 컨테이너 안에서 접근할 수 있는 주소여야 한다.
-- 컨테이너 포트는 앱 포트(3000~3005)와 같다.
-- Node 24, pnpm 12.18.0 기반 다단계 빌드(`turbo prune --docker`)이며 `node` 사용자로 `pnpm start`를 실행한다. `output: 'standalone'`은 쓰지 않는다.
+- 같은 저장소를 연결하고 Root Directory를 `apps/client`, `apps/admin`처럼 앱 폴더로 지정한다. Framework Preset은 Next.js, Node.js는 24다.
+- 설치는 Vercel이 저장소 루트의 pnpm workspace를 인식해 처리한다. 빌드 명령은 앱의 `build` 스크립트(`next build`와 빌드 CSS 검사)를 그대로 쓴다.
+- `API_BASE_URL`을 각 프로젝트의 Environment Variables에 환경(Production, Preview)별로 넣는다. `/backend/*` rewrite에 들어가 빌드할 때 고정되므로, 값을 바꾸면 다시 배포해야 반영된다.
 
 ## 의존성 업데이트
 
