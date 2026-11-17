@@ -8,7 +8,9 @@
     "./postcss": "./postcss.config.mjs"
   },
   "dependencies": {
-    "tailwindcss": "catalog:",
-    "@tailwindcss/postcss": "catalog:"
+    "@fontsource-variable/jetbrains-mono": "catalog:",
+    "@tailwindcss/postcss": "catalog:",
+    "pretendard": "catalog:",
+    "tailwindcss": "catalog:"
   }
 }
