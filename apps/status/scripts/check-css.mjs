@@ -2,8 +2,9 @@ import assert from 'node:assert/strict';
 import { readdir, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
-// 빌드 성공만으로는 core 소스 탐색과 앱 토큰 덮어쓰기를 보장할 수 없다.
-const root = fileURLToPath(new URL('../.next/', import.meta.url));
+// 빌드 성공만으로는 core 소스 탐색과 공통 CSS의 글꼴 포함을 보장할 수 없다.
+// .next/static만 읽는다. .next/dev에는 개발 서버가 남긴 이전 CSS가 있어 결과가 틀어질 수 있다.
+const root = fileURLToPath(new URL('../.next/static/', import.meta.url));
 const collect = async (dir) => {
   const entries = await readdir(dir, { withFileTypes: true });
   const nested = await Promise.all(
