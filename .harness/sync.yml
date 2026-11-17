@@ -1,5 +1,6 @@
 enabled: true
 groups: []
+base_branch: develop
 language: ko
 overrides:
   claude/agents/frontend-convention-validator: true
