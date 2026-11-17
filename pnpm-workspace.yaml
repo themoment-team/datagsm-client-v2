@@ -36,7 +36,6 @@ catalog:
   'husky': '9.1.7'
   'jsdom': '31.0.0'
   'lint-staged': '17.6.0'
-  'msw': '3.0.4'
   'next': '16.4.5'
   'prettier': '3.9.10'
   'prettier-plugin-tailwindcss': '0.8.1'

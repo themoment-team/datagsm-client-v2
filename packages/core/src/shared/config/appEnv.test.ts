@@ -14,20 +14,10 @@ describe('parseEnv(AppEnvSchema)', () => {
     );
   });
 
-  it('NEXT_PUBLIC_API_MOCKING이 enabled·disabled가 아니면 throw한다', () => {
-    expect(() =>
-      parseEnv(AppEnvSchema, {
-        API_BASE_URL: 'http://localhost:8080',
-        NEXT_PUBLIC_API_MOCKING: 'true',
-      }),
-    ).toThrow('NEXT_PUBLIC_API_MOCKING: enabled 또는 disabled여야 합니다');
-  });
-
   it('올바른 값은 그대로 준다', () => {
     expect(
       parseEnv(AppEnvSchema, {
         API_BASE_URL: 'https://api.example.com',
-        NEXT_PUBLIC_API_MOCKING: undefined,
       }),
     ).toEqual({ API_BASE_URL: 'https://api.example.com' });
   });

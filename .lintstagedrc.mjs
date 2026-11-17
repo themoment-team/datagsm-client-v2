@@ -9,7 +9,6 @@ const lintPackages = [
   'apps/oauth',
   'apps/projects',
   'packages/core',
-  'packages/mocks',
 ];
 
 export default {

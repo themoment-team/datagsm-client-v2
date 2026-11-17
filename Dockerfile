@@ -19,14 +19,12 @@ RUN HUSKY=0 pnpm install --frozen-lockfile
 FROM dependencies AS builder
 ARG APP
 ARG API_BASE_URL
-ENV NEXT_PUBLIC_API_MOCKING=disabled
 COPY --from=pruner /app/out/full/ .
 RUN API_BASE_URL="$API_BASE_URL" pnpm --filter "@datagsm/$APP" build
 
 FROM base AS runtime
 ARG APP
 ENV NODE_ENV=production
-ENV NEXT_PUBLIC_API_MOCKING=disabled
 COPY --from=builder --chown=node:node /app /app
 WORKDIR /app/apps/${APP}
 USER node

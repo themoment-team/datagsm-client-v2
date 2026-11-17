@@ -5,12 +5,12 @@
     "dev": {
       "cache": false,
       "persistent": true,
-      "env": ["API_BASE_URL", "NEXT_PUBLIC_API_MOCKING", "PORT"]
+      "env": ["API_BASE_URL", "PORT"]
     },
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**"],
-      "env": ["API_BASE_URL", "NEXT_PUBLIC_API_MOCKING"]
+      "env": ["API_BASE_URL"]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -22,12 +22,12 @@
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"],
-      "env": ["API_BASE_URL", "NEXT_PUBLIC_API_MOCKING"]
+      "env": ["API_BASE_URL"]
     },
     "test:e2e": {
       "dependsOn": ["^build"],
       "cache": false,
-      "env": ["API_BASE_URL", "NEXT_PUBLIC_API_MOCKING", "CI"]
+      "env": ["API_BASE_URL", "CI"]
     }
   }
 }

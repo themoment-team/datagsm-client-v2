@@ -5,5 +5,4 @@ import { AppEnvSchema, parseEnv } from '@datagsm/core/shared/config';
 // 아래 객체에 process.env 값을 함께 넘긴다.
 export const env = parseEnv(AppEnvSchema, {
   API_BASE_URL: process.env.API_BASE_URL,
-  NEXT_PUBLIC_API_MOCKING: process.env.NEXT_PUBLIC_API_MOCKING,
 });

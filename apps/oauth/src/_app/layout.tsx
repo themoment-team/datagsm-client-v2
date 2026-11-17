@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { MockProvider, TanStackProvider } from '@/_app/providers';
+import { TanStackProvider } from '@/_app/providers';
 
 import '@/_app/styles/globals.css';
 
@@ -17,9 +17,7 @@ export const RootLayout = ({
   return (
     <html lang="ko">
       <body className="bg-background text-foreground antialiased">
-        <MockProvider>
-          <TanStackProvider>{children}</TanStackProvider>
-        </MockProvider>
+        <TanStackProvider>{children}</TanStackProvider>
       </body>
     </html>
   );

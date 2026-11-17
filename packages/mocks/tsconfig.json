@@ -1,7 +1,0 @@
-{
-  "extends": "@datagsm/typescript-config/base.json",
-  "compilerOptions": {
-    "lib": ["ES2023", "DOM", "DOM.Iterable"]
-  },
-  "include": ["src/**/*.ts"]
-}

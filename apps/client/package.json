@@ -50,7 +50,6 @@
     "vitest": "catalog:",
     "@datagsm/eslint-config": "workspace:*",
     "@datagsm/typescript-config": "workspace:*",
-    "@datagsm/tailwind-config": "workspace:*",
-    "@datagsm/mocks": "workspace:*"
+    "@datagsm/tailwind-config": "workspace:*"
   }
 }

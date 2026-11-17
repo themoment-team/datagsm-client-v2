@@ -19,8 +19,6 @@ jobs:
     timeout-minutes: 30
     env:
       API_BASE_URL: http://localhost:8080
-      # 운영 빌드는 모킹 없이 검사한다. E2E의 mocking 프로젝트는 별도로 enabled를 넘긴다.
-      NEXT_PUBLIC_API_MOCKING: disabled
       HUSKY: '0'
     steps:
       - name: Checkout
