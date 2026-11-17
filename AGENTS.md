@@ -145,7 +145,7 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 ## API
 
 - 브라우저 요청은 `@/shared/api`, 서버(RSC, Server Function) 요청은 `@/shared/api/index.server`의 `get / post / patch / put / del`로 보낸다. 이 메서드는 core `createApiMethods`가 만들고 응답의 `.data`만 돌려준다. 인스턴스(`axiosInstance`, `serverAxiosInstance`)를 직접 호출하지 않는다.
-- 브라우저 인스턴스의 baseURL은 `/backend`이고, 각 앱 `next.config.ts`의 rewrite가 `API_BASE_URL`로 넘긴다. `/api/*`는 Route Handler용으로 비워 둔다. 서버 인스턴스는 `server-only`라 클라이언트 코드에서 `index.server`를 import하면 빌드가 실패한다.
+- 브라우저 인스턴스의 baseURL은 `/backend`이고, 각 앱 `next.config.ts`의 rewrite가 `API_BASE_URL`로 넘긴다. 단 client·admin은 `proxy.ts`가 `/backend/*`를 먼저 받아 토큰을 붙이고 직접 rewrite하므로 next.config rewrite까지 가지 않는다(인증 절 참고). `/api/*`는 Route Handler용으로 비워 둔다. 서버 인스턴스는 `server-only`라 클라이언트 코드에서 `index.server`를 import하면 빌드가 실패한다.
 - 응답 타입은 첫 번째, body 타입은 두 번째 제네릭이다: `post<UserResponse, UpdateProfileRequest>(url, body)`. URL 상수는 소유 slice의 `api/`에 두고 서버의 실제 경로를 그대로 쓴다.
 - DataGSM 서버 응답은 `{ status, code, message, data }` 형태로 감싸져 온다. 응답 타입에는 이 감싼 형태를 포함해 적는다.
 - 요청 실패는 모두 `ApiError { status, code, message, requestId? }`로 던져지고 원본은 `cause`에 있다. 응답이 없는 실패(네트워크 오류, 타임아웃, 취소)는 `status: 0`이다. `requestId`는 응답 헤더 `X-Request-Id`다. 화면에서는 `error instanceof ApiError`로 좁힌 뒤 분기한다.
@@ -156,12 +156,12 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 
 - 로그인이 필요한 앱은 client와 admin뿐이다. 로그인 화면은 oauth 앱이 띄우고, client·admin은 인가 서버의 OAuth client 하나를 함께 쓴다.
 - 흐름(Authorization Code + PKCE S256): `GET /api/login?returnTo=` → 인가 서버 `/v1/oauth/authorize` → 콜백 `GET /api/callback`에서 Next 서버가 `/v1/oauth/token`으로 code를 바꾼다. state·verifier·돌아갈 경로는 `/api/callback` 경로에만 보내는 10분짜리 httpOnly 쿠키에 둔다. `returnTo`는 같은 앱의 `/` 경로만 허용한다. 콜백은 state를 먼저 검증하고, 동의 거부(`error=access_denied`)는 403, 그 밖의 오류는 400으로 답한다. 임시 쿠키는 결과와 상관없이 콜백에서 지운다. `scope`는 client에 등록된 범위를 확인하기 전까지 보내지 않는다(등록되지 않은 값은 `invalid_scope`로 로그인이 막힌다). 기준 문서는 https://docs.datagsm.kr/oauth 이다.
-- access token은 앱 도메인의 host-only httpOnly 쿠키(`datagsm_at`, SameSite=Lax, 만료 = `expires_in`)에만 둔다. 브라우저 코드는 토큰을 읽지 않는다.
-- 백엔드는 `Authorization: Bearer`만 읽는다. 브라우저 요청은 `proxy.ts`가 `/backend/*`에서 쿠키를 헤더로 바꾸고(쿠키는 넘기지 않음), 서버 요청은 `withAccessToken`이 `cookies()`에서 읽어 붙인다.
+- 토큰은 앱 도메인의 host-only httpOnly 쿠키(SameSite=Lax)에만 둔다. access token은 `datagsm_at`(만료 = `expires_in` - 60초), refresh token은 `datagsm_rt`(30일)다. 브라우저 코드는 토큰을 읽지 않는다.
+- 백엔드는 `Authorization: Bearer`만 읽는다. 브라우저 요청은 `proxy.ts`가 `/backend/*`에서 쿠키를 헤더로 바꾸고(쿠키는 넘기지 않음) API 주소로 직접 rewrite한다. 외부 주소로 가는 next.config rewrite는 proxy가 붙인 `Set-Cookie`를 버리기 때문이다. 서버 요청은 `withAccessToken`이 `cookies()`에서 읽어 붙인다.
 - 각 앱 `proxy.ts`의 matcher는 보호할 경로를 직접 적는 allowlist다. 로그인이 필요한 페이지를 만들면 matcher에 더한다. 제외 패턴("…을 뺀 전부")은 쓰지 않는다.
 - CSRF: 쿠키가 자동 전송되므로 `/backend/*`의 상태 변경 요청과 `POST /api/logout`은 `Origin`이 앱 주소와 다르면 403이다.
-- 브라우저 요청이 401을 받으면 `setOnUnauthorized(redirectToLogin)`가 로그인을 다시 시작한다. 인가 서버 세션(기본 8시간)이 살아 있으면 입력 없이 돌아온다. refresh token은 아직 저장하지 않는다. 붙일 때는 서버에만 두고, 갱신 응답의 새 refresh token으로 항상 바꾸며(회전), 같은 토큰으로 동시에 갱신하지 않는다(재사용으로 보고 저장된 토큰까지 삭제된다). `invalid_grant`면 다시 로그인, 429면 토큰을 지우지 않고 잠시 뒤 다시 시도한다.
-- 로그아웃은 `POST /api/logout`(form 또는 fetch)이며 이 앱의 토큰 쿠키만 지운다. GET 링크로 만들지 않는다(prefetch·이미지 태그로 실행될 수 있다). 인가 서버 세션 종료는 아직 하지 않는다.
+- 갱신은 `proxy.ts`가 한다. matcher에 걸린 요청에서 `datagsm_at`이 없고 `datagsm_rt`가 있으면 갱신한 뒤 새 쿠키를 응답에 싣고, 페이지 요청이면 서버 컴포넌트가 새 토큰을 읽도록 요청 쿠키도 바꾼다. 갱신마다 새 refresh token으로 바꾼다(회전). 같은 refresh token의 동시 갱신은 `oauth.ts`의 `refreshTokens`가 한 번으로 합치고 결과를 30초 동안 함께 쓴다(같은 서버 인스턴스 안에서만). `invalid_grant`·401이면 토큰 쿠키를 지우고 다시 로그인, 429·네트워크 오류면 refresh token을 남긴다. 그래도 브라우저 요청이 401을 받으면 `setOnUnauthorized(redirectToLogin)`가 로그인을 다시 시작한다. matcher 밖의 페이지(공개 페이지)는 갱신하지 않는다.
+- 로그아웃은 `POST /api/logout`(form 또는 fetch)이며 이 앱의 토큰 쿠키(access, refresh)만 지운다. GET 링크로 만들지 않는다(prefetch·이미지 태그로 실행될 수 있다). 인가 서버 세션 종료는 아직 하지 않는다.
 - 공용 코드는 `@datagsm/core/shared/auth`(브라우저)와 `@datagsm/core/shared/auth/server`(Route Handler, Proxy, 서버 인스턴스)에 있다. 앱은 `src/shared/api/authRoutes.ts`에서 검증한 env를 넘겨 `createAuthRoutes`를 만들고 `app/api/{login,callback,logout}/route.ts`는 그 핸들러만 내보낸다.
 
 ## 환경 변수

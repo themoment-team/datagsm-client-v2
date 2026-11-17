@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createAuthRoutes } from './authRoutes';
+import { createAuthRoutes, toSafeReturnTo } from './authRoutes';
 
 const env = {
   OAUTH_AUTHORIZATION_BASE_URL: 'https://oauth.example',
@@ -55,7 +55,9 @@ describe('callback', () => {
   beforeEach(() => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => Response.json({ access_token: 'access-1', expires_in: 3600 })),
+      vi.fn(async () =>
+        Response.json({ access_token: 'access-1', refresh_token: 'refresh-1', expires_in: 3600 }),
+      ),
     );
   });
 
@@ -89,7 +91,16 @@ describe('callback', () => {
       secure: true,
       sameSite: 'lax',
       path: '/',
-      maxAge: 3600,
+      // 실제 만료보다 60초 먼저 사라지게 해서 proxy가 미리 갱신하게 한다.
+      maxAge: 3540,
+    });
+    expect(response.cookies.get('datagsm_rt')).toMatchObject({
+      value: 'refresh-1',
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 30 * 24 * 60 * 60,
     });
   });
 
@@ -171,6 +182,7 @@ describe('logout', () => {
 
     expect(response.status).toBe(303);
     expect(response.cookies.get('datagsm_at')?.value).toBe('');
+    expect(response.cookies.get('datagsm_rt')?.value).toBe('');
   });
 
   it('다른 사이트에서 온 요청은 403으로 막는다', () => {
@@ -180,4 +192,16 @@ describe('logout', () => {
 
     expect(response.status).toBe(403);
   });
+});
+
+it.each([
+  ['/api-keys?page=2', '/api-keys?page=2'],
+  ['/', '/'],
+  [null, '/'],
+  ['', '/'],
+  ['https://evil.example', '/'],
+  ['//evil.example', '/'],
+  ['/\\evil.example', '/'],
+])('돌아갈 경로 %s는 %s로 바꾼다', (input, expected) => {
+  expect(toSafeReturnTo(input)).toBe(expected);
 });
