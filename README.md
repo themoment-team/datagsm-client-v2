@@ -21,7 +21,7 @@ pnpm dev
 | oauth    | `http://localhost:3004` | OAuth       |
 | projects | `http://localhost:3005` | 프로젝트    |
 
-API 모킹은 두지 않는다. 각 앱의 `.env.local`에서 `API_BASE_URL`을 사용할 DataGSM 백엔드(개발 서버 또는 로컬) 주소로 바꾼다.
+터미널에서는 Turborepo TUI가 열려 `↑`/`↓`로 앱별 로그를 고를 수 있다(`m`: 단축키 목록). API 모킹은 두지 않는다. 각 앱의 `.env.local`에서 `API_BASE_URL`을 사용할 DataGSM 백엔드(개발 서버 또는 로컬) 주소로 바꾼다.
 
 ## 구조
 
