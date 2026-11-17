@@ -71,15 +71,33 @@ export const createAuthRoutes = (env: OauthEnv) => {
   };
 
   // GET /api/callback?code&state → 서버에서 code를 토큰으로 바꾸고 httpOnly 쿠키에 담는다.
+  // 인가 서버는 동의 거부 등 실패도 이 주소로 돌려보낸다(?error=access_denied&state=...).
   const callback = async (request: NextRequest) => {
     const flow = readLoginFlow(request);
-    const code = request.nextUrl.searchParams.get('code');
-    const state = request.nextUrl.searchParams.get('state');
+    const { searchParams } = request.nextUrl;
+    const code = searchParams.get('code');
+    const error = searchParams.get('error');
+    const state = searchParams.get('state');
 
-    if (!flow || !code || state !== flow.state) {
-      return new NextResponse('로그인 요청이 만료되었거나 올바르지 않습니다. 다시 시도해 주세요.', {
-        status: 400,
-      });
+    // 임시 쿠키는 일회성이다. 결과와 상관없이 응답마다 지운다.
+    const finish = (response: NextResponse) => {
+      response.cookies.delete({ name: LOGIN_FLOW_COOKIE, path: CALLBACK_PATH });
+
+      return response;
+    };
+    const fail = (message: string, status: number) => finish(new NextResponse(message, { status }));
+
+    // state를 먼저 확인한다. 다른 사이트가 만든 콜백(오류 콜백 포함)은 여기서 걸러진다.
+    if (!flow || !state || state !== flow.state) {
+      return fail('로그인 요청이 만료되었거나 올바르지 않습니다. 다시 시도해 주세요.', 400);
+    }
+
+    if (error === 'access_denied') {
+      return fail('권한에 동의해야 로그인할 수 있습니다. 다시 시도해 주세요.', 403);
+    }
+
+    if (error || !code) {
+      return fail('로그인에 실패했습니다. 다시 시도해 주세요.', 400);
     }
 
     let tokens;
@@ -91,13 +109,10 @@ export const createAuthRoutes = (env: OauthEnv) => {
         redirectUri: callbackUrl(request),
       });
     } catch {
-      return new NextResponse('로그인을 완료하지 못했습니다. 잠시 뒤 다시 시도해 주세요.', {
-        status: 502,
-      });
+      return fail('로그인을 완료하지 못했습니다. 잠시 뒤 다시 시도해 주세요.', 502);
     }
 
-    const response = NextResponse.redirect(new URL(flow.returnTo, request.nextUrl.origin));
-    response.cookies.delete({ name: LOGIN_FLOW_COOKIE, path: CALLBACK_PATH });
+    const response = finish(NextResponse.redirect(new URL(flow.returnTo, request.nextUrl.origin)));
     response.cookies.set(ACCESS_TOKEN_COOKIE, tokens.accessToken, {
       httpOnly: true,
       secure: isHttps(request),

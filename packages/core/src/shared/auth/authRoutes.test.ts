@@ -33,6 +33,7 @@ describe('login', () => {
       state: flow.state,
     });
     expect(location.searchParams.get('code_challenge')).not.toBe(flow.codeVerifier);
+    expect(location.searchParams.has('scope')).toBe(false);
     expect(flow.returnTo).toBe('/api-keys');
     expect(response.cookies.get('datagsm_login')).toMatchObject({
       httpOnly: true,
@@ -92,9 +93,47 @@ describe('callback', () => {
     });
   });
 
-  it('state가 다르면 토큰을 요청하지 않고 400으로 답한다', async () => {
+  it('state가 다르면 토큰을 요청하지 않고 400으로 답하며 임시 쿠키를 지운다', async () => {
     const response = await callback(
       request('/api/callback?code=code-1&state=other', {
+        headers: { cookie: loginFlowCookie(flow) },
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    expect(fetch).not.toHaveBeenCalled();
+    expect(response.cookies.get('datagsm_login')).toMatchObject({
+      value: '',
+      path: '/api/callback',
+    });
+  });
+
+  it('사용자가 동의를 거부하면 403으로 답하고 임시 쿠키를 지운다', async () => {
+    const response = await callback(
+      request('/api/callback?error=access_denied&error_description=denied&state=state-1', {
+        headers: { cookie: loginFlowCookie(flow) },
+      }),
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.text()).resolves.toContain('권한에 동의해야');
+    expect(fetch).not.toHaveBeenCalled();
+    expect(response.cookies.get('datagsm_login')?.value).toBe('');
+  });
+
+  it('state가 맞지 않는 오류 콜백은 오류 내용보다 state 검증을 먼저 한다', async () => {
+    const response = await callback(
+      request('/api/callback?error=access_denied&state=other', {
+        headers: { cookie: loginFlowCookie(flow) },
+      }),
+    );
+
+    expect(response.status).toBe(400);
+  });
+
+  it('그 밖의 오류나 code가 없는 콜백은 400으로 답한다', async () => {
+    const response = await callback(
+      request('/api/callback?error=server_error&state=state-1', {
         headers: { cookie: loginFlowCookie(flow) },
       }),
     );
@@ -109,7 +148,7 @@ describe('callback', () => {
     expect(response.status).toBe(400);
   });
 
-  it('토큰 발급이 실패하면 쿠키를 만들지 않고 502로 답한다', async () => {
+  it('토큰 발급이 실패하면 쿠키를 만들지 않고 502로 답하며 임시 쿠키를 지운다', async () => {
     vi.mocked(fetch).mockResolvedValueOnce(new Response(null, { status: 400 }));
 
     const response = await callback(
@@ -120,6 +159,7 @@ describe('callback', () => {
 
     expect(response.status).toBe(502);
     expect(response.cookies.get('datagsm_at')).toBeUndefined();
+    expect(response.cookies.get('datagsm_login')?.value).toBe('');
   });
 });
 

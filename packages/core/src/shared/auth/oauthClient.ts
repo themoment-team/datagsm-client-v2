@@ -16,6 +16,9 @@ export const buildAuthorizeUrl = (
 ) => {
   const url = new URL('/v1/oauth/authorize', env.OAUTH_AUTHORIZATION_BASE_URL);
 
+  // scope는 일부러 보내지 않는다. 생략하면 인가 서버가 client에 등록된 범위(opt-in 범위 제외)를 준다.
+  // 등록되지 않은 값을 보내면 invalid_scope로 로그인이 막힌다. 웹 서버는 토큰에 scopes 클레임이
+  // 있는지만 보므로, client에 등록된 범위를 확인한 뒤에 명시한다(v1도 생략했다).
   url.search = new URLSearchParams({
     client_id: env.OAUTH_CLIENT_ID,
     redirect_uri: params.redirectUri,
