@@ -33,5 +33,4 @@ overrides:
   codex/skills/tailwind-shadcn: true
   codex/skills/write-pr: true
   gemini/settings: true
-  nextjs/fsd/dependency-check: true
   nextjs/fsd/steiger-config: true
