@@ -30,6 +30,10 @@ jobs:
       APP_DOCS_URL: http://localhost:3002
       APP_STATUS_URL: http://localhost:3003
       APP_PROJECTS_URL: http://localhost:3005
+      # client·admin이 로그인에 쓰는 OAuth 값이다. CI에서는 자리 표시용 값만 넣는다.
+      OAUTH_AUTHORIZATION_BASE_URL: http://localhost:8083
+      OAUTH_CLIENT_ID: ci-client-id
+      OAUTH_CLIENT_SECRET: ci-client-secret
       HUSKY: '0'
     steps:
       - name: Checkout
