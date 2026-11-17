@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-// 두 앱이 함께 쓰는 환경 변수 스키마다. 앱 전용 변수는 앱에서 AppEnvSchema.extend({...})로 더한다.
+// 모든 앱이 함께 쓰는 환경 변수 스키마다. 앱 전용 변수는 앱에서 AppEnvSchema.extend({...})로 더한다.
 // core는 process.env를 읽지 않는다. 값은 앱이 모아서 parseEnv에 넘긴다.
 export const AppEnvSchema = z.object({
   API_BASE_URL: z.url({

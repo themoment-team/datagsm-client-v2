@@ -19,6 +19,18 @@
     {
       "files": "apps/admin/**",
       "options": { "tailwindStylesheet": "./apps/admin/src/_app/styles/globals.css" }
+    },
+    {
+      "files": "apps/docs/**",
+      "options": { "tailwindStylesheet": "./apps/docs/src/_app/styles/globals.css" }
+    },
+    {
+      "files": "apps/status/**",
+      "options": { "tailwindStylesheet": "./apps/status/src/_app/styles/globals.css" }
+    },
+    {
+      "files": "apps/oauth/**",
+      "options": { "tailwindStylesheet": "./apps/oauth/src/_app/styles/globals.css" }
     }
   ]
 }
