@@ -959,6 +959,9 @@ importers:
       jsdom:
         specifier: 'catalog:'
         version: 31.0.0
+      next:
+        specifier: 'catalog:'
+        version: 16.4.6(@babel/core@7.29.13)(@playwright/test@1.65.0)(@types/node@24.19.2)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react:
         specifier: 'catalog:'
         version: 19.3.1

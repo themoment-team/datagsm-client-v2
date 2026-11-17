@@ -24,6 +24,10 @@ export default defineConfig({
     command: `pnpm build && pnpm start --port ${port}`,
     url: baseURL,
     env: {
+      APP_CLIENT_URL: 'http://localhost:3000',
+      APP_DOCS_URL: 'http://localhost:3002',
+      APP_STATUS_URL: 'http://localhost:3003',
+      APP_PROJECTS_URL: 'http://localhost:3005',
       API_BASE_URL: apiBaseURL,
     },
     reuseExistingServer: false,

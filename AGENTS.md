@@ -26,7 +26,7 @@ apps/{client,admin,docs,status,oauth,projects}/
 │   └── shared/            api(앱별 연결), config(core 스키마로 env 검증)
 └── e2e/                   Playwright 테스트
 packages/
-├── core/                  widgets → features → entities → shared(앱 공유 FSD 레이어), API 팩토리·인터셉터·getQueryClient, env 스키마, cn
+├── core/                  widgets → features → entities → shared(앱 공유 FSD 레이어), 공용 레이아웃(widgets/app-shell), API 팩토리·인터셉터·getQueryClient, env 스키마, cn
 ├── tailwind-config/       공통 CSS 토큰·@source, PostCSS
 ├── typescript-config/     base, nextjs(앱), react-library(core)
 └── eslint-config/         base, next(앱), react(core)
@@ -64,6 +64,7 @@ export { HomePage as default } from '@/_pages/home';
 - core에는 패키지 루트 진입점이 없고, 앱 안의 slice 공개 API와 같은 단위로 공개한다: `@datagsm/core/shared/<segment>`, `@datagsm/core/{entities,features,widgets}/<slice>`, 서버 전용은 각각의 `/server`.
 - 앱과 core는 위치만 다를 뿐 같은 레이어 체계다. 앱의 레이어는 core의 **더 아래** 레이어만 import한다. 같은 레이어도 다른 slice라서 금지다. `@datagsm/eslint-config/next`가 레이어별로 막는다.
 - slice는 처음 쓰는 앱에 둔다. 두 앱 이상이 데이터와 동작까지 똑같이 쓰게 될 때만 core의 같은 레이어로 옮긴다.
+- 모든 웹 앱의 레이아웃(왼쪽 사이드바 + 본문)은 core의 `widgets/app-shell`(`AppShell`)이다. 앱은 `_app/layout`에서 지금 앱(`currentApp`), 앱 주소, 메뉴 목록만 넘긴다. client·docs·status·projects는 core의 `USER_SIDEBAR_ITEMS`를 함께 쓰고, 관리자 웹은 `apps/admin/src/_app/config`의 관리자 메뉴와 `badge="관리자"`를 넘긴다. 관리자 메뉴는 모두 admin 안 경로라 admin은 `APP_*_URL`을 받지 않는다. 같은 앱 메뉴는 `Link`, 다른 앱 메뉴는 `<a>`로 그 앱 주소에 연결된다.
 - 여러 앱이 함께 쓰는 도메인 없는 UI(기본 컴포넌트, 레이아웃 틀)는 core의 `shared/ui`에 컴포넌트별 폴더로 두고 `@datagsm/core/shared/ui/<component>`로 import한다. 별도 UI 패키지는 만들지 않는다. 팀 디자인 시스템(themoment-design-system)이 준비되면 그때 옮긴다.
 
 ## 네이밍
@@ -138,10 +139,12 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 
 ## API
 
-상세 규칙은 [`api-client`](.agents/skills/api-client/SKILL.md) 스킬에 있다. 요청 코드를 쓰거나 에러 처리·인증을 붙이기 전에 읽는다.
-
-- 브라우저 요청은 `@/shared/api`, 서버(RSC, Server Function) 요청은 `@/shared/api/index.server`의 `get / post / patch / put / del`로 보낸다.
-- 요청 실패는 모두 `ApiError`로 던져진다. 401 응답에 연결할 동작은 `setOnUnauthorized`로 등록한다.
+- 브라우저 요청은 `@/shared/api`, 서버(RSC, Server Function) 요청은 `@/shared/api/index.server`의 `get / post / patch / put / del`로 보낸다. 이 메서드는 core `createApiMethods`가 만들고 응답의 `.data`만 돌려준다. 인스턴스(`axiosInstance`, `serverAxiosInstance`)를 직접 호출하지 않는다.
+- 브라우저 인스턴스의 baseURL은 `/backend`이고, 각 앱 `next.config.ts`의 rewrite가 `API_BASE_URL`로 넘긴다. `/api/*`는 Route Handler용으로 비워 둔다. 서버 인스턴스는 `server-only`라 클라이언트 코드에서 `index.server`를 import하면 빌드가 실패한다.
+- 응답 타입은 첫 번째, body 타입은 두 번째 제네릭이다: `post<UserResponse, UpdateProfileRequest>(url, body)`. URL 상수는 소유 slice의 `api/`에 두고 서버의 실제 경로를 그대로 쓴다.
+- DataGSM 서버 응답은 `{ status, code, message, data }` 형태로 감싸져 온다. 응답 타입에는 이 감싼 형태를 포함해 적는다.
+- 요청 실패는 모두 `ApiError { status, code, message, requestId? }`로 던져지고 원본은 `cause`에 있다. 응답이 없는 실패(네트워크 오류, 타임아웃, 취소)는 `status: 0`이다. `requestId`는 응답 헤더 `X-Request-Id`다. 화면에서는 `error instanceof ApiError`로 좁힌 뒤 분기한다.
+- 401 응답에 연결할 동작은 `setOnUnauthorized`로 등록한다. 동시에 들어온 401은 진행 중인 훅 하나를 함께 기다리고, 훅이 끝나면 원래 요청은 재시도 없이 `ApiError`로 실패한다. 훅 안의 요청(토큰 갱신 등)은 이 인터셉터가 없는 별도 인스턴스로 보낸다. 같은 인스턴스로 보내 401을 받으면 훅을 기다리며 멈춘다. 서버 인스턴스는 모듈 상태를 요청 사이에 공유하므로 서버 쪽에 사용자별 훅을 등록하지 않는다.
 - API 모킹(MSW)은 두지 않는다. 개발은 `API_BASE_URL`로 실제 DataGSM 개발 서버에 붙는다. 컴포넌트 테스트에서 API 응답이 필요하면 `vi.mock`으로 API 함수를 바꾼다.
 
 ## 환경 변수
@@ -149,13 +152,14 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 - 서버 환경 변수는 `src/shared/config/env.ts` 한 곳에서 검증하고 `env`로 꺼내 쓴다. 앱 공통 변수와 오류 메시지는 `@datagsm/core/shared/config`의 `AppEnvSchema`가 소유하고, 앱은 `process.env` 값을 모아 `parseEnv`에 넘긴다. 앱 전용 변수는 `AppEnvSchema.extend({...})`로 더한다. 일반 기능은 `process.env`를 다른 곳에서 직접 읽지 않는다.
 - 새 변수를 추가하면 스키마(공통이면 core, 앱 전용이면 앱의 `extend`), `.env.example`, CI의 `env`를 함께 고친다.
 - status를 뺀 각 앱의 변수는 `API_BASE_URL`(필수, http(s) URL)이다. `API_BASE_URL`이 없으면 `dev`, `build`, `check-types`가 바로 실패한다.
+- client·docs·status·projects는 공용 사이드바에서 서로 이동할 앱 주소 `APP_CLIENT_URL`, `APP_DOCS_URL`, `APP_STATUS_URL`, `APP_PROJECTS_URL`(모두 필수)도 받는다. 스키마는 core의 `AppUrlsEnvSchema`이고, 값은 `readAppUrlsEnv(process.env)`로 모은다. 앱은 서브도메인(`datagsm.kr`, `docs.datagsm.kr` 등)으로 따로 배포한다.
 - status 앱은 상태를 확인할 서버 4개의 base URL(`STATUS_WEB_BASE_URL`, `STATUS_OPENAPI_BASE_URL`, `STATUS_OAUTH_AUTHORIZATION_BASE_URL`, `STATUS_OAUTH_RESOURCE_BASE_URL`, 모두 필수)만 받는다. DataGSM API를 호출하지 않으므로 `API_BASE_URL`, `/backend` rewrite, axios 인스턴스가 없다. 실제 주소는 공개하지 않으므로 `.env.example`과 CI에는 자리 표시용 값만 두고, 실제 값은 `.env.local`과 Vercel에만 넣는다. 상태 확인은 서버 컴포넌트에서 각 서버의 `GET /v1/health`를 요청해 2xx면 정상으로 보고, 응답 속도는 그 요청 앞뒤 시간만 잰다.
 - `env`는 서버에서만 읽는다. 클라이언트 컴포넌트에서 import하지 않는다.
 
 ## 보안 헤더와 배포
 
 - 모든 앱의 `next.config.ts`의 `headers()`가 모든 경로에 기본 보안 헤더(HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`)를 붙이고 `X-Powered-By`를 끈다. CSP는 넣지 않았다. 헤더를 바꾸거나 CSP를 더하면 모든 앱의 `e2e/security-headers.spec.ts`도 함께 고친다. 모든 앱의 `next.config.ts`는 같게 유지하고, 공통 부분을 바꾸면 모든 앱 파일에 똑같이 고친다. 단 status는 `API_BASE_URL`을 쓰지 않아 `/backend` rewrite가 없다.
-- 앱을 추가하거나 지우면 앱 폴더 밖에서 앱 목록을 가진 곳도 함께 고친다: 루트 `package.json`의 `lint:fsd`, `.lintstagedrc.mjs`, `.prettierrc` overrides, 전용 스킬 `api-client`, 이 문서와 README. 새 앱은 기존 앱을 복제한 뒤 `package.json` 이름·포트, `playwright.config.ts` 포트, `layout.tsx` 메타, 홈 제목과 그 테스트를 바꾼다. 마지막에 `rg -n "oauth"`처럼 기존 앱 이름으로 검색해 빠진 곳이 없는지 확인한다.
+- 앱을 추가하거나 지우면 앱 폴더 밖에서 앱 목록을 가진 곳도 함께 고친다: 루트 `package.json`의 `lint:fsd`, `.lintstagedrc.mjs`, `.prettierrc` overrides, 사이드바로 오가는 앱이면 core의 `AppId`·`AppUrlsEnvSchema`·사용자 메뉴와 CI·Playwright의 `APP_*_URL`, 이 문서와 README. 새 앱은 기존 앱을 복제한 뒤 `package.json` 이름·포트, `playwright.config.ts` 포트, `layout.tsx` 메타, 홈 제목과 그 테스트를 바꾼다. 마지막에 `rg -n "oauth"`처럼 기존 앱 이름으로 검색해 빠진 곳이 없는지 확인한다.
 - 배포는 Vercel이다. 앱마다 Vercel 프로젝트를 하나씩 두고 Root Directory를 `apps/<앱>`으로 둔다. `API_BASE_URL`은 rewrite에 들어가 빌드 시 고정되므로 Vercel 프로젝트의 환경 변수로 넣고, 값을 바꾸면 다시 배포한다. Docker 이미지 빌드 설정은 두지 않는다.
 
 ## 데이터와 폼
@@ -192,20 +196,23 @@ pnpm build         # API_BASE_URL 필요
 ## 에이전트 작업 규칙
 
 - 커밋, 푸시, PR 생성, 리뷰 답글은 사용자가 요청한 경우에만 한다. 기존 브랜치와 작업 트리의 변경을 보존한다.
+- 기본 작업 브랜치는 `develop`이다. 새 작업은 `develop`에서 브랜치를 만들어 `develop`으로 PR을 올린다(`git-commit`, `write-pr` 스킬의 Git Flow).
 - `.env.local`을 비롯한 환경·자격 증명 파일은 열거나 출력하지 않는다. 필요한 값은 `.env.example`과 `src/shared/config/env.ts`에서 확인한다.
 - 이 파일의 규칙 중 도구가 검사하는 것(ESLint, Prettier, steiger, tsc)은 도구 결과를 근거로 판단한다.
-- 작업 절차는 `.agents/skills/`(Codex)와 `.claude/skills/`(Claude Code)에 있다. 두 폴더와 `.codex/`, `.claude/agents`, `.claude/hooks`, `steiger.config.mjs`는 팀 하네스(themoment-ai-harness-sync)가 동기화하므로 이 레포에서 직접 고치지 않는다. 바꿀 내용은 하네스 레포에 반영한다.
-- 이 레포 전용 스킬은 `api-client`이며 두 폴더에 같은 내용으로 둔다.
+- 작업 절차는 `.agents/skills/`(Codex)와 `.claude/skills/`(Claude Code)에 있다. Gemini CLI는 `.gemini/settings.json`에 따라 이 파일을 읽는다. 이 폴더들과 `.codex/`, `.claude/agents`, `.claude/hooks`, `.claude/settings.json`, `.gemini/`, `steiger.config.mjs`는 팀 하네스(themoment-ai-harness-sync)가 `.harness/sync.yml` 설정대로 동기화하므로 이 레포에서 직접 고치지 않는다. 바꿀 내용은 하네스 레포에 반영한다.
 
-| 스킬                      | 쓰는 때                                                       |
-| ------------------------- | ------------------------------------------------------------- |
-| `git-commit`              | 변경을 논리 단위로 나눠 커밋할 때                             |
-| `write-pr`                | 커밋을 바탕으로 PR을 만들 때                                  |
-| `resolve-reviews`         | PR 리뷰 코멘트를 판단하고 반영할 때                           |
-| `nextjs-fsd-architecture` | 레이어·slice를 정하거나 구조, 앱과 패키지 사이 공유를 바꿀 때 |
-| `react-conventions`       | 파일·타입 이름, 컴포넌트 모양을 정할 때                       |
-| `data-and-forms`          | 서버 데이터 조회·변경, 폼을 만들 때                           |
-| `tailwind-shadcn`         | Tailwind 클래스, 토큰, 공통 UI 위치를 정할 때                 |
-| `api-client`              | API 요청 코드·에러 처리를 쓰거나 401 처리에 인증을 붙일 때    |
+| 스킬                      | 쓰는 때                                                         |
+| ------------------------- | --------------------------------------------------------------- |
+| `git-commit`              | 변경을 논리 단위로 나눠 커밋할 때                               |
+| `write-pr`                | 커밋을 바탕으로 PR을 만들 때                                    |
+| `resolve-reviews`         | PR 리뷰 코멘트를 판단하고 반영할 때                             |
+| `nextjs-fsd-architecture` | 레이어·slice를 정하거나 구조, 앱과 패키지 사이 공유를 바꿀 때   |
+| `react-conventions`       | 파일·타입 이름, 컴포넌트 모양을 정할 때                         |
+| `data-and-forms`          | 서버 데이터 조회·변경, 폼을 만들 때                             |
+| `tailwind-shadcn`         | Tailwind 클래스, 토큰, 공통 UI 위치를 정할 때                   |
+| `react-best-practices`    | React·Next 코드의 렌더링·데이터 요청·번들 성능을 볼 때          |
+| `ponytail`                | 가장 작은 변경으로 해결하고 과한 설계를 줄일 때                 |
+| `ponytail-audit`          | 레포 전체의 버그·보안·지울 코드를 점검할 때(코드는 바꾸지 않음) |
+| `humanizer`               | 문서·PR 본문 같은 글에서 AI 문투를 걷어낼 때                    |
 
 - 변경을 도구가 못 잡는 컨벤션 기준으로 검토할 때는 `frontend-convention-validator` 에이전트를 쓴다.
