@@ -55,7 +55,9 @@ describe('callback', () => {
   beforeEach(() => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => Response.json({ access_token: 'access-1', expires_in: 3600 })),
+      vi.fn(async () =>
+        Response.json({ access_token: 'access-1', refresh_token: 'refresh-1', expires_in: 3600 }),
+      ),
     );
   });
 
@@ -89,7 +91,16 @@ describe('callback', () => {
       secure: true,
       sameSite: 'lax',
       path: '/',
-      maxAge: 3600,
+      // 실제 만료보다 60초 먼저 사라지게 해서 proxy가 미리 갱신하게 한다.
+      maxAge: 3540,
+    });
+    expect(response.cookies.get('datagsm_rt')).toMatchObject({
+      value: 'refresh-1',
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 30 * 24 * 60 * 60,
     });
   });
 
@@ -171,6 +182,7 @@ describe('logout', () => {
 
     expect(response.status).toBe(303);
     expect(response.cookies.get('datagsm_at')?.value).toBe('');
+    expect(response.cookies.get('datagsm_rt')?.value).toBe('');
   });
 
   it('다른 사이트에서 온 요청은 403으로 막는다', () => {

@@ -2,12 +2,30 @@ import type { OauthEnv } from '../config';
 
 export interface OauthTokens {
   accessToken: string;
+  refreshToken: string;
   expiresIn: number;
 }
 
 interface TokenResponse {
   access_token?: unknown;
+  refresh_token?: unknown;
   expires_in?: unknown;
+  error?: unknown;
+}
+
+// 토큰 요청이 실패한 이유다. invalid_grant면 refresh token이 더는 쓸 수 없다는 뜻이다.
+export class OauthTokenError extends Error {
+  constructor(
+    readonly status: number,
+    readonly code: string | null,
+  ) {
+    super(`토큰 요청에 실패했습니다(${status}${code ? `, ${code}` : ''}).`);
+    this.name = 'OauthTokenError';
+  }
+
+  get isInvalidGrant() {
+    return this.code === 'invalid_grant';
+  }
 }
 
 export const buildAuthorizeUrl = (
@@ -32,34 +50,51 @@ export const buildAuthorizeUrl = (
 };
 
 // 인가 서버의 token 응답은 공통 응답 형식(CommonApiResponse)으로 감싸지 않은 OAuth 표준 JSON이다.
-export const exchangeCodeForTokens = async (
-  env: OauthEnv,
-  params: { code: string; codeVerifier: string; redirectUri: string },
-): Promise<OauthTokens> => {
+const requestTokens = async (env: OauthEnv, body: Record<string, string>): Promise<OauthTokens> => {
   const response = await fetch(new URL('/v1/oauth/token', env.OAUTH_AUTHORIZATION_BASE_URL), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      grant_type: 'authorization_code',
-      code: params.code,
-      redirect_uri: params.redirectUri,
+      ...body,
       client_id: env.OAUTH_CLIENT_ID,
       client_secret: env.OAUTH_CLIENT_SECRET,
-      code_verifier: params.codeVerifier,
     }),
     cache: 'no-store',
     signal: AbortSignal.timeout(10000),
   });
 
+  const json = (await response.json().catch(() => ({}))) as TokenResponse;
+
   if (!response.ok) {
-    throw new Error(`토큰 발급에 실패했습니다(${response.status}).`);
+    throw new OauthTokenError(response.status, typeof json.error === 'string' ? json.error : null);
   }
 
-  const body = (await response.json()) as TokenResponse;
-
-  if (typeof body.access_token !== 'string' || typeof body.expires_in !== 'number') {
+  if (
+    typeof json.access_token !== 'string' ||
+    typeof json.refresh_token !== 'string' ||
+    typeof json.expires_in !== 'number'
+  ) {
     throw new Error('토큰 응답 형식이 올바르지 않습니다.');
   }
 
-  return { accessToken: body.access_token, expiresIn: body.expires_in };
+  return {
+    accessToken: json.access_token,
+    refreshToken: json.refresh_token,
+    expiresIn: json.expires_in,
+  };
 };
+
+export const exchangeCodeForTokens = (
+  env: OauthEnv,
+  params: { code: string; codeVerifier: string; redirectUri: string },
+) =>
+  requestTokens(env, {
+    grant_type: 'authorization_code',
+    code: params.code,
+    redirect_uri: params.redirectUri,
+    code_verifier: params.codeVerifier,
+  });
+
+// 갱신할 때마다 새 refresh token이 온다(회전). 응답의 새 값으로 바꿔 저장해야 한다.
+export const refreshTokens = (env: OauthEnv, refreshToken: string) =>
+  requestTokens(env, { grant_type: 'refresh_token', refresh_token: refreshToken });

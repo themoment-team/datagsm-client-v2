@@ -1,15 +1,11 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import type { OauthEnv } from '../config';
-import {
-  ACCESS_TOKEN_COOKIE,
-  CALLBACK_PATH,
-  LOGIN_FLOW_COOKIE,
-  LOGIN_FLOW_MAX_AGE_SECONDS,
-} from './authCookies';
+import { CALLBACK_PATH, LOGIN_FLOW_COOKIE, LOGIN_FLOW_MAX_AGE_SECONDS } from './authCookies';
 import { buildAuthorizeUrl, exchangeCodeForTokens } from './oauthClient';
 import { createCodeChallenge, createRandomToken } from './pkce';
 import { toSafeReturnTo } from './returnTo';
+import { clearTokenCookies, setTokenCookies } from './tokenCookies';
 
 interface LoginFlow {
   state: string;
@@ -113,25 +109,19 @@ export const createAuthRoutes = (env: OauthEnv) => {
     }
 
     const response = finish(NextResponse.redirect(new URL(flow.returnTo, request.nextUrl.origin)));
-    response.cookies.set(ACCESS_TOKEN_COOKIE, tokens.accessToken, {
-      httpOnly: true,
-      secure: isHttps(request),
-      sameSite: 'lax',
-      path: '/',
-      maxAge: tokens.expiresIn,
-    });
+    setTokenCookies(response, tokens, isHttps(request));
 
     return response;
   };
 
-  // POST /api/logout → 이 앱의 토큰 쿠키만 지운다. 인가 서버(IdP) 세션 종료는 아직 하지 않는다.
+  // POST /api/logout → 이 앱의 토큰 쿠키(access, refresh)만 지운다. 인가 서버(IdP) 세션 종료는 아직 하지 않는다.
   const logout = (request: NextRequest) => {
     if (request.headers.get('origin') !== request.nextUrl.origin) {
       return new NextResponse(null, { status: 403 });
     }
 
     const response = NextResponse.redirect(new URL('/', request.nextUrl.origin), 303);
-    response.cookies.delete(ACCESS_TOKEN_COOKIE);
+    clearTokenCookies(response);
 
     return response;
   };
