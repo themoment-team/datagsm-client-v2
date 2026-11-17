@@ -3,7 +3,8 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    # develop은 작업 브랜치, main은 배포 브랜치다. 병합 결과도 두 브랜치에서 확인한다.
+    branches: [main, develop]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
