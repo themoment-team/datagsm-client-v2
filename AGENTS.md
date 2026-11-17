@@ -145,7 +145,7 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 ## API
 
 - 브라우저 요청은 `@/shared/api`, 서버(RSC, Server Function) 요청은 `@/shared/api/index.server`의 `get / post / patch / put / del`로 보낸다. 이 메서드는 core `createApiMethods`가 만들고 응답의 `.data`만 돌려준다. 인스턴스(`axiosInstance`, `serverAxiosInstance`)를 직접 호출하지 않는다.
-- 브라우저 인스턴스의 baseURL은 `/backend`이고, 각 앱 `next.config.ts`의 rewrite가 `API_BASE_URL`로 넘긴다. `/api/*`는 Route Handler용으로 비워 둔다. 서버 인스턴스는 `server-only`라 클라이언트 코드에서 `index.server`를 import하면 빌드가 실패한다.
+- 브라우저 인스턴스의 baseURL은 `/backend`이고, 각 앱 `next.config.ts`의 rewrite가 `API_BASE_URL`로 넘긴다. 단 client·admin은 `proxy.ts`가 `/backend/*`를 먼저 받아 토큰을 붙이고 직접 rewrite하므로 next.config rewrite까지 가지 않는다(인증 절 참고). `/api/*`는 Route Handler용으로 비워 둔다. 서버 인스턴스는 `server-only`라 클라이언트 코드에서 `index.server`를 import하면 빌드가 실패한다.
 - 응답 타입은 첫 번째, body 타입은 두 번째 제네릭이다: `post<UserResponse, UpdateProfileRequest>(url, body)`. URL 상수는 소유 slice의 `api/`에 두고 서버의 실제 경로를 그대로 쓴다.
 - DataGSM 서버 응답은 `{ status, code, message, data }` 형태로 감싸져 온다. 응답 타입에는 이 감싼 형태를 포함해 적는다.
 - 요청 실패는 모두 `ApiError { status, code, message, requestId? }`로 던져지고 원본은 `cause`에 있다. 응답이 없는 실패(네트워크 오류, 타임아웃, 취소)는 `status: 0`이다. `requestId`는 응답 헤더 `X-Request-Id`다. 화면에서는 `error instanceof ApiError`로 좁힌 뒤 분기한다.
