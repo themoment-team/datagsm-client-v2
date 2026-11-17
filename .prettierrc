@@ -1,0 +1,40 @@
+{
+  "printWidth": 100,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "tailwindFunctions": ["cn", "cva"],
+  "tailwindStylesheet": "./packages/tailwind-config/shared-styles.css",
+  "overrides": [
+    {
+      "files": "apps/client/**",
+      "options": { "tailwindStylesheet": "./apps/client/src/_app/styles/globals.css" }
+    },
+    {
+      "files": "apps/admin/**",
+      "options": { "tailwindStylesheet": "./apps/admin/src/_app/styles/globals.css" }
+    },
+    {
+      "files": "apps/docs/**",
+      "options": { "tailwindStylesheet": "./apps/docs/src/_app/styles/globals.css" }
+    },
+    {
+      "files": "apps/status/**",
+      "options": { "tailwindStylesheet": "./apps/status/src/_app/styles/globals.css" }
+    },
+    {
+      "files": "apps/oauth/**",
+      "options": { "tailwindStylesheet": "./apps/oauth/src/_app/styles/globals.css" }
+    },
+    {
+      "files": "apps/projects/**",
+      "options": { "tailwindStylesheet": "./apps/projects/src/_app/styles/globals.css" }
+    }
+  ]
+}

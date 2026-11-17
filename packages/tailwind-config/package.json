@@ -1,14 +1,14 @@
 {
   "name": "@datagsm/tailwind-config",
   "version": "0.0.0",
-  "type": "module",
   "private": true,
+  "type": "module",
   "exports": {
-    ".": "./shared-styles.css",
-    "./postcss": "./postcss.config.js"
+    "./shared-styles.css": "./shared-styles.css",
+    "./postcss": "./postcss.config.mjs"
   },
-  "devDependencies": {
-    "postcss": "catalog:",
-    "tailwindcss": "catalog:"
+  "dependencies": {
+    "tailwindcss": "catalog:",
+    "@tailwindcss/postcss": "catalog:"
   }
 }

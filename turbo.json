@@ -1,22 +1,33 @@
 {
-  "$schema": "https://turborepo.dev/schema.json",
-  "ui": "tui",
-  "globalEnv": ["API_BASE_URL"],
+  "$schema": "https://turborepo.com/schema.json",
+  "globalEnv": ["NODE_ENV"],
   "tasks": {
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "env": ["API_BASE_URL", "PORT"]
+    },
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "!.next/dev/**"]
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": ["API_BASE_URL"]
     },
     "lint": {
       "dependsOn": ["^lint"]
     },
     "check-types": {
-      "dependsOn": ["^build", "^check-types"]
+      "dependsOn": ["^check-types"],
+      "env": ["API_BASE_URL"]
     },
-    "dev": {
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"],
+      "env": ["API_BASE_URL"]
+    },
+    "test:e2e": {
+      "dependsOn": ["^build"],
       "cache": false,
-      "persistent": true
+      "env": ["API_BASE_URL", "CI"]
     }
   }
 }

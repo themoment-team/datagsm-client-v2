@@ -1,37 +1,55 @@
 {
-  "name": "client",
-  "version": "1.0.0",
-  "type": "module",
+  "name": "@datagsm/client",
+  "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.18.0",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "next dev --port 3000",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint --max-warnings 0",
-    "check-types": "next typegen && tsc --noEmit"
+    "build": "next build && node scripts/check-css.mjs",
+    "start": "next start --port 3000",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "check-types": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@datagsm/core": "workspace:*",
-    "@datagsm/ui": "workspace:*",
+    "@hookform/resolvers": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-query-devtools": "catalog:",
-    "geist": "catalog:",
+    "axios": "catalog:",
+    "class-variance-authority": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "react-hook-form": "catalog:",
+    "server-only": "catalog:",
+    "zod": "catalog:",
+    "@datagsm/core": "workspace:*"
   },
   "devDependencies": {
-    "@datagsm/eslint-config": "workspace:*",
-    "@datagsm/tailwind-config": "workspace:*",
-    "@datagsm/typescript-config": "workspace:*",
-    "@next/eslint-plugin-next": "catalog:",
+    "@playwright/test": "catalog:",
     "@tailwindcss/postcss": "catalog:",
+    "@testing-library/dom": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/react": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "babel-plugin-react-compiler": "catalog:",
     "eslint": "catalog:",
-    "postcss": "catalog:",
+    "jsdom": "catalog:",
     "tailwindcss": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "@datagsm/eslint-config": "workspace:*",
+    "@datagsm/typescript-config": "workspace:*",
+    "@datagsm/tailwind-config": "workspace:*"
   }
 }
