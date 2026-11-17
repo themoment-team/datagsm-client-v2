@@ -152,12 +152,25 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 - 401 응답에 연결할 동작은 `setOnUnauthorized`로 등록한다. 동시에 들어온 401은 진행 중인 훅 하나를 함께 기다리고, 훅이 끝나면 원래 요청은 재시도 없이 `ApiError`로 실패한다. 훅 안의 요청(토큰 갱신 등)은 이 인터셉터가 없는 별도 인스턴스로 보낸다. 같은 인스턴스로 보내 401을 받으면 훅을 기다리며 멈춘다. 서버 인스턴스는 모듈 상태를 요청 사이에 공유하므로 서버 쪽에 사용자별 훅을 등록하지 않는다.
 - API 모킹(MSW)은 두지 않는다. 개발은 `API_BASE_URL`로 실제 DataGSM 개발 서버에 붙는다. 컴포넌트 테스트에서 API 응답이 필요하면 `vi.mock`으로 API 함수를 바꾼다.
 
+## 인증
+
+- 로그인이 필요한 앱은 client와 admin뿐이다. 로그인 화면은 oauth 앱이 띄우고, client·admin은 인가 서버의 OAuth client 하나를 함께 쓴다.
+- 흐름(Authorization Code + PKCE S256): `GET /api/login?returnTo=` → 인가 서버 `/v1/oauth/authorize` → 콜백 `GET /api/callback`에서 Next 서버가 `/v1/oauth/token`으로 code를 바꾼다. state·verifier·돌아갈 경로는 `/api/callback` 경로에만 보내는 10분짜리 httpOnly 쿠키에 둔다. `returnTo`는 같은 앱의 `/` 경로만 허용한다.
+- access token은 앱 도메인의 host-only httpOnly 쿠키(`datagsm_at`, SameSite=Lax, 만료 = `expires_in`)에만 둔다. 브라우저 코드는 토큰을 읽지 않는다.
+- 백엔드는 `Authorization: Bearer`만 읽는다. 브라우저 요청은 `proxy.ts`가 `/backend/*`에서 쿠키를 헤더로 바꾸고(쿠키는 넘기지 않음), 서버 요청은 `withAccessToken`이 `cookies()`에서 읽어 붙인다.
+- 각 앱 `proxy.ts`의 matcher는 보호할 경로를 직접 적는 allowlist다. 로그인이 필요한 페이지를 만들면 matcher에 더한다. 제외 패턴("…을 뺀 전부")은 쓰지 않는다.
+- CSRF: 쿠키가 자동 전송되므로 `/backend/*`의 상태 변경 요청과 `POST /api/logout`은 `Origin`이 앱 주소와 다르면 403이다.
+- 브라우저 요청이 401을 받으면 `setOnUnauthorized(redirectToLogin)`가 로그인을 다시 시작한다. 인가 서버 세션(기본 8시간)이 살아 있으면 입력 없이 돌아온다. refresh token은 아직 저장하지 않는다.
+- 로그아웃은 `POST /api/logout`(form 또는 fetch)이며 이 앱의 토큰 쿠키만 지운다. GET 링크로 만들지 않는다(prefetch·이미지 태그로 실행될 수 있다). 인가 서버 세션 종료는 아직 하지 않는다.
+- 공용 코드는 `@datagsm/core/shared/auth`(브라우저)와 `@datagsm/core/shared/auth/server`(Route Handler, Proxy, 서버 인스턴스)에 있다. 앱은 `src/shared/api/authRoutes.ts`에서 검증한 env를 넘겨 `createAuthRoutes`를 만들고 `app/api/{login,callback,logout}/route.ts`는 그 핸들러만 내보낸다.
+
 ## 환경 변수
 
 - 서버 환경 변수는 `src/shared/config/env.ts` 한 곳에서 검증하고 `env`로 꺼내 쓴다. 앱 공통 변수와 오류 메시지는 `@datagsm/core/shared/config`의 `AppEnvSchema`가 소유하고, 앱은 `process.env` 값을 모아 `parseEnv`에 넘긴다. 앱 전용 변수는 `AppEnvSchema.extend({...})`로 더한다. 일반 기능은 `process.env`를 다른 곳에서 직접 읽지 않는다.
 - 새 변수를 추가하면 스키마(공통이면 core, 앱 전용이면 앱의 `extend`), `.env.example`, CI의 `env`를 함께 고친다.
 - status를 뺀 각 앱의 변수는 `API_BASE_URL`(필수, http(s) URL)이다. `API_BASE_URL`이 없으면 `dev`, `build`, `check-types`가 바로 실패한다.
 - client·docs·status·projects는 공용 사이드바에서 서로 이동할 앱 주소 `APP_CLIENT_URL`, `APP_DOCS_URL`, `APP_STATUS_URL`, `APP_PROJECTS_URL`(모두 필수)도 받는다. 스키마는 core의 `AppUrlsEnvSchema`이고, 값은 `readAppUrlsEnv(process.env)`로 모은다. 앱은 서브도메인(`datagsm.kr`, `docs.datagsm.kr` 등)으로 따로 배포한다.
+- client·admin은 로그인용 `OAUTH_AUTHORIZATION_BASE_URL`(인가 서버 주소), `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`(모두 필수, 서버 전용)도 받는다. 인가 서버의 client에 앱마다 `<앱 주소>/api/callback`을 redirect URI로 등록해야 한다. secret은 `.env.local`과 Vercel에만 넣는다.
 - status 앱은 상태를 확인할 서버 4개의 base URL(`STATUS_WEB_BASE_URL`, `STATUS_OPENAPI_BASE_URL`, `STATUS_OAUTH_AUTHORIZATION_BASE_URL`, `STATUS_OAUTH_RESOURCE_BASE_URL`, 모두 필수)만 받는다. DataGSM API를 호출하지 않으므로 `API_BASE_URL`, `/backend` rewrite, axios 인스턴스가 없다. 실제 주소는 공개하지 않으므로 `.env.example`과 CI에는 자리 표시용 값만 두고, 실제 값은 `.env.local`과 Vercel에만 넣는다. 상태 확인은 서버 컴포넌트에서 각 서버의 `GET /v1/health`를 요청해 2xx면 정상으로 보고, 응답 속도는 그 요청 앞뒤 시간만 잰다.
 - `env`는 서버에서만 읽는다. 클라이언트 컴포넌트에서 import하지 않는다.
 
