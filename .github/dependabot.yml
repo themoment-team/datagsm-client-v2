@@ -1,9 +1,11 @@
 version: 2
 
 updates:
+  # 작업 브랜치가 develop이라 업데이트 PR도 develop으로 보낸다. 기본 브랜치(main)로 가면 두 브랜치가 엇갈린다.
   # pnpm 워크스페이스와 catalog 버전은 루트에서 함께 갱신한다.
   - package-ecosystem: npm
     directory: /
+    target-branch: develop
     schedule:
       interval: weekly
       day: monday
@@ -31,6 +33,7 @@ updates:
   # 메이저 업데이트는 그룹에 넣지 않고 개별 PR로 검토한다.
   - package-ecosystem: github-actions
     directory: /
+    target-branch: develop
     schedule:
       interval: weekly
       day: monday
