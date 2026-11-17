@@ -31,6 +31,10 @@
     {
       "files": "apps/oauth/**",
       "options": { "tailwindStylesheet": "./apps/oauth/src/_app/styles/globals.css" }
+    },
+    {
+      "files": "apps/projects/**",
+      "options": { "tailwindStylesheet": "./apps/projects/src/_app/styles/globals.css" }
     }
   ]
 }

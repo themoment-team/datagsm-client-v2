@@ -7,6 +7,7 @@ const lintPackages = [
   'apps/docs',
   'apps/status',
   'apps/oauth',
+  'apps/projects',
   'packages/core',
   'packages/mocks',
 ];

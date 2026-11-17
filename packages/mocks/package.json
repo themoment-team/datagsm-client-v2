@@ -28,7 +28,8 @@
       "../../apps/admin/public",
       "../../apps/docs/public",
       "../../apps/status/public",
-      "../../apps/oauth/public"
+      "../../apps/oauth/public",
+      "../../apps/projects/public"
     ]
   }
 }

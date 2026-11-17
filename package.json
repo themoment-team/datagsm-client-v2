@@ -10,7 +10,7 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
-    "lint:fsd": "steiger apps/client/src --fail-on-warnings && steiger apps/admin/src --fail-on-warnings && steiger apps/docs/src --fail-on-warnings && steiger apps/status/src --fail-on-warnings && steiger apps/oauth/src --fail-on-warnings && steiger packages/core/src --fail-on-warnings",
+    "lint:fsd": "steiger apps/client/src --fail-on-warnings && steiger apps/admin/src --fail-on-warnings && steiger apps/docs/src --fail-on-warnings && steiger apps/status/src --fail-on-warnings && steiger apps/oauth/src --fail-on-warnings && steiger apps/projects/src --fail-on-warnings && steiger packages/core/src --fail-on-warnings",
     "check-types": "turbo run check-types",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
