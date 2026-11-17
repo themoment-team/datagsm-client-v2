@@ -2,8 +2,9 @@ import assert from 'node:assert/strict';
 import { readdir, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
-// 빌드 성공만으로는 core 소스 탐색과 앱 토큰 덮어쓰기를 보장할 수 없다.
-const root = fileURLToPath(new URL('../.next/', import.meta.url));
+// 빌드 성공만으로는 core 소스 탐색과 공통 CSS의 글꼴 포함을 보장할 수 없다.
+// .next/static만 읽는다. .next/dev에는 개발 서버가 남긴 이전 CSS가 있어 결과가 틀어질 수 있다.
+const root = fileURLToPath(new URL('../.next/static/', import.meta.url));
 const collect = async (dir) => {
   const entries = await readdir(dir, { withFileTypes: true });
   const nested = await Promise.all(
@@ -33,10 +34,5 @@ assert.match(
   css,
   /url\([^)]*\/media\/PretendardVariable\.subset\.[^)]*\.woff2\)/,
   'Pretendard 폰트 파일 경로가 빌드에서 풀리지 않았습니다.',
-);
-assert.match(
-  css,
-  /--color-background:\s*#f3f4f6\b/i,
-  'admin 토큰 덮어쓰기가 빌드 CSS에서 빠졌습니다.',
 );
 console.log('빌드 CSS 검증 통과');

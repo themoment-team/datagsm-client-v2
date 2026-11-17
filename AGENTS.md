@@ -99,6 +99,10 @@ export { HomePage as default } from '@/_pages/home';
 ## 스타일링
 
 - Tailwind CSS v4다. 앱 진입점은 `src/_app/styles/globals.css`, 공통 디자인 토큰은 `@datagsm/tailwind-config/shared-styles.css`가 소유한다. 토큰은 `@theme`에 추가하고(`--color-background` → `bg-background`), 다른 전역 스타일 진입점을 만들지 않는다.
+- 디자인 토큰은 Figma DataGSMv2의 "WF · 파운데이션"(Dark 모드만)을 옮긴 것이다. Tailwind 기본 색 팔레트는 지웠으므로 색은 토큰만 쓴다: 면 `background`·`surface`·`subtle`·`table-head`·`selected`·`row-selected`·`strong`·`glass-fill`·`scrim`·`scrim-card`, 선 `line`·`glass-line`, 글자 `foreground`·`foreground-muted`·`on-strong`·`error`.
+- 글자는 텍스트 스타일 토큰 하나로 크기·줄 높이·자간·굵기를 함께 정한다: `text-title-32`, `text-title-24`, `text-heading-20`, `text-body-16`, `text-body-16-regular`, `text-label-14`, `text-caption-12`, `text-badge-11`, 코드는 `font-mono text-code-12`.
+- Figma의 간격·모서리·높이 값은 Tailwind 기본값과 같아서 토큰을 따로 두지 않는다: 간격 4·8·12·14·16·24·32px = `1`·`2`·`3`·`3.5`·`4`·`6`·`8`, 모서리 4px = `rounded`, 버튼 높이 36px = `h-9`. 같은 값의 토큰(`--spacing-14` 등)을 새로 만들지 않는다.
+- `--text-*` 토큰 이름을 더하거나 바꾸면 core `shared/lib/cn.ts`의 목록도 고친다. tailwind-merge가 모르는 이름은 잘못 병합한다(예: `text-title-32`를 글자색으로 보고 지운다).
 - 글꼴은 본문 Pretendard(`font-sans`, 기본값), 코드 JetBrains Mono(`font-mono`)다. 둘 다 `@datagsm/tailwind-config/shared-styles.css`가 npm 패키지의 unicode-range 분할 CSS로 불러온다. 앱에서 `next/font`나 다른 글꼴 진입점을 따로 만들지 않는다.
 - 정적 클래스는 문자열 하나로 쓴다. `cn()`(`@datagsm/core/shared/lib`)은 조건부 클래스나 외부 `className` 병합이 있을 때만 쓴다.
 - 여러 곳에서 반복되는 클래스 조합은 컴포넌트로 뽑는다. 클래스 문자열을 상수로 빼지 않는다.
