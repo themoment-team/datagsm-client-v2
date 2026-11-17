@@ -18,4 +18,20 @@ const files = await collect(root);
 assert.ok(files.length, '빌드 CSS가 없습니다.');
 const css = (await Promise.all(files.map((file) => readFile(file, 'utf8')))).join('\n');
 assert.match(css, /z-index:\s*314159/, 'core fixture 클래스가 빌드 CSS에서 빠졌습니다.');
+// 공통 CSS가 import한 폰트의 url()이 앱 빌드에서 풀려 파일로 나갔는지 확인한다.
+assert.match(
+  css,
+  /font-family:\s*"?Pretendard Variable/,
+  'Pretendard @font-face가 빌드 CSS에서 빠졌습니다.',
+);
+assert.match(
+  css,
+  /font-family:\s*"?JetBrains Mono Variable/,
+  'JetBrains Mono @font-face가 빌드 CSS에서 빠졌습니다.',
+);
+assert.match(
+  css,
+  /url\([^)]*\/media\/PretendardVariable\.subset\.[^)]*\.woff2\)/,
+  'Pretendard 폰트 파일 경로가 빌드에서 풀리지 않았습니다.',
+);
 console.log('빌드 CSS 검증 통과');
