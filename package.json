@@ -1,25 +1,33 @@
 {
   "name": "datagsm-client-v2",
+  "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "lint:fsd": "node scripts/check-fsd-dependencies.mjs apps/client/src apps/admin/src apps/docs/src apps/status/src apps/oauth/src packages/core/src && steiger apps/client/src --fail-on-warnings && steiger apps/admin/src --fail-on-warnings && steiger apps/docs/src --fail-on-warnings && steiger apps/status/src --fail-on-warnings && steiger apps/oauth/src --fail-on-warnings && steiger packages/core/src --fail-on-warnings",
-    "lint:fix": "turbo run lint -- --fix",
-    "check-types": "turbo run check-types",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
-  },
-  "devDependencies": {
-    "@feature-sliced/steiger-plugin": "^0.7.0",
-    "prettier": "3.9.6",
-    "prettier-plugin-tailwindcss": "0.8.1",
-    "steiger": "^0.6.0",
-    "turbo": "^2.10.12"
-  },
-  "packageManager": "pnpm@12.3.4",
+  "packageManager": "pnpm@12.18.0",
   "engines": {
     "node": ">=24"
-  }
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "lint:fsd": "steiger apps/client/src --fail-on-warnings && steiger apps/admin/src --fail-on-warnings && steiger apps/docs/src --fail-on-warnings && steiger apps/status/src --fail-on-warnings && steiger apps/oauth/src --fail-on-warnings && steiger packages/core/src --fail-on-warnings",
+    "check-types": "turbo run check-types",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@feature-sliced/steiger-plugin": "catalog:",
+    "steiger": "catalog:",
+    "@playwright/test": "catalog:",
+    "turbo": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-tailwindcss": "catalog:",
+    "husky": "catalog:",
+    "lint-staged": "catalog:",
+    "typescript": "catalog:"
+  },
+  "type": "module"
 }

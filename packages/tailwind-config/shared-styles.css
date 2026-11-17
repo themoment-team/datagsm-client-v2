@@ -1,7 +1,8 @@
 @import 'tailwindcss';
 
+@source '../core/src';
+
 @theme {
-  --color-blue-1000: #2a8af6;
-  --color-purple-1000: #a853ba;
-  --color-red-1000: #e92a67;
+  --color-background: #ffffff;
+  --color-foreground: #171717;
 }

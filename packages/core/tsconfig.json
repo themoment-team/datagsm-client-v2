@@ -1,5 +1,7 @@
 {
-  "extends": "@datagsm/typescript-config/nextjs.json",
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  "extends": "@datagsm/typescript-config/react-library.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vitest.config.ts", "vitest.setup.ts"]
 }

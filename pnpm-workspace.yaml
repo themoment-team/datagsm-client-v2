@@ -1,27 +1,55 @@
 packages:
-  - 'apps/*'
-  - 'packages/*'
+  - apps/*
+  - packages/*
+
+minimumReleaseAge: 10080
+
+# 필요한 설치 스크립트만 허용한다.
+allowBuilds:
+  esbuild: true
 
 catalog:
-  '@next/eslint-plugin-next': 16.3.4
-  '@tailwindcss/postcss': 4.3.3
-  '@tanstack/react-query': 5.102.8
-  '@tanstack/react-query-devtools': 5.102.8
-  '@types/node': 26.4.1
-  '@types/react': 19.2.18
-  '@types/react-dom': 19.2.7
-  eslint: 10.10.0
-  geist: 1.7.2
-  next: 16.3.4
-  postcss: 8.5.28
-  react: 19.2.8
-  react-dom: 19.2.8
-  tailwindcss: 4.3.3
-  typescript: 7.0.2
-
-catalogs:
-  typescript6:
-    typescript: npm:@typescript/typescript6@6.0.2
-
-allowBuilds:
-  '@parcel/watcher': true
+  '@feature-sliced/steiger-plugin': '0.8.2'
+  '@hookform/resolvers': '7.0.5'
+  '@playwright/test': '1.65.0'
+  '@tailwindcss/postcss': '4.3.5'
+  '@tanstack/react-query': '5.107.1'
+  '@tanstack/react-query-devtools': '5.107.1'
+  '@testing-library/dom': '10.4.2'
+  '@testing-library/jest-dom': '7.0.1'
+  '@testing-library/react': '16.3.3'
+  '@types/node': '24.19.2'
+  '@types/react': '19.3.0'
+  '@types/react-dom': '19.3.0'
+  '@vitejs/plugin-react': '6.3.0'
+  'axios': '1.21.0'
+  'babel-plugin-react-compiler': '1.0.0'
+  'class-variance-authority': '0.7.1'
+  'clsx': '2.1.1'
+  'eslint': '10.14.0'
+  'eslint-config-next': '16.4.5'
+  'eslint-config-prettier': '10.1.8'
+  'eslint-plugin-jsx-a11y': '6.10.2'
+  'eslint-plugin-react': '7.37.5'
+  'eslint-plugin-react-hooks': '7.1.1'
+  'eslint-plugin-simple-import-sort': '14.0.0'
+  'husky': '9.1.7'
+  'jsdom': '31.0.0'
+  'lint-staged': '17.6.0'
+  'msw': '3.0.4'
+  'next': '16.4.5'
+  'prettier': '3.9.10'
+  'prettier-plugin-tailwindcss': '0.8.1'
+  'react': '19.3.1'
+  'react-dom': '19.3.1'
+  'react-hook-form': '7.91.0'
+  'server-only': '0.0.1'
+  'steiger': '0.9.0'
+  'tailwind-merge': '3.7.0'
+  'tailwindcss': '4.3.5'
+  'turbo': '2.11.10'
+  'typescript': '6.0.3'
+  'typescript-eslint': '8.72.1'
+  'vite': '8.3.6'
+  'vitest': '5.1.0'
+  'zod': '4.6.7'

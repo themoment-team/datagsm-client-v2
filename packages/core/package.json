@@ -1,32 +1,49 @@
 {
   "name": "@datagsm/core",
   "version": "0.0.0",
-  "type": "module",
   "private": true,
+  "type": "module",
   "exports": {
+    "./shared/*": "./src/shared/*/index.ts",
+    "./shared/*/server": "./src/shared/*/index.server.ts",
     "./entities/*": "./src/entities/*/index.ts",
-    "./shared": "./src/shared/index.ts",
-    "./shared/client": "./src/shared/index.client.ts",
-    "./shared/server": "./src/shared/index.server.ts"
+    "./entities/*/server": "./src/entities/*/index.server.ts",
+    "./features/*": "./src/features/*/index.ts",
+    "./features/*/server": "./src/features/*/index.server.ts",
+    "./widgets/*": "./src/widgets/*/index.ts",
+    "./widgets/*/server": "./src/widgets/*/index.server.ts"
   },
   "scripts": {
+    "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit",
-    "lint": "eslint src --max-warnings 0",
-    "lint:fix": "eslint src --max-warnings 0 --fix"
-  },
-  "peerDependencies": {
-    "next": "catalog:",
-    "react": "catalog:"
+    "test": "vitest run"
   },
   "dependencies": {
-    "axios": "1.20.0",
-    "server-only": "0.0.1"
+    "@tanstack/react-query": "catalog:",
+    "axios": "catalog:",
+    "class-variance-authority": "catalog:",
+    "clsx": "catalog:",
+    "server-only": "catalog:",
+    "tailwind-merge": "catalog:",
+    "zod": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:"
   },
   "devDependencies": {
     "@datagsm/eslint-config": "workspace:*",
     "@datagsm/typescript-config": "workspace:*",
+    "@testing-library/dom": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/react": "catalog:",
     "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
     "eslint": "catalog:",
-    "typescript": "catalog:"
+    "jsdom": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
