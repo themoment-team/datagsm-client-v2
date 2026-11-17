@@ -1,6 +1,6 @@
 # DataGSM Client v2
 
-DataGSM의 Next.js 프런트엔드 모노레포다. 다섯 앱(client, admin, docs, status, oauth)이 외부 DataGSM 백엔드를 사용하고, 각 앱은 FSD 구조를 갖는다. 공통 코드는 패키지로 공유한다. 구조와 검사는 [project-template](https://github.com/junjuny0227/project-template)의 multi-web을 바탕으로 했다.
+DataGSM의 Next.js 프런트엔드 모노레포다. 여섯 앱(client, admin, docs, status, oauth, projects)이 외부 DataGSM 백엔드를 사용하고, 각 앱은 FSD 구조를 갖는다. 공통 코드는 패키지로 공유한다. 구조와 검사는 [project-template](https://github.com/junjuny0227/project-template)의 multi-web을 바탕으로 했다.
 
 ## 시작하기
 
@@ -8,17 +8,18 @@ Node.js 24 이상과 pnpm 12.18.0이 필요하다.
 
 ```bash
 pnpm install --frozen-lockfile
-for app in client admin docs status oauth; do cp apps/$app/.env.example apps/$app/.env.local; done
+for app in client admin docs status oauth projects; do cp apps/$app/.env.example apps/$app/.env.local; done
 pnpm dev
 ```
 
-| 앱     | 주소                    | 용도        |
-| ------ | ----------------------- | ----------- |
-| client | `http://localhost:3000` | 사용자      |
-| admin  | `http://localhost:3001` | 관리자      |
-| docs   | `http://localhost:3002` | 기술 문서   |
-| status | `http://localhost:3003` | 서비스 상태 |
-| oauth  | `http://localhost:3004` | OAuth       |
+| 앱       | 주소                    | 용도        |
+| -------- | ----------------------- | ----------- |
+| client   | `http://localhost:3000` | 사용자      |
+| admin    | `http://localhost:3001` | 관리자      |
+| docs     | `http://localhost:3002` | 기술 문서   |
+| status   | `http://localhost:3003` | 서비스 상태 |
+| oauth    | `http://localhost:3004` | OAuth       |
+| projects | `http://localhost:3005` | 프로젝트    |
 
 기본 환경에서는 MSW가 브라우저와 서버 요청을 모킹하므로 백엔드 없이 각 홈을 확인할 수 있다.
 
@@ -30,7 +31,8 @@ apps/
 ├── admin/                  관리자 (3001)
 ├── docs/                   기술 문서 (3002)
 ├── status/                 서비스 상태 (3003)
-└── oauth/                  OAuth (3004)
+├── oauth/                  OAuth (3004)
+└── projects/               프로젝트 (3005)
     ├── app/                얇은 Next 라우트, 오류 화면(error, not-found, global-error)
     ├── src/                _app → _pages → widgets → features → entities → shared
     ├── instrumentation.ts  서버 모킹 시작점
@@ -80,10 +82,10 @@ docker build --build-arg APP=client --build-arg API_BASE_URL=https://api.example
 docker run --rm -p 3000:3000 -e API_BASE_URL=https://api.example.com datagsm-client
 ```
 
-다른 앱은 `APP`을 `admin`, `docs`, `status`, `oauth`로 바꾸고 해당 포트(3001~3004)를 연결한다.
+다른 앱은 `APP`을 `admin`, `docs`, `status`, `oauth`, `projects`로 바꾸고 해당 포트(3001~3005)를 연결한다.
 
 - `API_BASE_URL`은 `/backend/*` rewrite에 들어가 빌드할 때 고정된다. API 주소가 바뀌면 이미지를 다시 만든다. 실행할 때도 환경 변수 검증에 필요하므로 같은 값을 넘긴다. 컨테이너 안에서 접근할 수 있는 주소여야 한다.
-- 이미지는 모킹을 끈 상태(`NEXT_PUBLIC_API_MOCKING=disabled`)로 빌드·실행된다. 컨테이너 포트는 앱 포트(3000~3004)와 같다.
+- 이미지는 모킹을 끈 상태(`NEXT_PUBLIC_API_MOCKING=disabled`)로 빌드·실행된다. 컨테이너 포트는 앱 포트(3000~3005)와 같다.
 - Node 24, pnpm 12.18.0 기반 다단계 빌드(`turbo prune --docker`)이며 `node` 사용자로 `pnpm start`를 실행한다. `output: 'standalone'`은 쓰지 않는다.
 
 ## 의존성 업데이트
@@ -96,7 +98,7 @@ docker run --rm -p 3000:3000 -e API_BASE_URL=https://api.example.com datagsm-cli
 
 ## 명령과 검증
 
-루트 명령은 다섯 앱과 해당 패키지의 작업을 Turborepo로 실행한다. `lint:fsd`만 루트 `steiger.config.mjs`로 각 소스 루트를 차례로 검사한다.
+루트 명령은 모든 앱과 해당 패키지의 작업을 Turborepo로 실행한다. `lint:fsd`만 루트 `steiger.config.mjs`로 각 소스 루트를 차례로 검사한다.
 
 ```bash
 pnpm dev
@@ -112,10 +114,10 @@ pnpm build
 
 `check-types`, `build`에는 `API_BASE_URL`이 필요하다. 환경 파일 없이 검사하려면 `API_BASE_URL=http://localhost:8080 NEXT_PUBLIC_API_MOCKING=disabled pnpm build`처럼 명령 앞에 전달한다. `.github/workflows/ci.yml`은 같은 게이트를 실행하며 운영 빌드의 모킹을 명시적으로 끈다.
 
-- `lint:fsd`: 다섯 앱과 core의 FSD 경계 검사.
+- `lint:fsd`: 모든 앱과 core의 FSD 경계 검사.
 - `test`: Vitest 단위 테스트.
-- `test:e2e`: 앱마다 Playwright가 서버 두 개를 직접 띄운다. `chromium` 프로젝트는 모킹을 끈 빌드·운영 서버(3000~3004), `mocking` 프로젝트는 모킹을 켠 개발 서버(3100~3104)를 사용한다. 백엔드는 필요 없으며 열 포트는 비워 둔다.
-- `build`: 다섯 앱 빌드와 core 클래스·앱 전용 토큰이 CSS에 포함됐는지 검사.
+- `test:e2e`: 앱마다 Playwright가 서버 두 개를 직접 띄운다. `chromium` 프로젝트는 모킹을 끈 빌드·운영 서버(3000~3005), `mocking` 프로젝트는 모킹을 켠 개발 서버(3100~3105)를 사용한다. 백엔드는 필요 없으며 이 포트들은 비워 둔다.
+- `build`: 모든 앱 빌드와 core 클래스·앱 전용 토큰이 CSS에 포함됐는지 검사.
 - `format`: Prettier 자동 수정.
 
 ## 에이전트와 작업 양식

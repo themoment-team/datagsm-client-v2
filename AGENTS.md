@@ -1,6 +1,6 @@
 # DataGSM Client v2
 
-DataGSM의 Next.js App Router **프런트엔드 모노레포**다. 다섯 앱 `apps/client`(3000), `apps/admin`(3001), `apps/docs`(3002), `apps/status`(3003), `apps/oauth`(3004)가 외부 DataGSM 백엔드를 사용한다. Feature-Sliced Design(FSD) 공식 Next.js 구조를 따른다. 모든 응답과 문서는 한국어로 작성하고, 식별자·파일 이름·커밋 타입은 영어로 둔다.
+DataGSM의 Next.js App Router **프런트엔드 모노레포**다. 여섯 앱 `apps/client`(3000), `apps/admin`(3001), `apps/docs`(3002), `apps/status`(3003), `apps/oauth`(3004), `apps/projects`(3005)가 외부 DataGSM 백엔드를 사용한다. Feature-Sliced Design(FSD) 공식 Next.js 구조를 따른다. 모든 응답과 문서는 한국어로 작성하고, 식별자·파일 이름·커밋 타입은 영어로 둔다.
 
 ## 스택
 
@@ -15,7 +15,7 @@ pnpm 12 / Next.js 16 (App Router, React Compiler) / React 19 / TypeScript 6 / Ta
 ## 구조
 
 ```text
-apps/{client,admin,docs,status,oauth}/
+apps/{client,admin,docs,status,oauth,projects}/
 ├── app/                   얇은 Next 라우트 (layout, page, error, not-found, global-error)
 ├── src/
 │   ├── _app/              providers(TanStackProvider, MockProvider), global-error, styles/globals.css
@@ -156,8 +156,9 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 
 ## 보안 헤더와 배포
 
-- 다섯 앱의 `next.config.ts`의 `headers()`가 모든 경로에 기본 보안 헤더(HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`)를 붙이고 `X-Powered-By`를 끈다. CSP는 넣지 않았다. 헤더를 바꾸거나 CSP를 더하면 모든 앱의 `e2e/security-headers.spec.ts`도 함께 고친다. 다섯 앱의 `next.config.ts`는 같게 유지하고, 공통 부분을 바꾸면 다섯 파일에 똑같이 고친다.
-- 루트 `Dockerfile` 하나로 각 앱을 빌드한다(`--build-arg APP=client`, `admin`, `docs`, `status`, `oauth`). `API_BASE_URL`은 rewrite에 들어가 빌드 시 고정되므로 `--build-arg`로 넘기고, 주소가 바뀌면 이미지를 다시 만든다. 빌드·실행 명령은 README에 있다.
+- 모든 앱의 `next.config.ts`의 `headers()`가 모든 경로에 기본 보안 헤더(HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`)를 붙이고 `X-Powered-By`를 끈다. CSP는 넣지 않았다. 헤더를 바꾸거나 CSP를 더하면 모든 앱의 `e2e/security-headers.spec.ts`도 함께 고친다. 모든 앱의 `next.config.ts`는 같게 유지하고, 공통 부분을 바꾸면 모든 앱 파일에 똑같이 고친다.
+- 앱을 추가하거나 지우면 앱 폴더 밖에서 앱 목록을 가진 곳도 함께 고친다: 루트 `package.json`의 `lint:fsd`, `.lintstagedrc.mjs`, `.prettierrc` overrides, `packages/mocks/package.json`의 `msw.workerDirectory`, `Dockerfile`의 `APP` 검사와 `EXPOSE`, 전용 스킬 `api-client`·`api-mocking`, 이 문서와 README. 새 앱은 기존 앱을 복제한 뒤 `package.json` 이름·포트, `playwright.config.ts` 포트(앱 포트 + 100), `layout.tsx` 메타, 홈 제목과 그 테스트를 바꾼다. 마지막에 `rg -n "oauth"`처럼 기존 앱 이름으로 검색해 빠진 곳이 없는지 확인한다.
+- 루트 `Dockerfile` 하나로 각 앱을 빌드한다(`--build-arg APP=client`, `admin`, `docs`, `status`, `oauth`, `projects`). `API_BASE_URL`은 rewrite에 들어가 빌드 시 고정되므로 `--build-arg`로 넘기고, 주소가 바뀌면 이미지를 다시 만든다. 빌드·실행 명령은 README에 있다.
 
 ## 데이터와 폼
 
@@ -169,12 +170,12 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 ## 테스트
 
 - 단위 테스트는 대상 파일 옆에 `*.test.ts(x)`로 둔다(Vitest, jsdom, Testing Library).
-- E2E 테스트는 `e2e/*.spec.ts`에 둔다(Playwright). 모킹을 끈 검사는 앱을 빌드해 띄운 뒤(3000~3004) 돌고 모킹을 켠 검사만 개발 서버(3100~3104)에서 돈다. 외부 API 없이 통과해야 한다.
+- E2E 테스트는 `e2e/*.spec.ts`에 둔다(Playwright). 모킹을 끈 검사는 앱을 빌드해 띄운 뒤(3000~3005) 돌고 모킹을 켠 검사만 개발 서버(3100~3105)에서 돈다. 외부 API 없이 통과해야 한다.
 - 동작을 바꾸면 그 동작을 확인하는 테스트를 함께 고치거나 추가한다.
 
 ## 검증
 
-변경 후 프로젝트 루트에서 범위에 맞는 검사를 실행한다. 루트 스크립트가 다섯 앱과 패키지의 게이트를 실행하며 lint:fsd는 다섯 앱과 core를 검사한다. CI(`.github/workflows/ci.yml`)도 같은 순서로 전부 실행한다.
+변경 후 프로젝트 루트에서 범위에 맞는 검사를 실행한다. 루트 스크립트가 모든 앱과 패키지의 게이트를 실행하며 lint:fsd는 모든 앱과 core를 검사한다. CI(`.github/workflows/ci.yml`)도 같은 순서로 전부 실행한다.
 
 ```bash
 pnpm lint

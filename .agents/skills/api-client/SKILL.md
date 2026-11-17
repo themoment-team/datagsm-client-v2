@@ -5,7 +5,7 @@ description: 웹 앱에서 API 요청 코드를 쓰거나 고칠 때, 요청 에
 
 # api-client
 
-이 문서의 `src/`, `@/` 경로와 `next.config.ts`는 웹 앱 기준이다. 각 앱 폴더(`apps/client/`, `apps/admin/`, `apps/docs/`, `apps/status/`, `apps/oauth/`) 아래에 대응한다.
+이 문서의 `src/`, `@/` 경로와 `next.config.ts`는 웹 앱 기준이다. 각 앱 폴더(`apps/client/`, `apps/admin/`, `apps/docs/`, `apps/status/`, `apps/oauth/`, `apps/projects/`) 아래에 대응한다.
 
 요청 위에서 데이터를 다루는 방법(query 팩토리, mutation, 폼)은 `data-and-forms` 스킬에 있다. 아래 예의 `UserResponse`, `UpdateProfileRequest`는 설명용 이름이며 아직 없는 코드다.
 

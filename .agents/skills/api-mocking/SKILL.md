@@ -5,7 +5,7 @@ description: MSW API 모킹을 다룰 때 쓴다. `@datagsm/mocks`에 mock handl
 
 # api-mocking
 
-`src/`, `instrumentation.ts`, `next.config.ts`, `e2e/` 경로는 각 앱(`apps/client/`, `apps/admin/`, `apps/docs/`, `apps/status/`, `apps/oauth/`) 기준이다. MSW가 브라우저 요청과 Node 서버 요청을 함께 모킹해서 백엔드 없이 개발할 수 있다. `@datagsm/mocks`가 공통 handler와 시작 함수를 제공하고, 앱이 그것을 배선한다.
+`src/`, `instrumentation.ts`, `next.config.ts`, `e2e/` 경로는 각 앱(`apps/client/`, `apps/admin/`, `apps/docs/`, `apps/status/`, `apps/oauth/`, `apps/projects/`) 기준이다. MSW가 브라우저 요청과 Node 서버 요청을 함께 모킹해서 백엔드 없이 개발할 수 있다. `@datagsm/mocks`가 공통 handler와 시작 함수를 제공하고, 앱이 그것을 배선한다.
 
 ## 켜고 끄기
 
@@ -23,7 +23,7 @@ description: MSW API 모킹을 다룰 때 쓴다. `@datagsm/mocks`에 mock handl
 
 ## worker 파일
 
-- MSW를 올리면 `pnpm --filter @datagsm/mocks exec msw init`으로 다섯 앱의 worker 파일을 재생성한다.
+- MSW를 올리면 `pnpm --filter @datagsm/mocks exec msw init`으로 모든 앱의 worker 파일을 재생성한다.
 
 ## 확인용 화면
 
@@ -31,4 +31,4 @@ description: MSW API 모킹을 다룰 때 쓴다. `@datagsm/mocks`에 mock handl
 
 ## E2E
 
-- E2E의 `mocking` 프로젝트는 `enabled`인 `pnpm dev`(앱 포트 + 100: 3100~3104), `chromium` 프로젝트는 `disabled`로 빌드한 운영 서버(3000~3004)를 쓴다. 모킹 켠 브라우저·서버 응답, 모킹 끈 worker 미등록·번들 MSW 부재를 확인한다.
+- E2E의 `mocking` 프로젝트는 `enabled`인 `pnpm dev`(앱 포트 + 100: 3100~3105), `chromium` 프로젝트는 `disabled`로 빌드한 운영 서버(3000~3005)를 쓴다. 모킹 켠 브라우저·서버 응답, 모킹 끈 worker 미등록·번들 MSW 부재를 확인한다.
