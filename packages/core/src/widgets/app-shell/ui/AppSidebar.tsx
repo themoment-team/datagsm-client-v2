@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { LogoutButton } from '../../../features/logout';
 import type { AppUrls } from '../../../shared/config';
 import { getSidebarItemHref, isSidebarItemActive } from '../lib/sidebarLink';
 import type { SidebarItem } from '../model/sidebarItem';
@@ -14,6 +15,9 @@ interface AppSidebarProps {
   footerItems: SidebarItem[];
   // 로고 옆에 붙는 표시다. 관리자 웹은 '관리자'를 넘긴다.
   badge?: string;
+  // 로그인하는 앱(client, admin)만 넘긴다. 넘기면 계정 메뉴 끝에 로그아웃 버튼을 둔다.
+  // 공개 앱(docs, status, projects)은 로그인 상태를 모르므로 로그아웃 버튼이 없다.
+  idpLogoutUrl?: string;
 }
 
 interface SidebarLinkProps {
@@ -45,7 +49,14 @@ const SidebarLink = ({ item, currentApp, appUrls, pathname }: SidebarLinkProps) 
   );
 };
 
-export const AppSidebar = ({ currentApp, appUrls, items, footerItems, badge }: AppSidebarProps) => {
+export const AppSidebar = ({
+  currentApp,
+  appUrls,
+  items,
+  footerItems,
+  badge,
+  idpLogoutUrl,
+}: AppSidebarProps) => {
   const pathname = usePathname();
 
   return (
@@ -75,6 +86,9 @@ export const AppSidebar = ({ currentApp, appUrls, items, footerItems, badge }: A
             pathname={pathname}
           />
         ))}
+        {idpLogoutUrl && (
+          <LogoutButton idpLogoutUrl={idpLogoutUrl} className="flex items-center gap-3 px-4 py-3" />
+        )}
       </nav>
     </aside>
   );

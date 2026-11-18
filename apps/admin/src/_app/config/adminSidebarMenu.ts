@@ -10,6 +10,5 @@ export const ADMIN_SIDEBAR_ITEMS: SidebarItem[] = [
   { label: 'API 키 관리', app: 'admin', path: '/api-keys' },
 ];
 
-export const ADMIN_SIDEBAR_FOOTER_ITEMS: SidebarItem[] = [
-  { label: '로그아웃', app: 'admin', path: '/logout' },
-];
+// 로그아웃은 메뉴 항목이 아니라 AppShell의 idpLogoutUrl로 붙는 버튼이다.
+export const ADMIN_SIDEBAR_FOOTER_ITEMS: SidebarItem[] = [];

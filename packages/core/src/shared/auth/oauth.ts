@@ -54,6 +54,11 @@ export const buildAuthorizeUrl = (
   return url;
 };
 
+// 인가 서버의 SSO(IdP) 세션 종료 주소다. 세션 쿠키가 인가 서버 도메인의 브라우저 쿠키라서
+// Next 서버가 대신 부를 수 없고, 브라우저가 credentials를 실어 직접 POST한다.
+export const buildIdpLogoutUrl = (env: Pick<OauthEnv, 'OAUTH_AUTHORIZATION_BASE_URL'>) =>
+  new URL('/v1/oauth/logout', env.OAUTH_AUTHORIZATION_BASE_URL).toString();
+
 // token 응답은 공통 응답 형식(CommonApiResponse)으로 감싸지 않은 OAuth 표준 JSON이다.
 const requestTokens = async (env: OauthEnv, body: Record<string, string>): Promise<OauthTokens> => {
   const response = await fetch(new URL('/v1/oauth/token', env.OAUTH_AUTHORIZATION_BASE_URL), {

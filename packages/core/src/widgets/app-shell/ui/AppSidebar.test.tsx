@@ -102,3 +102,31 @@ it('badge를 넘기면 로고 옆에 표시하고, 넘기지 않으면 표시하
 
   expect(screen.queryByText('관리자')).not.toBeInTheDocument();
 });
+
+it('idpLogoutUrl을 넘긴 앱만 계정 메뉴에 로그아웃 버튼을 둔다', () => {
+  const { rerender } = render(
+    <AppSidebar
+      currentApp="client"
+      appUrls={appUrls}
+      items={[]}
+      footerItems={USER_SIDEBAR_FOOTER_ITEMS}
+      idpLogoutUrl="https://oauth.example/v1/oauth/logout"
+    />,
+  );
+
+  const accountNav = screen.getByRole('navigation', { name: '계정 메뉴' });
+
+  expect(within(accountNav).getByRole('button', { name: '로그아웃' })).toBeInTheDocument();
+  expect(within(accountNav).queryByRole('link', { name: '로그아웃' })).not.toBeInTheDocument();
+
+  rerender(
+    <AppSidebar
+      currentApp="docs"
+      appUrls={appUrls}
+      items={[]}
+      footerItems={USER_SIDEBAR_FOOTER_ITEMS}
+    />,
+  );
+
+  expect(screen.queryByRole('button', { name: '로그아웃' })).not.toBeInTheDocument();
+});

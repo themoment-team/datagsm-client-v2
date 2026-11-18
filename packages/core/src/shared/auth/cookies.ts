@@ -10,6 +10,7 @@ export const LOGIN_FLOW_COOKIE = 'datagsm_login';
 
 export const LOGIN_PATH = '/api/login';
 export const CALLBACK_PATH = '/api/callback';
+export const LOGOUT_PATH = '/api/logout';
 
 // access token 쿠키는 실제 만료보다 60초 먼저 사라지게 둔다.
 // 쿠키가 없고 refresh token이 있으면 proxy가 갱신하므로, 만료된 토큰이 백엔드에 닿지 않는다.

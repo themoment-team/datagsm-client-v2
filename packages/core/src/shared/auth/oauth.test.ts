@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  buildIdpLogoutUrl,
   clearRefreshingForTest,
   createCodeChallenge,
   createRandomToken,
@@ -12,6 +13,13 @@ const env = {
   OAUTH_CLIENT_ID: 'client-id',
   OAUTH_CLIENT_SECRET: 'client-secret',
 };
+
+it('SSO 로그아웃 주소는 인가 서버의 /v1/oauth/logout이다', () => {
+  expect(buildIdpLogoutUrl(env)).toBe('https://oauth.example/v1/oauth/logout');
+  expect(buildIdpLogoutUrl({ OAUTH_AUTHORIZATION_BASE_URL: 'https://oauth.example/' })).toBe(
+    'https://oauth.example/v1/oauth/logout',
+  );
+});
 
 describe('PKCE', () => {
   it('RFC 7636 부록 B의 예시와 같은 code challenge를 만든다', async () => {

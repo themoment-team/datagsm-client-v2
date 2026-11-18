@@ -20,3 +20,12 @@ test('사이드바가 앱 안 메뉴와 다른 앱 메뉴를 각각 올바른 �
     'http://localhost:3005',
   );
 });
+
+test('계정 메뉴의 로그아웃은 POST /api/logout을 제출하는 버튼이다', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(
+    page.getByRole('navigation', { name: '계정 메뉴' }).getByRole('button', { name: '로그아웃' }),
+  ).toBeVisible();
+  await expect(page.locator('form[action="/api/logout"][method="post"]')).toHaveCount(1);
+});
