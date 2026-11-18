@@ -1,3 +1,4 @@
+import { buildIdpLogoutUrl } from '@datagsm/core/shared/auth/server';
 import { toAppUrls } from '@datagsm/core/shared/config';
 import {
   AppShell,
@@ -30,6 +31,7 @@ export const RootLayout = ({
             appUrls={toAppUrls(env)}
             items={USER_SIDEBAR_ITEMS}
             footerItems={USER_SIDEBAR_FOOTER_ITEMS}
+            idpLogoutUrl={buildIdpLogoutUrl(env)}
           >
             {children}
           </AppShell>

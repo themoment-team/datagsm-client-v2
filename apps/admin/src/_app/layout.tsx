@@ -1,8 +1,10 @@
+import { buildIdpLogoutUrl } from '@datagsm/core/shared/auth/server';
 import { AppShell } from '@datagsm/core/widgets/app-shell';
 import type { Metadata } from 'next';
 
 import { ADMIN_SIDEBAR_FOOTER_ITEMS, ADMIN_SIDEBAR_ITEMS } from '@/_app/config';
 import { TanStackProvider } from '@/_app/providers';
+import { env } from '@/shared/config';
 
 import '@/_app/styles/globals.css';
 
@@ -27,6 +29,7 @@ export const RootLayout = ({
             items={ADMIN_SIDEBAR_ITEMS}
             footerItems={ADMIN_SIDEBAR_FOOTER_ITEMS}
             badge="관리자"
+            idpLogoutUrl={buildIdpLogoutUrl(env)}
           >
             {children}
           </AppShell>

@@ -13,5 +13,4 @@ export const USER_SIDEBAR_ITEMS: SidebarItem[] = [
 
 export const USER_SIDEBAR_FOOTER_ITEMS: SidebarItem[] = [
   { label: '내 정보', app: 'client', path: '/me' },
-  { label: '로그아웃', app: 'client', path: '/logout' },
 ];

@@ -20,7 +20,10 @@ test('관리자 사이드바가 관리자 배지와 관리자 메뉴를 보여 �
     'href',
     '/projects',
   );
-  await expect(
-    page.getByRole('navigation', { name: '계정 메뉴' }).getByRole('link', { name: '로그아웃' }),
-  ).toHaveAttribute('href', '/logout');
+  // 로그아웃은 GET 링크가 아니라 POST /api/logout을 제출하는 버튼이다.
+  const logout = page.getByRole('navigation', { name: '계정 메뉴' }).getByRole('button', {
+    name: '로그아웃',
+  });
+  await expect(logout).toBeVisible();
+  await expect(page.locator('form[action="/api/logout"][method="post"]')).toHaveCount(1);
 });
