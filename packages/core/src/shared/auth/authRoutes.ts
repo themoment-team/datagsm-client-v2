@@ -126,7 +126,8 @@ export const createAuthRoutes = (env: OauthEnv) => {
     }
   };
 
-  // POST /api/logout → 이 앱의 토큰 쿠키(access, refresh)만 지운다. 인가 서버(IdP) 세션 종료는 아직 하지 않는다.
+  // POST /api/logout → 이 앱의 토큰 쿠키(access, refresh)를 지운다.
+  // 인가 서버(IdP) 세션은 브라우저가 이 요청 전에 직접 끝낸다(features/logout의 LogoutButton).
   const logout = (request: NextRequest) => {
     if (request.headers.get('origin') !== request.nextUrl.origin) {
       return new NextResponse(null, { status: 403 });
