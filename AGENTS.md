@@ -144,11 +144,11 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 
 ## API
 
-- 브라우저 요청은 `@/shared/api`, 서버(RSC, Server Function) 요청은 `@/shared/api/index.server`의 `get / post / patch / put / del`로 보낸다. 이 메서드는 core `createApiMethods`가 만들고 응답의 `.data`만 돌려준다. 인스턴스(`axiosInstance`, `serverAxiosInstance`)를 직접 호출하지 않는다.
+- 브라우저 요청은 `@/shared/api`, 서버(RSC, Server Function) 요청은 `@/shared/api/index.server`의 `get / post / patch / put / del`로 보낸다. 이 메서드는 core `createApiMethods`가 만들고 응답의 `.data`만 돌려준다. 인스턴스(`axiosInstance`, `serverAxiosInstance`)를 직접 호출하지 않는다. core가 제공하는 것(`ApiError`, `ApiResponse`, `getQueryClient` 등)은 앱 파일에서 다시 내보내지 않고 쓰는 곳에서 `@datagsm/core/...`로 바로 가져온다. 다시 내보내기는 앱마다 값이 달라야 하는 등 이유가 있을 때만 둔다.
 - 브라우저 인스턴스의 baseURL은 `/backend`이고, 각 앱 `next.config.ts`의 rewrite가 `API_BASE_URL`로 넘긴다. 단 client·admin은 `proxy.ts`가 `/backend/*`를 먼저 받아 토큰을 붙이고 직접 rewrite하므로 next.config rewrite까지 가지 않는다(인증 절 참고). `/api/*`는 Route Handler용으로 비워 둔다. 서버 인스턴스는 `server-only`라 클라이언트 코드에서 `index.server`를 import하면 빌드가 실패한다.
 - 응답 타입은 첫 번째, body 타입은 두 번째 제네릭이다: `post<UserResponse, UpdateProfileRequest>(url, body)`. URL 상수는 소유 slice의 `api/`에 두고 서버의 실제 경로를 그대로 쓴다.
-- DataGSM 서버 응답은 `{ status, code, message, data }` 형태로 감싸져 온다. 응답 타입에는 이 감싼 형태를 포함해 적는다.
-- 요청 실패는 모두 `ApiError { status, code, message, requestId? }`로 던져지고 원본은 `cause`에 있다. 응답이 없는 실패(네트워크 오류, 타임아웃, 취소)는 `status: 0`이다. `requestId`는 응답 헤더 `X-Request-Id`다. 화면에서는 `error instanceof ApiError`로 좁힌 뒤 분기한다.
+- DataGSM 서버 응답은 `{ status, code, message, data }` 형태로 감싸져 온다. 응답 타입은 `@datagsm/core/shared/api`의 `ApiResponse<T>`로 감싸 적는다(`get<ApiResponse<ClubListResponse>>(url)`). `data`가 없는 메시지 응답(삭제 등)은 `ApiMessageResponse`다. 예외: 엑셀 내보내기(`/v1/*/exports/excel`)는 파일을 그대로 주므로 `get<Blob>(url, { responseType: 'blob' })`, 반환값이 없는 API는 본문 없는 204라 `post<void>`로 받는다. `status`는 `"200 OK"` 형식 문자열, `code`는 숫자다.
+- 요청 실패는 모두 `ApiError { status, code, message, requestId? }`(`@datagsm/core/shared/api`)로 던져지고 원본은 `cause`에 있다. 응답이 없는 실패(네트워크 오류, 타임아웃, 취소)는 `status: 0`이다. `requestId`는 응답 헤더 `X-Request-Id`다. 화면에서는 `error instanceof ApiError`로 좁힌 뒤 분기한다.
 - 401 응답에 연결할 동작은 `setOnUnauthorized`로 등록한다. 동시에 들어온 401은 진행 중인 훅 하나를 함께 기다리고, 훅이 끝나면 원래 요청은 재시도 없이 `ApiError`로 실패한다. 훅 안의 요청(토큰 갱신 등)은 이 인터셉터가 없는 별도 인스턴스로 보낸다. 같은 인스턴스로 보내 401을 받으면 훅을 기다리며 멈춘다. 서버 인스턴스는 모듈 상태를 요청 사이에 공유하므로 서버 쪽에 사용자별 훅을 등록하지 않는다.
 - API 모킹(MSW)은 두지 않는다. 개발은 `API_BASE_URL`로 실제 DataGSM 개발 서버에 붙는다. 컴포넌트 테스트에서 API 응답이 필요하면 `vi.mock`으로 API 함수를 바꾼다.
 
@@ -184,7 +184,7 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 
 상세 패턴은 [`data-and-forms`](.agents/skills/data-and-forms/SKILL.md) 스킬에 있다.
 
-- TanStack Query: 조회는 entity `api/`의 `<리소스>Queries` 팩토리(`queryOptions`, key는 `all()` 루트의 계층 배열)를 컴포넌트에서 `useQuery` 등에 바로 넘긴다. 로직이 없는 조회 훅으로 감싸지 않는다. mutation은 훅으로 두고 동작으로 이름 짓는다(`useUpdateProfile`, HTTP 메서드 이름 아님). QueryClient는 `@/shared/api`의 `getQueryClient`로 얻는다. 서버 prefetch는 `src/_pages`의 페이지 컴포넌트에서 하고 루트 `app/` 라우트는 얇게 둔다.
+- TanStack Query: 조회는 entity `api/`의 `<리소스>Queries` 팩토리(`queryOptions`, key는 `all()` 루트의 계층 배열)를 컴포넌트에서 `useQuery` 등에 바로 넘긴다. 로직이 없는 조회 훅으로 감싸지 않는다. mutation은 훅으로 두고 동작으로 이름 짓는다(`useUpdateProfile`, HTTP 메서드 이름 아님). QueryClient는 `@datagsm/core/shared/api`의 `getQueryClient`로 얻는다. 서버 prefetch는 `src/_pages`의 페이지 컴포넌트에서 하고 루트 `app/` 라우트는 얇게 둔다.
 - 폼: zod 스키마(`...Schema`)와 react-hook-form(`zodResolver`)을 쓰고, 요청 타입은 `z.infer`로 만든 `...Request`이다. 제출은 mutation으로 한다.
 
 ## 테스트
