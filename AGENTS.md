@@ -26,7 +26,7 @@ apps/{client,admin,docs,status,oauth,projects}/
 │   └── shared/            api(앱별 연결), config(core 스키마로 env 검증)
 └── e2e/                   Playwright 테스트
 packages/
-├── core/                  widgets → features → entities → shared(앱 공유 FSD 레이어), API 팩토리·인터셉터·getQueryClient, env 스키마, cn
+├── core/                  widgets → features → entities → shared(앱 공유 FSD 레이어), 공용 레이아웃(widgets/app-shell), API 팩토리·인터셉터·getQueryClient, env 스키마, cn
 ├── tailwind-config/       공통 CSS 토큰·@source, PostCSS
 ├── typescript-config/     base, nextjs(앱), react-library(core)
 └── eslint-config/         base, next(앱), react(core)
@@ -64,6 +64,7 @@ export { HomePage as default } from '@/_pages/home';
 - core에는 패키지 루트 진입점이 없고, 앱 안의 slice 공개 API와 같은 단위로 공개한다: `@datagsm/core/shared/<segment>`, `@datagsm/core/{entities,features,widgets}/<slice>`, 서버 전용은 각각의 `/server`.
 - 앱과 core는 위치만 다를 뿐 같은 레이어 체계다. 앱의 레이어는 core의 **더 아래** 레이어만 import한다. 같은 레이어도 다른 slice라서 금지다. `@datagsm/eslint-config/next`가 레이어별로 막는다.
 - slice는 처음 쓰는 앱에 둔다. 두 앱 이상이 데이터와 동작까지 똑같이 쓰게 될 때만 core의 같은 레이어로 옮긴다.
+- 모든 웹 앱의 레이아웃(왼쪽 사이드바 + 본문)은 core의 `widgets/app-shell`(`AppShell`)이다. 앱은 `_app/layout`에서 지금 앱(`currentApp`), 앱 주소, 메뉴 목록만 넘긴다. client·docs·status·projects는 core의 `USER_SIDEBAR_ITEMS`를 함께 쓰고, 관리자 웹은 `apps/admin/src/_app/config`의 관리자 메뉴와 `badge="관리자"`를 넘긴다. 관리자 메뉴는 모두 admin 안 경로라 admin은 `APP_*_URL`을 받지 않는다. 같은 앱 메뉴는 `Link`, 다른 앱 메뉴는 `<a>`로 그 앱 주소에 연결된다.
 - 여러 앱이 함께 쓰는 도메인 없는 UI(기본 컴포넌트, 레이아웃 틀)는 core의 `shared/ui`에 컴포넌트별 폴더로 두고 `@datagsm/core/shared/ui/<component>`로 import한다. 별도 UI 패키지는 만들지 않는다. 팀 디자인 시스템(themoment-design-system)이 준비되면 그때 옮긴다.
 
 ## 네이밍
@@ -98,6 +99,11 @@ export { HomePage as default } from '@/_pages/home';
 ## 스타일링
 
 - Tailwind CSS v4다. 앱 진입점은 `src/_app/styles/globals.css`, 공통 디자인 토큰은 `@datagsm/tailwind-config/shared-styles.css`가 소유한다. 토큰은 `@theme`에 추가하고(`--color-background` → `bg-background`), 다른 전역 스타일 진입점을 만들지 않는다.
+- 디자인 토큰은 Figma DataGSMv2의 "WF · 파운데이션"(Dark 모드만)을 옮긴 것이다. Tailwind 기본 색 팔레트는 지웠으므로 색은 토큰만 쓴다: 면 `background`·`surface`·`subtle`·`table-head`·`selected`·`row-selected`·`strong`·`glass-fill`·`scrim`·`scrim-card`, 선 `line`·`glass-line`, 글자 `foreground`·`foreground-muted`·`on-strong`·`error`.
+- 글자는 텍스트 스타일 토큰 하나로 크기·줄 높이·자간·굵기를 함께 정한다: `text-title-32`, `text-title-24`, `text-heading-20`, `text-body-16`, `text-body-16-regular`, `text-label-14`, `text-caption-12`, `text-badge-11`, 코드는 `font-mono text-code-12`.
+- Figma의 간격·모서리·높이 값은 Tailwind 기본값과 같아서 토큰을 따로 두지 않는다: 간격 4·8·12·14·16·24·32px = `1`·`2`·`3`·`3.5`·`4`·`6`·`8`, 모서리 4px = `rounded`, 버튼 높이 36px = `h-9`. 같은 값의 토큰(`--spacing-14` 등)을 새로 만들지 않는다.
+- `--text-*` 토큰 이름을 더하거나 바꾸면 core `shared/lib/cn.ts`의 목록도 고친다. tailwind-merge가 모르는 이름은 잘못 병합한다(예: `text-title-32`를 글자색으로 보고 지운다).
+- 글꼴은 본문 Pretendard(`font-sans`, 기본값), 코드 JetBrains Mono(`font-mono`)다. 둘 다 `@datagsm/tailwind-config/shared-styles.css`가 npm 패키지의 unicode-range 분할 CSS로 불러온다. 앱에서 `next/font`나 다른 글꼴 진입점을 따로 만들지 않는다.
 - 정적 클래스는 문자열 하나로 쓴다. `cn()`(`@datagsm/core/shared/lib`)은 조건부 클래스나 외부 `className` 병합이 있을 때만 쓴다.
 - 여러 곳에서 반복되는 클래스 조합은 컴포넌트로 뽑는다. 클래스 문자열을 상수로 빼지 않는다.
 - 크기·색 같은 variant가 있는 컴포넌트는 `cva`(class-variance-authority)로 정의하고 `VariantProps`로 props 타입을 만든다. 외부 `className`은 `cn(variants({ ... }), className)`으로 병합한다.
@@ -138,31 +144,47 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 
 ## API
 
-상세 규칙은 [`api-client`](.agents/skills/api-client/SKILL.md) 스킬에 있다. 요청 코드를 쓰거나 에러 처리·인증을 붙이기 전에 읽는다.
-
-- 브라우저 요청은 `@/shared/api`, 서버(RSC, Server Function) 요청은 `@/shared/api/index.server`의 `get / post / patch / put / del`로 보낸다.
-- 요청 실패는 모두 `ApiError`로 던져진다. 401 응답에 연결할 동작은 `setOnUnauthorized`로 등록한다.
+- 브라우저 요청은 `@/shared/api`, 서버(RSC, Server Function) 요청은 `@/shared/api/index.server`의 `get / post / patch / put / del`로 보낸다. 이 메서드는 core `createApiMethods`가 만들고 응답의 `.data`만 돌려준다. 인스턴스(`axiosInstance`, `serverAxiosInstance`)를 직접 호출하지 않는다. core가 제공하는 것(`ApiError`, `ApiResponse`, `getQueryClient` 등)은 앱 파일에서 다시 내보내지 않고 쓰는 곳에서 `@datagsm/core/...`로 바로 가져온다. 다시 내보내기는 앱마다 값이 달라야 하는 등 이유가 있을 때만 둔다.
+- 브라우저 인스턴스의 baseURL은 `/backend`이고, 각 앱 `next.config.ts`의 rewrite가 `API_BASE_URL`로 넘긴다. 단 client·admin은 `proxy.ts`가 `/backend/*`를 먼저 받아 토큰을 붙이고 직접 rewrite하므로 next.config rewrite까지 가지 않는다(인증 절 참고). `/api/*`는 Route Handler용으로 비워 둔다. 서버 인스턴스는 `server-only`라 클라이언트 코드에서 `index.server`를 import하면 빌드가 실패한다.
+- 응답 타입은 첫 번째, body 타입은 두 번째 제네릭이다: `post<UserResponse, UpdateProfileRequest>(url, body)`. URL 상수는 소유 slice의 `api/`에 두고 서버의 실제 경로를 그대로 쓴다.
+- DataGSM 서버 응답은 `{ status, code, message, data }` 형태로 감싸져 온다. 응답 타입은 `@datagsm/core/shared/api`의 `ApiResponse<T>`로 감싸 적는다(`get<ApiResponse<ClubListResponse>>(url)`). `data`가 없는 메시지 응답(삭제 등)은 `ApiMessageResponse`다. 예외: 엑셀 내보내기(`/v1/*/exports/excel`)는 파일을 그대로 주므로 `get<Blob>(url, { responseType: 'blob' })`, 반환값이 없는 API는 본문 없는 204라 `post<void>`로 받는다. `status`는 `"200 OK"` 형식 문자열, `code`는 숫자다.
+- 요청 실패는 모두 `ApiError { status, code, message }`(`@datagsm/core/shared/api`)로 던져지고 원본은 `cause`에 있다. 화면에서는 `error instanceof ApiError`로 좁힌 뒤 `status`로 분기하고 서버 문구는 `message`로 보여 준다. 응답이 없는 실패(네트워크 오류, 타임아웃, 취소)는 `status: 0`이고, 원인은 axios 오류 코드인 `code`(`ERR_NETWORK`, `ECONNABORTED` 등)로 구분한다. 서버 본문의 `code`는 HTTP 상태와 같은 숫자라 담지 않는다.
+- 401 응답에 연결할 동작은 `setOnUnauthorized`로 등록한다. 동시에 들어온 401은 진행 중인 훅 하나를 함께 기다리고, 훅이 끝나면 원래 요청은 재시도 없이 `ApiError`로 실패한다. 훅 안의 요청(토큰 갱신 등)은 이 인터셉터가 없는 별도 인스턴스로 보낸다. 같은 인스턴스로 보내 401을 받으면 훅을 기다리며 멈춘다. 서버 인스턴스는 모듈 상태를 요청 사이에 공유하므로 서버 쪽에 사용자별 훅을 등록하지 않는다.
 - API 모킹(MSW)은 두지 않는다. 개발은 `API_BASE_URL`로 실제 DataGSM 개발 서버에 붙는다. 컴포넌트 테스트에서 API 응답이 필요하면 `vi.mock`으로 API 함수를 바꾼다.
+
+## 인증
+
+- 로그인이 필요한 앱은 client와 admin뿐이다. 로그인 화면은 oauth 앱이 띄우고, client·admin은 인가 서버의 OAuth client 하나를 함께 쓴다.
+- 흐름(Authorization Code + PKCE S256): `GET /api/login?returnTo=` → 인가 서버 `/v1/oauth/authorize` → 콜백 `GET /api/callback`에서 Next 서버가 `/v1/oauth/token`으로 code를 바꾼다. state·verifier·돌아갈 경로는 `/api/callback` 경로에만 보내는 10분짜리 httpOnly 쿠키에 둔다. `returnTo`는 같은 앱의 `/` 경로만 허용한다. 콜백은 state를 먼저 검증하고, 동의 거부(`error=access_denied`)는 403, 그 밖의 오류는 400으로 답한다. 임시 쿠키는 결과와 상관없이 콜백에서 지운다. `scope`는 client에 등록된 범위를 확인하기 전까지 보내지 않는다(등록되지 않은 값은 `invalid_scope`로 로그인이 막힌다). 기준 문서는 https://docs.datagsm.kr/oauth 이다.
+- 토큰은 앱 도메인의 host-only httpOnly 쿠키(SameSite=Lax)에만 둔다. access token은 `datagsm_at`(만료 = `expires_in` - 60초), refresh token은 `datagsm_rt`(30일)다. 브라우저 코드는 토큰을 읽지 않는다.
+- 백엔드는 `Authorization: Bearer`만 읽는다. 브라우저 요청은 `proxy.ts`가 `/backend/*`에서 쿠키를 헤더로 바꾸고(쿠키는 넘기지 않음) API 주소로 직접 rewrite한다. 외부 주소로 가는 next.config rewrite는 proxy가 붙인 `Set-Cookie`를 버리기 때문이다. 서버 요청은 `withAccessToken`이 `cookies()`에서 읽어 붙인다.
+- 각 앱 `proxy.ts`의 matcher는 보호할 경로를 직접 적는 allowlist다. 로그인이 필요한 페이지를 만들면 matcher에 더한다. 제외 패턴("…을 뺀 전부")은 쓰지 않는다.
+- CSRF: 쿠키가 자동 전송되므로 `/backend/*`의 상태 변경 요청과 `POST /api/logout`은 `Origin`이 앱 주소와 다르면 403이다.
+- 갱신은 `proxy.ts`가 한다. matcher에 걸린 요청에서 `datagsm_at`이 없고 `datagsm_rt`가 있으면 갱신한 뒤 새 쿠키를 응답에 싣고, 페이지 요청이면 서버 컴포넌트가 새 토큰을 읽도록 요청 쿠키도 바꾼다. 갱신마다 새 refresh token으로 바꾼다(회전). 같은 refresh token의 동시 갱신은 `oauth.ts`의 `refreshTokens`가 한 번으로 합치고 결과를 30초 동안 함께 쓴다(같은 서버 인스턴스 안에서만). `invalid_grant`·401이면 토큰 쿠키를 지우고 다시 로그인, 429·네트워크 오류면 refresh token을 남긴다. 그래도 브라우저 요청이 401을 받으면 `setOnUnauthorized(redirectToLogin)`가 로그인을 다시 시작한다. matcher 밖의 페이지(공개 페이지)는 갱신하지 않는다.
+- 로그아웃은 `POST /api/logout`(form 또는 fetch)이며 이 앱의 토큰 쿠키(access, refresh)만 지운다. GET 링크로 만들지 않는다(prefetch·이미지 태그로 실행될 수 있다). 인가 서버 세션 종료는 아직 하지 않는다.
+- 공용 코드는 `@datagsm/core/shared/auth`(브라우저)와 `@datagsm/core/shared/auth/server`(Route Handler, Proxy, 서버 인스턴스)에 있다. 앱은 `src/shared/api/authRoutes.ts`에서 검증한 env를 넘겨 `createAuthRoutes`를 만들고 `app/api/{login,callback,logout}/route.ts`는 그 핸들러만 내보낸다.
 
 ## 환경 변수
 
 - 서버 환경 변수는 `src/shared/config/env.ts` 한 곳에서 검증하고 `env`로 꺼내 쓴다. 앱 공통 변수와 오류 메시지는 `@datagsm/core/shared/config`의 `AppEnvSchema`가 소유하고, 앱은 `process.env` 값을 모아 `parseEnv`에 넘긴다. 앱 전용 변수는 `AppEnvSchema.extend({...})`로 더한다. 일반 기능은 `process.env`를 다른 곳에서 직접 읽지 않는다.
 - 새 변수를 추가하면 스키마(공통이면 core, 앱 전용이면 앱의 `extend`), `.env.example`, CI의 `env`를 함께 고친다.
 - status를 뺀 각 앱의 변수는 `API_BASE_URL`(필수, http(s) URL)이다. `API_BASE_URL`이 없으면 `dev`, `build`, `check-types`가 바로 실패한다.
+- client·docs·status·projects는 공용 사이드바에서 서로 이동할 앱 주소 `APP_CLIENT_URL`, `APP_DOCS_URL`, `APP_STATUS_URL`, `APP_PROJECTS_URL`(모두 필수)도 받는다. 스키마는 core의 `AppUrlsEnvSchema`이고, 값은 `readAppUrlsEnv(process.env)`로 모은다. 앱은 서브도메인(`datagsm.kr`, `docs.datagsm.kr` 등)으로 따로 배포한다.
+- client·admin은 로그인용 `OAUTH_AUTHORIZATION_BASE_URL`(인가 서버 주소), `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`(모두 필수, 서버 전용)도 받는다. 인가 서버의 client에 앱마다 `<앱 주소>/api/callback`을 redirect URI로 등록해야 한다. secret은 `.env.local`과 Vercel에만 넣는다.
 - status 앱은 상태를 확인할 서버 4개의 base URL(`STATUS_WEB_BASE_URL`, `STATUS_OPENAPI_BASE_URL`, `STATUS_OAUTH_AUTHORIZATION_BASE_URL`, `STATUS_OAUTH_RESOURCE_BASE_URL`, 모두 필수)만 받는다. DataGSM API를 호출하지 않으므로 `API_BASE_URL`, `/backend` rewrite, axios 인스턴스가 없다. 실제 주소는 공개하지 않으므로 `.env.example`과 CI에는 자리 표시용 값만 두고, 실제 값은 `.env.local`과 Vercel에만 넣는다. 상태 확인은 서버 컴포넌트에서 각 서버의 `GET /v1/health`를 요청해 2xx면 정상으로 보고, 응답 속도는 그 요청 앞뒤 시간만 잰다.
 - `env`는 서버에서만 읽는다. 클라이언트 컴포넌트에서 import하지 않는다.
 
 ## 보안 헤더와 배포
 
 - 모든 앱의 `next.config.ts`의 `headers()`가 모든 경로에 기본 보안 헤더(HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`)를 붙이고 `X-Powered-By`를 끈다. CSP는 넣지 않았다. 헤더를 바꾸거나 CSP를 더하면 모든 앱의 `e2e/security-headers.spec.ts`도 함께 고친다. 모든 앱의 `next.config.ts`는 같게 유지하고, 공통 부분을 바꾸면 모든 앱 파일에 똑같이 고친다. 단 status는 `API_BASE_URL`을 쓰지 않아 `/backend` rewrite가 없다.
-- 앱을 추가하거나 지우면 앱 폴더 밖에서 앱 목록을 가진 곳도 함께 고친다: 루트 `package.json`의 `lint:fsd`, `.lintstagedrc.mjs`, `.prettierrc` overrides, 전용 스킬 `api-client`, 이 문서와 README. 새 앱은 기존 앱을 복제한 뒤 `package.json` 이름·포트, `playwright.config.ts` 포트, `layout.tsx` 메타, 홈 제목과 그 테스트를 바꾼다. 마지막에 `rg -n "oauth"`처럼 기존 앱 이름으로 검색해 빠진 곳이 없는지 확인한다.
+- 앱을 추가하거나 지우면 앱 폴더 밖에서 앱 목록을 가진 곳도 함께 고친다: 루트 `package.json`의 `lint:fsd`, `.lintstagedrc.mjs`, `.prettierrc` overrides, 사이드바로 오가는 앱이면 core의 `AppId`·`AppUrlsEnvSchema`·사용자 메뉴와 CI·Playwright의 `APP_*_URL`, 이 문서와 README. 새 앱은 기존 앱을 복제한 뒤 `package.json` 이름·포트, `playwright.config.ts` 포트, `layout.tsx` 메타, 홈 제목과 그 테스트를 바꾼다. 마지막에 `rg -n "oauth"`처럼 기존 앱 이름으로 검색해 빠진 곳이 없는지 확인한다.
 - 배포는 Vercel이다. 앱마다 Vercel 프로젝트를 하나씩 두고 Root Directory를 `apps/<앱>`으로 둔다. `API_BASE_URL`은 rewrite에 들어가 빌드 시 고정되므로 Vercel 프로젝트의 환경 변수로 넣고, 값을 바꾸면 다시 배포한다. Docker 이미지 빌드 설정은 두지 않는다.
 
 ## 데이터와 폼
 
 상세 패턴은 [`data-and-forms`](.agents/skills/data-and-forms/SKILL.md) 스킬에 있다.
 
-- TanStack Query: 조회는 entity `api/`의 `<리소스>Queries` 팩토리(`queryOptions`, key는 `all()` 루트의 계층 배열)를 컴포넌트에서 `useQuery` 등에 바로 넘긴다. 로직이 없는 조회 훅으로 감싸지 않는다. mutation은 훅으로 두고 동작으로 이름 짓는다(`useUpdateProfile`, HTTP 메서드 이름 아님). QueryClient는 `@/shared/api`의 `getQueryClient`로 얻는다. 서버 prefetch는 `src/_pages`의 페이지 컴포넌트에서 하고 루트 `app/` 라우트는 얇게 둔다.
+- TanStack Query: 조회는 entity `api/`의 `<리소스>Queries` 팩토리(`queryOptions`, key는 `all()` 루트의 계층 배열)를 컴포넌트에서 `useQuery` 등에 바로 넘긴다. 로직이 없는 조회 훅으로 감싸지 않는다. mutation은 훅으로 두고 동작으로 이름 짓는다(`useUpdateProfile`, HTTP 메서드 이름 아님). QueryClient는 `@datagsm/core/shared/api`의 `getQueryClient`로 얻는다. 서버 prefetch는 `src/_pages`의 페이지 컴포넌트에서 하고 루트 `app/` 라우트는 얇게 둔다.
 - 폼: zod 스키마(`...Schema`)와 react-hook-form(`zodResolver`)을 쓰고, 요청 타입은 `z.infer`로 만든 `...Request`이다. 제출은 mutation으로 한다.
 
 ## 테스트
@@ -192,20 +214,23 @@ pnpm build         # API_BASE_URL 필요
 ## 에이전트 작업 규칙
 
 - 커밋, 푸시, PR 생성, 리뷰 답글은 사용자가 요청한 경우에만 한다. 기존 브랜치와 작업 트리의 변경을 보존한다.
+- 기본 작업 브랜치는 `develop`이다. 새 작업은 `develop`에서 브랜치를 만들어 `develop`으로 PR을 올린다(`git-commit`, `write-pr` 스킬의 Git Flow).
 - `.env.local`을 비롯한 환경·자격 증명 파일은 열거나 출력하지 않는다. 필요한 값은 `.env.example`과 `src/shared/config/env.ts`에서 확인한다.
 - 이 파일의 규칙 중 도구가 검사하는 것(ESLint, Prettier, steiger, tsc)은 도구 결과를 근거로 판단한다.
-- 작업 절차는 `.agents/skills/`(Codex)와 `.claude/skills/`(Claude Code)에 있다. 두 폴더와 `.codex/`, `.claude/agents`, `.claude/hooks`, `steiger.config.mjs`는 팀 하네스(themoment-ai-harness-sync)가 동기화하므로 이 레포에서 직접 고치지 않는다. 바꿀 내용은 하네스 레포에 반영한다.
-- 이 레포 전용 스킬은 `api-client`이며 두 폴더에 같은 내용으로 둔다.
+- 작업 절차는 `.agents/skills/`(Codex)와 `.claude/skills/`(Claude Code)에 있다. Gemini CLI는 `.gemini/settings.json`에 따라 이 파일을 읽는다. 이 폴더들과 `.codex/`, `.claude/agents`, `.claude/hooks`, `.claude/settings.json`, `.gemini/`, `steiger.config.mjs`는 팀 하네스(themoment-ai-harness-sync)가 `.harness/sync.yml` 설정대로 동기화하므로 이 레포에서 직접 고치지 않는다. 바꿀 내용은 하네스 레포에 반영한다.
 
-| 스킬                      | 쓰는 때                                                       |
-| ------------------------- | ------------------------------------------------------------- |
-| `git-commit`              | 변경을 논리 단위로 나눠 커밋할 때                             |
-| `write-pr`                | 커밋을 바탕으로 PR을 만들 때                                  |
-| `resolve-reviews`         | PR 리뷰 코멘트를 판단하고 반영할 때                           |
-| `nextjs-fsd-architecture` | 레이어·slice를 정하거나 구조, 앱과 패키지 사이 공유를 바꿀 때 |
-| `react-conventions`       | 파일·타입 이름, 컴포넌트 모양을 정할 때                       |
-| `data-and-forms`          | 서버 데이터 조회·변경, 폼을 만들 때                           |
-| `tailwind-shadcn`         | Tailwind 클래스, 토큰, 공통 UI 위치를 정할 때                 |
-| `api-client`              | API 요청 코드·에러 처리를 쓰거나 401 처리에 인증을 붙일 때    |
+| 스킬                      | 쓰는 때                                                         |
+| ------------------------- | --------------------------------------------------------------- |
+| `git-commit`              | 변경을 논리 단위로 나눠 커밋할 때                               |
+| `write-pr`                | 커밋을 바탕으로 PR을 만들 때                                    |
+| `resolve-reviews`         | PR 리뷰 코멘트를 판단하고 반영할 때                             |
+| `nextjs-fsd-architecture` | 레이어·slice를 정하거나 구조, 앱과 패키지 사이 공유를 바꿀 때   |
+| `react-conventions`       | 파일·타입 이름, 컴포넌트 모양을 정할 때                         |
+| `data-and-forms`          | 서버 데이터 조회·변경, 폼을 만들 때                             |
+| `tailwind-shadcn`         | Tailwind 클래스, 토큰, 공통 UI 위치를 정할 때                   |
+| `react-best-practices`    | React·Next 코드의 렌더링·데이터 요청·번들 성능을 볼 때          |
+| `ponytail`                | 가장 작은 변경으로 해결하고 과한 설계를 줄일 때                 |
+| `ponytail-audit`          | 레포 전체의 버그·보안·지울 코드를 점검할 때(코드는 바꾸지 않음) |
+| `humanizer`               | 문서·PR 본문 같은 글에서 AI 문투를 걷어낼 때                    |
 
 - 변경을 도구가 못 잡는 컨벤션 기준으로 검토할 때는 `frontend-convention-validator` 에이전트를 쓴다.

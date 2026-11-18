@@ -25,6 +25,9 @@ export default defineConfig({
     url: baseURL,
     env: {
       API_BASE_URL: apiBaseURL,
+      OAUTH_AUTHORIZATION_BASE_URL: 'http://localhost:8083',
+      OAUTH_CLIENT_ID: 'e2e-client-id',
+      OAUTH_CLIENT_SECRET: 'e2e-client-secret',
     },
     reuseExistingServer: false,
     timeout: 180 * 1000,

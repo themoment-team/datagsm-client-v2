@@ -1,4 +1,5 @@
 export { ApiError } from './apiError';
+export type { ApiMessageResponse, ApiResponse } from './apiResponse';
 export { createApiInstance } from './createApiInstance';
 export { createApiMethods } from './createApiMethods';
 export { getQueryClient } from './getQueryClient';

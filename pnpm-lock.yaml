@@ -167,6 +167,9 @@ catalogs:
     '@feature-sliced/steiger-plugin':
       specifier: 0.8.2
       version: 0.8.2
+    '@fontsource-variable/jetbrains-mono':
+      specifier: 5.3.0
+      version: 5.3.0
     '@hookform/resolvers':
       specifier: 7.0.5
       version: 7.0.5
@@ -248,6 +251,9 @@ catalogs:
     next:
       specifier: 16.4.6
       version: 16.4.6
+    pretendard:
+      specifier: 1.3.9
+      version: 1.3.9
     prettier:
       specifier: 3.9.10
       version: 3.9.10
@@ -959,6 +965,9 @@ importers:
       jsdom:
         specifier: 'catalog:'
         version: 31.0.0
+      next:
+        specifier: 'catalog:'
+        version: 16.4.6(@babel/core@7.29.13)(@playwright/test@1.65.0)(@types/node@24.19.2)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react:
         specifier: 'catalog:'
         version: 19.3.1
@@ -1008,9 +1017,15 @@ importers:
 
   packages/tailwind-config:
     dependencies:
+      '@fontsource-variable/jetbrains-mono':
+        specifier: 'catalog:'
+        version: 5.3.0
       '@tailwindcss/postcss':
         specifier: 'catalog:'
         version: 4.3.5
+      pretendard:
+        specifier: 'catalog:'
+        version: 1.3.9
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.5
@@ -1176,6 +1191,9 @@ packages:
 
   '@floating-ui/utils@0.2.12':
     resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
+
+  '@fontsource-variable/jetbrains-mono@5.3.0':
+    resolution: {integrity: sha512-F32xpS2NsGYoQi2ADSkKTgpJj7ozajsGgDJ8woTnqjmIB+dxDIqImjl4pXZVEExu8UFZ2ndhmX18EBS/hdz3Lw==}
 
   '@hookform/resolvers@7.0.5':
     resolution: {integrity: sha512-E7ca3tpIJxHPGhFOfXLlCCZh7up6EcnUTbgTt0SRUENXagq8DJnob9rK+VqsNCsfUuO6mMU5NYNm6BaL18flgQ==}
@@ -3361,6 +3379,9 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
+  pretendard@1.3.9:
+    resolution: {integrity: sha512-PaQAADyLY5v4kYFwkpSJHbSSYIkiriY/1xXw75TKoZ9UQQqeU+tvP05yTdZAWibiIYoo8ZKtRv8PM7w0IaywSw==}
+
   prettier-plugin-tailwindcss@0.8.1:
     resolution: {integrity: sha512-iaFMYqDsE4ffdDkn5qup0j5f2aCEBFZrdrZnvu9QKTlWx/iGPeQ4HHu7b7fCPMxeo9nwQBiOAh2nSypdFYWJkw==}
     engines: {node: '>=20.19'}
@@ -4221,6 +4242,8 @@ snapshots:
       '@floating-ui/utils': 0.2.12
 
   '@floating-ui/utils@0.2.12': {}
+
+  '@fontsource-variable/jetbrains-mono@5.3.0': {}
 
   '@hookform/resolvers@7.0.5(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.1))(zod@4.6.7)':
     dependencies:
@@ -6312,6 +6335,8 @@ snapshots:
       source-map-js: 1.2.2
 
   prelude-ls@1.2.1: {}
+
+  pretendard@1.3.9: {}
 
   prettier-plugin-tailwindcss@0.8.1(prettier@3.9.10):
     dependencies:

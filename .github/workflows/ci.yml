@@ -3,7 +3,8 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    # develop은 작업 브랜치, main은 배포 브랜치다. 병합 결과도 두 브랜치에서 확인한다.
+    branches: [main, develop]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -24,6 +25,15 @@ jobs:
       STATUS_OPENAPI_BASE_URL: http://localhost:8082
       STATUS_OAUTH_AUTHORIZATION_BASE_URL: http://localhost:8083
       STATUS_OAUTH_RESOURCE_BASE_URL: http://localhost:8084
+      # 사이드바에서 다른 앱으로 이동할 주소다.
+      APP_CLIENT_URL: http://localhost:3000
+      APP_DOCS_URL: http://localhost:3002
+      APP_STATUS_URL: http://localhost:3003
+      APP_PROJECTS_URL: http://localhost:3005
+      # client·admin이 로그인에 쓰는 OAuth 값이다. CI에서는 자리 표시용 값만 넣는다.
+      OAUTH_AUTHORIZATION_BASE_URL: http://localhost:8083
+      OAUTH_CLIENT_ID: ci-client-id
+      OAUTH_CLIENT_SECRET: ci-client-secret
       HUSKY: '0'
     steps:
       - name: Checkout

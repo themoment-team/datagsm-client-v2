@@ -28,6 +28,7 @@
     "zod": "catalog:"
   },
   "peerDependencies": {
+    "next": "catalog:",
     "react": "catalog:"
   },
   "devDependencies": {
@@ -41,6 +42,7 @@
     "@vitejs/plugin-react": "catalog:",
     "eslint": "catalog:",
     "jsdom": "catalog:",
+    "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "typescript": "catalog:",

@@ -1,8 +1,87 @@
 @import 'tailwindcss';
+/* 본문은 Pretendard, 코드는 JetBrains Mono를 쓴다. 둘 다 unicode-range로 나뉜 파일이라 화면에 쓰인 글자의 조각만 받는다.
+   Pretendard는 한글 전체가 든 파일 하나가 2MB라 next/font/local 대신 dynamic subset CSS를 쓴다. */
+@import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+@import '@fontsource-variable/jetbrains-mono';
 
 @source '../core/src';
 
+/* 디자인 토큰은 Figma DataGSMv2의 "WF · 파운데이션"(Wireframe 변수 모음, Dark 모드)을 옮긴 것이다.
+   회색만 쓰고 강조는 밝기 차이로 낸다. Tailwind 기본 색 팔레트는 지워서 아래 토큰만 쓰게 한다. */
 @theme {
-  --color-background: #ffffff;
-  --color-foreground: #171717;
+  --color-*: initial;
+
+  /* 면 */
+  --color-background: #202225; /* wf/bg */
+  --color-surface: #292b2f; /* wf/surface */
+  --color-subtle: #34373c; /* wf/subtle */
+  --color-table-head: #1d1e20; /* wf/table-head */
+  --color-selected: #868d9a14; /* wf/selected */
+  --color-row-selected: #868d9a24; /* wf/row-selected */
+  --color-strong: #e3e5e8; /* wf/strong */
+  --color-glass-fill: #292b2f7a; /* wf/glass-fill */
+  --color-scrim: #0000008f; /* wf/scrim */
+  --color-scrim-card: #00000066; /* wf/scrim-card */
+
+  /* 선 */
+  --color-line: #4a4d54; /* wf/line */
+  --color-glass-line: #4a4d54cc; /* wf/glass-line */
+
+  /* 글자 */
+  --color-foreground: #f2f3f5; /* wf/text */
+  --color-foreground-muted: #a3a6ab; /* wf/text-muted */
+  --color-on-strong: #292b2f; /* wf/text-on-strong */
+  --color-error: #d95757; /* wf/error */
+
+  --font-sans:
+    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui,
+    'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --font-mono:
+    'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono',
+    monospace;
+
+  /* 텍스트 스타일. Figma의 자간(%)은 em으로 바꿨다(-2 → -0.02em).
+     이름을 더하거나 바꾸면 core의 cn.ts(TEXT_STYLES)도 함께 고친다. */
+  --text-title-32: 2rem;
+  --text-title-32--line-height: 2.5rem;
+  --text-title-32--letter-spacing: -0.03em;
+  --text-title-32--font-weight: 700;
+  --text-title-24: 1.5rem;
+  --text-title-24--line-height: 2rem;
+  --text-title-24--letter-spacing: -0.025em;
+  --text-title-24--font-weight: 600;
+  --text-heading-20: 1.25rem;
+  --text-heading-20--line-height: 1.75rem;
+  --text-heading-20--letter-spacing: -0.025em;
+  --text-heading-20--font-weight: 600;
+  --text-body-16: 1rem;
+  --text-body-16--line-height: 1.6;
+  --text-body-16--letter-spacing: -0.02em;
+  --text-body-16--font-weight: 500;
+  --text-body-16-regular: 1rem;
+  --text-body-16-regular--line-height: 1.6;
+  --text-body-16-regular--letter-spacing: -0.02em;
+  --text-body-16-regular--font-weight: 400;
+  --text-label-14: 0.875rem;
+  --text-label-14--line-height: 1.6;
+  --text-label-14--letter-spacing: -0.02em;
+  --text-label-14--font-weight: 500;
+  --text-caption-12: 0.75rem;
+  --text-caption-12--line-height: 1rem;
+  --text-caption-12--letter-spacing: -0.02em;
+  --text-caption-12--font-weight: 400;
+  --text-badge-11: 0.6875rem;
+  --text-badge-11--line-height: 0.875rem;
+  --text-badge-11--letter-spacing: -0.02em;
+  --text-badge-11--font-weight: 500;
+  /* 코드 글자는 font-mono와 함께 쓴다(font-mono text-code-12). */
+  --text-code-12: 0.75rem;
+  --text-code-12--line-height: 1.125rem;
+  --text-code-12--letter-spacing: -0.02em;
+  --text-code-12--font-weight: 500;
+}
+
+/* 화면은 Dark 모드 하나만 쓴다. 스크롤바·폼 컨트롤 같은 브라우저 기본 UI도 어두운 색으로 맞춘다. */
+:root {
+  color-scheme: dark;
 }
