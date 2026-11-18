@@ -110,7 +110,7 @@
 - 각 앱 `proxy.ts`의 matcher는 보호할 경로를 직접 적는 allowlist다. 로그인이 필요한 페이지를 만들면 matcher에 더한다. "…을 뺀 전부" 같은 제외 패턴은 쓰지 않는다. matcher 밖의 페이지는 토큰을 갱신하지 않는다.
 - CSRF: 쿠키가 자동 전송되므로 `/backend/*`의 상태 변경 요청과 `POST /api/logout`은 `Origin`이 앱 주소와 다르면 403이다.
 - 갱신은 `proxy.ts`가 한다. refresh token은 갱신마다 바뀐다(회전). `invalid_grant`·401이면 토큰 쿠키를 지우고 다시 로그인하게 하고, 429·네트워크 오류면 refresh token을 남겨 다음에 다시 시도한다.
-- 로그아웃은 `POST /api/logout`(form 또는 fetch)이고 이 앱의 토큰 쿠키만 지운다. prefetch·이미지 태그로 실행될 수 있으므로 GET 링크로 만들지 않는다. 인가 서버 세션 종료는 아직 하지 않는다.
+- 로그아웃은 core `features/logout`의 `LogoutButton` 하나로 한다. 브라우저가 인가 서버 `POST /v1/oauth/logout`(`credentials: 'include'`)으로 SSO 세션을 끝낸 뒤, 실패하더라도 이 앱의 `POST /api/logout` form을 제출해 토큰 쿠키를 지운다. 사이드바에는 `AppShell`의 `idpLogoutUrl`(서버에서 `buildIdpLogoutUrl(env)`로 만든다)을 넘긴 앱(client, admin)에만 버튼이 생긴다. prefetch·이미지 태그로 실행될 수 있으므로 GET 링크로 만들지 않는다. 다른 앱에 이미 저장된 토큰은 만료나 다음 갱신 실패까지 남는다. 로컬(`localhost` → stage 인가 서버)은 다른 사이트라 SameSite=Lax 세션 쿠키가 실리지 않아 SSO 세션이 남는다.
 
 ## 환경 변수
 
