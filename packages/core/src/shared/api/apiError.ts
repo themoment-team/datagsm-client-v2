@@ -1,51 +1,41 @@
-import { type AxiosError, AxiosHeaders } from 'axios';
+import type { AxiosError } from 'axios';
 
 interface ApiErrorInit {
   status: number;
   code: string;
   message: string;
-  requestId?: string;
 }
 
 // 모든 API 호출 실패는 이 형태로 통일된다. 원본 AxiosError는 cause에 남는다.
+// - status: HTTP 상태 코드. 응답이 없는 실패(네트워크 오류, 타임아웃, 취소)는 0이다. 화면 분기는 이 값으로 한다.
+// - message: 서버가 준 에러 문구. 없으면 axios의 메시지다.
+// - code: axios 오류 코드(ERR_NETWORK, ECONNABORTED 등). status 0인 실패의 원인을 구분할 때 쓴다.
+//   DataGSM 서버 본문의 code는 status와 같은 숫자라 담지 않는다.
 export class ApiError extends Error implements ApiErrorInit {
   readonly status: number;
   readonly code: string;
-  readonly requestId?: string;
 
-  constructor({ status, code, message, requestId }: ApiErrorInit, options?: ErrorOptions) {
+  constructor({ status, code, message }: ApiErrorInit, options?: ErrorOptions) {
     super(message, options);
     this.name = 'ApiError';
     this.status = status;
     this.code = code;
-    this.requestId = requestId;
   }
 }
 
-const readString = (source: unknown, key: string) => {
-  if (typeof source !== 'object' || source === null) {
-    return undefined;
-  }
+const readMessage = (body: unknown) => {
+  const message =
+    typeof body === 'object' && body !== null ? (body as Record<string, unknown>).message : null;
 
-  const value = (source as Record<string, unknown>)[key];
-
-  return typeof value === 'string' ? value : undefined;
+  return typeof message === 'string' ? message : undefined;
 };
 
-// 응답이 없는 실패(네트워크 오류, 타임아웃, 취소)는 status 0으로 둔다.
-export const toApiError = (error: AxiosError): ApiError => {
-  const { response } = error;
-  const headers = response?.headers;
-  const requestId =
-    headers instanceof AxiosHeaders ? headers.get('X-Request-Id') : headers?.['x-request-id'];
-
-  return new ApiError(
+export const toApiError = (error: AxiosError): ApiError =>
+  new ApiError(
     {
-      status: response?.status ?? 0,
-      code: readString(response?.data, 'code') ?? error.code ?? 'UNKNOWN',
-      message: readString(response?.data, 'message') ?? error.message,
-      requestId: typeof requestId === 'string' ? requestId : undefined,
+      status: error.response?.status ?? 0,
+      code: error.code ?? 'UNKNOWN',
+      message: readMessage(error.response?.data) ?? error.message,
     },
     { cause: error },
   );
-};
