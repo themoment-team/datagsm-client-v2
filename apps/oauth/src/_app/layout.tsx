@@ -1,3 +1,4 @@
+import { ThemeProvider } from '@datagsm/core/features/theme-toggle';
 import type { Metadata } from 'next';
 
 import { TanStackProvider } from '@/_app/providers';
@@ -15,9 +16,11 @@ export const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <body className="bg-background text-foreground antialiased">
-        <TanStackProvider>{children}</TanStackProvider>
+        <ThemeProvider>
+          <TanStackProvider>{children}</TanStackProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

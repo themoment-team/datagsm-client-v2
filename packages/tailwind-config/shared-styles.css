@@ -6,32 +6,50 @@
 
 @source '../core/src';
 
-/* 디자인 토큰은 Figma DataGSMv2의 "WF · 파운데이션"(Wireframe 변수 모음, Dark 모드)을 옮긴 것이다.
-   회색만 쓰고 강조는 밝기 차이로 낸다. Tailwind 기본 색 팔레트는 지워서 아래 토큰만 쓰게 한다. */
+/* 디자인 토큰은 Figma DataGSMv2의 "WF · 파운데이션"(Wireframe 변수 모음)을 옮긴 것이다.
+   회색만 쓰고 강조는 밝기 차이로 낸다. Tailwind 기본 색 팔레트는 지워서 아래 토큰만 쓰게 한다.
+   기본은 Light 모드이고, Dark 모드 값은 아래 [data-theme='dark']가 같은 이름의 변수를 덮어쓴다. */
 @theme {
   --color-*: initial;
 
   /* 면 */
-  --color-background: #202225; /* wf/bg */
-  --color-surface: #292b2f; /* wf/surface */
-  --color-subtle: #34373c; /* wf/subtle */
-  --color-table-head: #1d1e20; /* wf/table-head */
-  --color-selected: #868d9a14; /* wf/selected */
-  --color-row-selected: #868d9a24; /* wf/row-selected */
-  --color-strong: #e3e5e8; /* wf/strong */
-  --color-glass-fill: #292b2f7a; /* wf/glass-fill */
-  --color-scrim: #0000008f; /* wf/scrim */
-  --color-scrim-card: #00000066; /* wf/scrim-card */
+  --color-background: #f4f4f4; /* wf/bg */
+  --color-surface: #ffffff; /* wf/surface */
+  --color-subtle: #ededed; /* wf/subtle */
+  --color-table-head: #e8ebf0; /* wf/table-head */
+  --color-selected: #dcdcdc; /* wf/selected */
+  --color-row-selected: #dcdcdc; /* wf/row-selected */
+  --color-strong: #292b2f; /* wf/strong */
+  --color-table-fill: #ffffff66; /* wf/table-fill */
+  --color-background-overlay: #ffffff33; /* wf/bg-overlay */
+  --color-glass-fill: #ffffff7a; /* wf/glass-fill. 모달(오른쪽 카드)도 이 색이다. */
+  /* Figma 변수도 두 모드 모두 #000000이다. 모달 면은 glass-fill이고, 이 토큰을 쓰는 곳은 아직 정해지지 않았다. */
+  --color-modal-fill: #000000; /* wf/modal-fill */
+  /* 인증 창(로그인·회원가입·비밀번호 초기화·OAuth) 뒤 덮개. Dark는 덮개가 없다(투명). */
+  --color-scrim: #ffffff8f; /* wf/scrim */
+  /* 오른쪽 카드에서 모달을 조작할 때 왼쪽 두 카드를 덮는 막 */
+  --color-scrim-card: #ffffff99; /* wf/scrim-card */
+  /* 토스트는 화면과 반대 모드로 보인다. 토스트 요소에 반대 모드의 data-theme을 붙여
+     배경 toast-fill과 글자 foreground를 그 모드 값으로 쓴다(라이트 화면 = 검은 토스트, 다크 화면 = 흰 토스트).
+     그래서 토스트 색을 고칠 때는 화면 모드가 아니라 반대 모드 값을 바꾼다.
+     지금은 Dark 값만 [data-theme='dark']로 덮어쓰므로 다크 화면 안에서 Light로 고정하려면
+     토스트를 만들 때 Light 값을 되돌리는 [data-theme='light'] 규칙이 필요하다. */
+  --color-toast-fill: #ffffff; /* wf/toast-fill */
+
+  /* 상태 */
+  --color-hover: #0000000f; /* wf/hover */
+  --color-hover-on-strong: #ffffff29; /* wf/hover-on-strong */
+  --color-row-hover: #00000008; /* wf/row-hover */
 
   /* 선 */
-  --color-line: #4a4d54; /* wf/line */
-  --color-glass-line: #4a4d54cc; /* wf/glass-line */
+  --color-line: #d0d0d0; /* wf/line */
+  --color-glass-line: #d0d0d0cc; /* wf/glass-line */
 
   /* 글자 */
-  --color-foreground: #f2f3f5; /* wf/text */
-  --color-foreground-muted: #a3a6ab; /* wf/text-muted */
-  --color-on-strong: #292b2f; /* wf/text-on-strong */
-  --color-error: #d95757; /* wf/error */
+  --color-foreground: #1e1e1e; /* wf/text */
+  --color-foreground-muted: #6e6e6e; /* wf/text-muted */
+  --color-on-strong: #ffffff; /* wf/text-on-strong */
+  --color-error: #f84c4c; /* wf/error */
 
   --font-sans:
     'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui,
@@ -81,7 +99,43 @@
   --text-code-12--font-weight: 500;
 }
 
-/* 화면은 Dark 모드 하나만 쓴다. 스크롤바·폼 컨트롤 같은 브라우저 기본 UI도 어두운 색으로 맞춘다. */
+/* 스크롤바·폼 컨트롤 같은 브라우저 기본 UI도 모드에 맞춘다.
+   data-theme이 없는 문서는 Light로 보인다. 전역 오류 화면(GlobalError)은 레이아웃과 ThemeProvider를 대신하므로
+   저장된 테마와 상관없이 Light다. 레이아웃이 깨졌을 때 뜨는 화면이라 Provider에 다시 기대지 않는다. */
 :root {
+  color-scheme: light;
+}
+
+/* Dark 모드는 <html data-theme="dark">일 때 켜진다. 색 토큰만 바꾸므로 컴포넌트는 dark: 변형 없이 같은 클래스를 쓴다.
+   @theme의 색 토큰을 모두 덮어써야 한다(core theme-toggle의 ThemeProvider.test.ts가 검사한다).
+   색만 넣는다. --text-* 같은 다른 토큰을 넣으면 cn.test.ts가 이름 중복으로 실패한다. */
+[data-theme='dark'] {
   color-scheme: dark;
+
+  --color-background: #202225;
+  --color-surface: #292b2f;
+  --color-subtle: #34373c;
+  --color-table-head: #1d1e20;
+  --color-selected: #868d9a14;
+  --color-row-selected: #868d9a24;
+  --color-strong: #e3e5e8;
+  --color-table-fill: #12131480;
+  --color-background-overlay: #00000033;
+  --color-glass-fill: #292b2f7a;
+  --color-modal-fill: #000000;
+  --color-scrim: #00000000;
+  --color-scrim-card: #00000099;
+  --color-toast-fill: #000000;
+
+  --color-hover: #ffffff14;
+  --color-hover-on-strong: #0000001f;
+  --color-row-hover: #ffffff0a;
+
+  --color-line: #4a4d54;
+  --color-glass-line: #4a4d54cc;
+
+  --color-foreground: #f2f3f5;
+  --color-foreground-muted: #a3a6ab;
+  --color-on-strong: #292b2f;
+  --color-error: #d95757;
 }

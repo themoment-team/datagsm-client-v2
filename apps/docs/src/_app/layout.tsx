@@ -1,3 +1,4 @@
+import { ThemeProvider } from '@datagsm/core/features/theme-toggle';
 import { toAppUrls } from '@datagsm/core/shared/config';
 import {
   AppShell,
@@ -22,18 +23,20 @@ export const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <body className="bg-background text-foreground antialiased">
-        <TanStackProvider>
-          <AppShell
-            currentApp="docs"
-            appUrls={toAppUrls(env)}
-            items={USER_SIDEBAR_ITEMS}
-            footerItems={USER_SIDEBAR_FOOTER_ITEMS}
-          >
-            {children}
-          </AppShell>
-        </TanStackProvider>
+        <ThemeProvider>
+          <TanStackProvider>
+            <AppShell
+              currentApp="docs"
+              appUrls={toAppUrls(env)}
+              items={USER_SIDEBAR_ITEMS}
+              footerItems={USER_SIDEBAR_FOOTER_ITEMS}
+            >
+              {children}
+            </AppShell>
+          </TanStackProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
