@@ -1,3 +1,4 @@
+import { ThemeProvider } from '@datagsm/core/features/theme-toggle';
 import { buildIdpLogoutUrl } from '@datagsm/core/shared/auth/server';
 import { toAppUrls } from '@datagsm/core/shared/config';
 import {
@@ -23,19 +24,21 @@ export const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <body className="bg-background text-foreground antialiased">
-        <TanStackProvider>
-          <AppShell
-            currentApp="client"
-            appUrls={toAppUrls(env)}
-            items={USER_SIDEBAR_ITEMS}
-            footerItems={USER_SIDEBAR_FOOTER_ITEMS}
-            idpLogoutUrl={buildIdpLogoutUrl(env)}
-          >
-            {children}
-          </AppShell>
-        </TanStackProvider>
+        <ThemeProvider>
+          <TanStackProvider>
+            <AppShell
+              currentApp="client"
+              appUrls={toAppUrls(env)}
+              items={USER_SIDEBAR_ITEMS}
+              footerItems={USER_SIDEBAR_FOOTER_ITEMS}
+              idpLogoutUrl={buildIdpLogoutUrl(env)}
+            >
+              {children}
+            </AppShell>
+          </TanStackProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
