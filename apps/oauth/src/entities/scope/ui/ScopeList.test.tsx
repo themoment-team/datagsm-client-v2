@@ -25,10 +25,11 @@ it('체크 아이콘은 장식이라 스크린 리더에서 숨긴다', () => {
   expect(screen.queryByRole('img')).toBeNull();
 });
 
-it('최대 높이 280에서 세로로 스크롤한다', () => {
-  render(<ScopeList scopes={scopes} />);
+it('최대 높이 280인 스크롤 영역 안에 목록을 그린다', () => {
+  const { container } = render(<ScopeList scopes={scopes} />);
 
-  expect(screen.getByRole('list')).toHaveClass('max-h-70', 'overflow-y-auto');
+  expect(container.firstElementChild).toHaveClass('max-h-70');
+  expect(container.firstElementChild).toContainElement(screen.getByRole('list'));
 });
 
 it('권한이 없으면 빈 목록이다', () => {
