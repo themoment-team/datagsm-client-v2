@@ -60,7 +60,9 @@ export const AppSidebar = ({
   const pathname = usePathname();
 
   return (
-    <aside className="sticky top-0 flex h-screen w-72 shrink-0 flex-col px-5 py-8">
+    // 폭 272(w-68)는 Figma WF/Sidebar 값이다. PanelLayout의 최소 폭이 이 폭을 기준으로 계산되어 있다.
+    // 화면 높이가 메뉴보다 낮을 때(크게 확대했을 때 등)는 사이드바 안에서 스크롤된다.
+    <aside className="flex h-full w-68 shrink-0 flex-col overflow-y-auto px-5 py-8">
       <div className="flex items-center justify-between gap-2 px-4">
         <p>DATA GSM</p>
         {badge && <span>{badge}</span>}
