@@ -19,7 +19,8 @@ export const RootLayout = ({
     <html lang="ko" suppressHydrationWarning>
       <body className="bg-background text-foreground antialiased">
         <ThemeProvider>
-          {/* 사이드바와 공통 배경은 app/(shell)의 ShellLayout이 깐다. 랜딩(/)은 그 밖에 있어 둘 다 없다. */}
+          {/* 사이드바와 공통 배경은 app/(shell)의 ShellLayout이 깐다. 랜딩(/)은 그 밖에 있어 둘 다 없다.
+              오류·404 화면도 사이드바가 남도록 (shell)/error.tsx와 루트 not-found.tsx가 ShellLayout을 쓴다. */}
           <TanStackProvider>{children}</TanStackProvider>
         </ThemeProvider>
       </body>
