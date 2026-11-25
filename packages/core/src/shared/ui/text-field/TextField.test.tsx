@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../button';
+import { TextButton } from '../text-button';
 import { TextField } from './TextField';
 
 describe('TextField', () => {
@@ -170,6 +171,16 @@ describe('TextField', () => {
     expect(container.querySelector('.h-12')).not.toContainElement(button);
     expect(button.parentElement).toBe(container.querySelector('.h-12')?.parentElement);
     expect(button).toHaveClass('w-20');
+  });
+
+  it('info를 라벨 옆에 그리고 라벨 이름에는 섞지 않는다', () => {
+    render(<TextField label="이메일" info={<TextButton>정보</TextButton>} disabled />);
+    const info = screen.getByRole('button', { name: '정보' });
+
+    expect(screen.getByRole('textbox', { name: '이메일' })).toBeInTheDocument();
+    expect(info.parentElement).toHaveClass('px-2', 'py-0.5');
+    // Figma Disabled: 라벨만 흐려지고 정보 링크는 그대로 누를 수 있다.
+    expect(info).toBeEnabled();
   });
 
   it('className은 바깥 래퍼에 붙는다', () => {

@@ -1,10 +1,12 @@
 import { type ComponentProps, type ReactNode, useId } from 'react';
 
 import { cn } from '../../lib';
-import { WarningIcon } from '../icon';
+import { FormField } from '../form-field';
 
 interface TextFieldProps extends ComponentProps<'input'> {
   label?: ReactNode;
+  // 라벨 오른쪽 "정보" 링크 자리(예: <TextButton>정보</TextButton>).
+  info?: ReactNode;
   hint?: ReactNode;
   // 있으면 오류 상태다. hint 자리에 이 문구를 경고 아이콘과 함께 보여 주고 input에 aria-invalid를 붙인다.
   error?: ReactNode;
@@ -17,8 +19,8 @@ interface TextFieldProps extends ComponentProps<'input'> {
 }
 
 // Figma DataGSMv2 "WF/Input field"(Type=Text)와 "WF/Email field"를 하나로 옮겼다.
-// - 라벨·입력칸·안내 문구는 세로로 8 간격. 라벨과 안내 문구는 label-14, 입력 글자는 body-16-regular.
-// - 입력칸: 높이 48, 좌우 16, 1px line 선, 면 없음. 폭은 부모를 채우고 다른 폭은 className으로 정한다.
+// 라벨·정보·안내·오류 문구와 그 연결은 FormField가 맡고, 여기서는 입력칸만 그린다.
+// - 입력칸: 높이 48, 좌우 16, 1px line 선, 면 없음, 글자 body-16-regular. 폭은 부모를 채우고 다른 폭은 className으로 정한다.
 // - State는 prop이 아니라 input 상태로 그린다.
 //   Filled: 값은 foreground, placeholder는 foreground-muted. Focus: focus-within으로 선이 strong 2px.
 //   Disabled: 면 subtle, 라벨·값 foreground-muted. Error: 선 error 2px, 오류 문구와 경고 아이콘은 error.
@@ -29,6 +31,7 @@ interface TextFieldProps extends ComponentProps<'input'> {
 // React Hook Form의 register 결과를 그대로 펼칠 수 있다: <TextField {...register('email')} label="이메일" />
 export const TextField = ({
   label,
+  info,
   hint,
   error,
   suffix,
@@ -40,70 +43,47 @@ export const TextField = ({
   'aria-describedby': ariaDescribedBy,
   ...props
 }: TextFieldProps) => {
-  const generatedId = useId();
-  const inputId = id ?? generatedId;
-  const suffixId = `${inputId}-suffix`;
-  const messageId = `${inputId}-message`;
+  const suffixId = useId();
   const hasError = Boolean(error);
-  const message = hasError ? error : hint;
-  const describedBy = [ariaDescribedBy, suffix && suffixId, message && messageId]
-    .filter(Boolean)
-    .join(' ');
+  const describedBy = [ariaDescribedBy, suffix && suffixId].filter(Boolean).join(' ');
 
   return (
-    <div className={cn('flex flex-col gap-2', className)}>
-      {label && (
-        <label
-          htmlFor={inputId}
-          className={cn(
-            'self-start text-label-14',
-            disabled ? 'text-foreground-muted' : 'text-foreground',
-          )}
-        >
-          {label}
-        </label>
-      )}
-      <div className="flex items-center gap-2">
-        <div
-          className={cn(
-            'flex h-12 min-w-0 flex-1 cursor-text items-center gap-2 rounded border px-4 text-body-16-regular text-foreground-muted has-disabled:cursor-not-allowed has-disabled:bg-subtle',
-            hasError
-              ? 'border-error inset-ring-1 inset-ring-error'
-              : 'border-line focus-within:border-strong focus-within:inset-ring-1 focus-within:inset-ring-strong',
-          )}
-        >
-          <input
-            id={inputId}
-            disabled={disabled}
-            aria-invalid={hasError || undefined}
-            aria-describedby={describedBy || undefined}
-            className="h-full min-w-0 flex-1 text-foreground outline-none placeholder:text-foreground-muted disabled:cursor-not-allowed disabled:text-foreground-muted"
-            {...props}
-          />
-          {suffix && (
-            <span id={suffixId} className="shrink-0 whitespace-nowrap">
-              {suffix}
-            </span>
-          )}
-          {trailing && <span className="shrink-0 whitespace-nowrap">{trailing}</span>}
-        </div>
-        {action}
-      </div>
-      {message &&
-        (hasError ? (
-          <p
-            id={messageId}
-            role="alert"
-            className="flex items-center gap-1 text-label-14 text-error"
+    <FormField
+      id={id}
+      label={label}
+      info={info}
+      hint={hint}
+      error={error}
+      disabled={disabled}
+      aria-describedby={describedBy || undefined}
+      className={className}
+    >
+      {(control) => (
+        <div className="flex items-center gap-2">
+          <div
+            className={cn(
+              'flex h-12 min-w-0 flex-1 cursor-text items-center gap-2 rounded border px-4 text-body-16-regular text-foreground-muted has-disabled:cursor-not-allowed has-disabled:bg-subtle',
+              hasError
+                ? 'border-error inset-ring-1 inset-ring-error'
+                : 'border-line focus-within:border-strong focus-within:inset-ring-1 focus-within:inset-ring-strong',
+            )}
           >
-            <WarningIcon />
-            <span className="min-w-0 flex-1">{message}</span>
-          </p>
-        ) : (
-          <p id={messageId} className="text-label-14 text-foreground-muted">
-            {message}
-          </p>
-        ))}
-    </div>
+            <input
+              {...control}
+              disabled={disabled}
+              className="h-full min-w-0 flex-1 text-foreground outline-none placeholder:text-foreground-muted disabled:cursor-not-allowed disabled:text-foreground-muted"
+              {...props}
+            />
+            {suffix && (
+              <span id={suffixId} className="shrink-0 whitespace-nowrap">
+                {suffix}
+              </span>
+            )}
+            {trailing && <span className="shrink-0 whitespace-nowrap">{trailing}</span>}
+          </div>
+          {action}
+        </div>
+      )}
+    </FormField>
   );
 };
