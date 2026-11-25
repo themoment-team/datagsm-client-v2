@@ -18,8 +18,10 @@ test('랜딩 밖의 화면에는 사이드바와 공통 배경이 깔린다', as
   await page.goto('/this-page-does-not-exist');
 
   await expect(page.getByRole('navigation', { name: '주 메뉴' })).toBeVisible();
-  const background = page.locator('canvas[aria-hidden="true"]');
+  // 배경 레이어(aria-hidden div) 안에 WebGL canvas가 하나 그려진다.
+  const background = page.locator('[aria-hidden="true"]:has(> canvas)');
   await expect(background).toHaveCount(1);
+  await expect(background.locator('canvas')).toHaveCount(1);
   await expect(background).toHaveCSS('position', 'fixed');
   await expect(background).toHaveCSS('pointer-events', 'none');
 });

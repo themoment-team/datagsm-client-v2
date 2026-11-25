@@ -9,8 +9,10 @@ test('home renders heading', async ({ page }) => {
 test('home에 공통 배경이 장식으로 깔린다', async ({ page }) => {
   await page.goto('/');
 
-  const background = page.locator('canvas[aria-hidden="true"]');
+  // 배경 레이어(aria-hidden div) 안에 WebGL canvas가 하나 그려진다.
+  const background = page.locator('[aria-hidden="true"]:has(> canvas)');
   await expect(background).toHaveCount(1);
+  await expect(background.locator('canvas')).toHaveCount(1);
   await expect(background).toHaveCSS('position', 'fixed');
   await expect(background).toHaveCSS('pointer-events', 'none');
 });

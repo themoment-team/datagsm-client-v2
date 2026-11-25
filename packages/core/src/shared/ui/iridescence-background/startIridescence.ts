@@ -28,7 +28,8 @@ const compile = (gl: WebGLRenderingContext, type: number, source: string) => {
 // WebGL을 쓸 수 없으면 null을 돌려준다. 이때 canvas 뒤의 배경색이 대신 보인다.
 export const startIridescence = (canvas: HTMLCanvasElement): (() => void) | null => {
   const gl = canvas.getContext('webgl', { alpha: false, antialias: false });
-  if (!gl) return null;
+  // 이미 잃은 컨텍스트가 돌아오면(정리한 canvas를 다시 쓴 경우) 셰이더를 만들 수 없으므로 시작하지 않는다.
+  if (!gl || gl.isContextLost()) return null;
 
   let program: WebGLProgram | null = null;
   let vertexShader: WebGLShader | null = null;

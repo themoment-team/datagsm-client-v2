@@ -15,20 +15,37 @@ interface IridescenceBackgroundProps {
 // 장식이라 스크린 리더에서 숨기고 클릭·포커스를 받지 않는다.
 // WebGL을 쓸 수 없으면 bg-background 단색이 대신 보인다.
 export const IridescenceBackground = ({ className }: IridescenceBackgroundProps) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    // canvas는 마운트할 때마다 새로 만든다. 정리할 때 WebGL 컨텍스트를 돌려주는데(loseContext),
+    // 같은 canvas에서 getContext를 다시 부르면 잃은 컨텍스트가 그대로 돌아와 그릴 수 없다.
+    // 개발 모드의 StrictMode는 effect를 정리한 뒤 다시 실행하므로, canvas를 재사용하면 바로 이 상황이 된다.
+    const canvas = document.createElement('canvas');
+    canvas.style.display = 'block';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    container.append(canvas);
+
     const stop = startIridescence(canvas);
-    return () => stop?.();
+    if (!stop) {
+      canvas.remove();
+      return;
+    }
+    return () => {
+      stop();
+      canvas.remove();
+    };
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
+    <div
+      ref={containerRef}
       aria-hidden
-      className={cn('pointer-events-none fixed inset-0 -z-10 size-full bg-background', className)}
+      className={cn('pointer-events-none fixed inset-0 -z-10 bg-background', className)}
     />
   );
 };

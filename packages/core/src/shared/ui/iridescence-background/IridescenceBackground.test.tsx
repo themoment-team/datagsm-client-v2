@@ -1,3 +1,5 @@
+import { StrictMode } from 'react';
+
 import { render } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
@@ -5,8 +7,12 @@ import { IridescenceBackground } from './IridescenceBackground';
 import { startIridescence } from './startIridescence';
 
 // jsdom에는 WebGL이 없어서 호출만 기록하는 가짜 컨텍스트를 쓴다.
+// 실제 WebGL처럼 loseContext 뒤에는 isContextLost가 true가 된다.
 const createFakeGl = ({ compiles = true } = {}) => {
-  const loseContext = vi.fn();
+  let lost = false;
+  const loseContext = vi.fn(() => {
+    lost = true;
+  });
   const calls: { name: string; args: unknown[] }[] = [];
   const gl = new Proxy(
     {
@@ -16,6 +22,7 @@ const createFakeGl = ({ compiles = true } = {}) => {
       LINK_STATUS: 4,
       getShaderParameter: () => compiles,
       getProgramParameter: () => true,
+      isContextLost: () => lost,
       getShaderInfoLog: () => 'compile error',
       getExtension: (name: string) => (name === 'WEBGL_lose_context' ? { loseContext } : null),
       getUniformLocation: (_: unknown, name: string) => name,
@@ -66,23 +73,67 @@ it('장식 배경이라 스크린 리더에서 숨기고, WebGL이 없으면 배
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
 
   const { container } = render(<IridescenceBackground className="absolute" />);
-  const canvas = container.querySelector('canvas');
+  const layer = container.firstElementChild;
 
-  expect(canvas).toHaveAttribute('aria-hidden', 'true');
-  expect(canvas).toHaveClass('pointer-events-none', 'bg-background', 'absolute', '-z-10');
-  expect(canvas).not.toHaveClass('fixed');
+  expect(layer).toHaveAttribute('aria-hidden', 'true');
+  expect(layer).toHaveClass('pointer-events-none', 'bg-background', 'absolute', '-z-10');
+  expect(layer).not.toHaveClass('fixed');
+  expect(container.querySelector('canvas')).toBeNull();
+});
+
+// 개발 모드 StrictMode는 effect를 정리한 뒤 다시 실행한다. 같은 canvas를 다시 쓰면 잃은 컨텍스트가 돌아와
+// "셰이더 컴파일에 실패했습니다"가 났다. 다시 실행할 때는 새 canvas와 새 컨텍스트로 그려야 한다.
+it('StrictMode에서 effect가 다시 실행돼도 새 canvas로 다시 그린다', () => {
+  const contexts = new Map<HTMLCanvasElement, ReturnType<typeof createFakeGl>>();
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(function (
+    this: HTMLCanvasElement,
+  ) {
+    const fake = contexts.get(this) ?? createFakeGl();
+    contexts.set(this, fake);
+    return fake.gl as never;
+  });
+  const consoleError = vi.spyOn(console, 'error');
+
+  const { container } = render(
+    <StrictMode>
+      <IridescenceBackground />
+    </StrictMode>,
+  );
+
+  const [first, second] = [...contexts.values()];
+  expect(contexts.size).toBe(2);
+  expect(first?.loseContext).toHaveBeenCalledTimes(1);
+  expect(second?.calls.some((call) => call.name === 'drawArrays')).toBe(true);
+  expect(second?.loseContext).not.toHaveBeenCalled();
+  expect(container.querySelectorAll('canvas')).toHaveLength(1);
+  expect(consoleError).not.toHaveBeenCalled();
+});
+
+it('이미 잃은 컨텍스트를 받으면 시작하지 않고 오류도 남기지 않는다', () => {
+  const consoleError = vi.spyOn(console, 'error');
+  const fake = createFakeGl();
+  fake.loseContext();
+  fake.loseContext.mockClear();
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(fake.gl as never);
+
+  expect(startIridescence(document.createElement('canvas'))).toBeNull();
+  expect(fake.calls.some((call) => call.name === 'createShader')).toBe(false);
+  expect(consoleError).not.toHaveBeenCalled();
 });
 
 it('언마운트하면 애니메이션·관찰을 멈추고 WebGL 컨텍스트를 돌려준다', () => {
   const fake = createFakeGl();
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(fake.gl as never);
 
-  const { unmount } = render(<IridescenceBackground />);
+  const { container, unmount } = render(<IridescenceBackground />);
   expect(fake.calls.some((call) => call.name === 'drawArrays')).toBe(true);
   expect(requestAnimationFrame).toHaveBeenCalled();
 
+  expect(container.querySelectorAll('canvas')).toHaveLength(1);
+
   unmount();
 
+  expect(container.querySelector('canvas')).toBeNull();
   expect(cancelAnimationFrame).toHaveBeenCalled();
   expect(observers).toHaveLength(2);
   observers.forEach((observer) => expect(observer.disconnect).toHaveBeenCalled());
