@@ -5,7 +5,7 @@ import { cn } from '../../lib';
 export type LogoProps = Omit<SVGProps<SVGSVGElement>, 'children'>;
 
 // Figma DataGSMv2 "WF/Logo"(node 743:1899). 앱 파비콘(app/icon.svg)과 같은 모양이다.
-// 색은 currentColor라서 기본은 글자색(text-foreground)을 따른다.
+// 색은 currentColor라서 부모의 글자색을 따른다. 색을 바꾸려면 부모나 className에 text-* 클래스를 준다.
 // aria-label이 없으면 장식으로 보고 스크린 리더에서 숨긴다. 로고만 단독으로 쓰면 aria-label을 붙인다.
 export const Logo = ({ className, ...props }: LogoProps) => {
   const labelled = props['aria-label'] !== undefined || props['aria-labelledby'] !== undefined;
@@ -18,7 +18,7 @@ export const Logo = ({ className, ...props }: LogoProps) => {
       focusable="false"
       role={labelled ? 'img' : undefined}
       aria-hidden={labelled ? undefined : true}
-      className={cn('h-6.5 w-9.25 shrink-0 text-foreground', className)}
+      className={cn('h-6.5 w-9.25 shrink-0', className)}
       {...props}
     >
       <path
