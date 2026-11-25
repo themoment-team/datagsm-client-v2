@@ -1,8 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { expect, it } from 'vitest';
 
-import { CheckIcon, MailIcon } from './icons';
+import { CheckIcon } from './CheckIcon';
 import * as icons from './index';
+import { MailIcon } from './MailIcon';
 
 const iconComponents = Object.entries(icons).filter(([name]) => name.endsWith('Icon'));
 

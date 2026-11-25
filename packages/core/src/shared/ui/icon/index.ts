@@ -1,40 +1,38 @@
+export { BellIcon } from './BellIcon';
+export { BookIcon } from './BookIcon';
+export { CheckCircleIcon } from './CheckCircleIcon';
+export { CheckIcon } from './CheckIcon';
+export { ChevronDownIcon } from './ChevronDownIcon';
+export { ChevronLeftIcon } from './ChevronLeftIcon';
+export { ChevronRightIcon } from './ChevronRightIcon';
+export { ClockIcon } from './ClockIcon';
+export { CloseIcon } from './CloseIcon';
+export { CogIcon } from './CogIcon';
+export { CopyIcon } from './CopyIcon';
+export { EditIcon } from './EditIcon';
+export { EyeIcon } from './EyeIcon';
+export { FileTextIcon } from './FileTextIcon';
+export { FingerprintIcon } from './FingerprintIcon';
+export { FolderIcon } from './FolderIcon';
+export { HeartRateIcon } from './HeartRateIcon';
 export type { IconProps } from './Icon';
-export {
-  BellIcon,
-  BookIcon,
-  CheckCircleIcon,
-  CheckIcon,
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ClockIcon,
-  CloseIcon,
-  CogIcon,
-  CopyIcon,
-  EditIcon,
-  EyeIcon,
-  FileTextIcon,
-  FingerprintIcon,
-  FolderIcon,
-  HeartRateIcon,
-  ImageIcon,
-  InfoIcon,
-  KeyIcon,
-  LoginIcon,
-  LogoutIcon,
-  MailIcon,
-  ModuleIcon,
-  MonitorIcon,
-  MoreIcon,
-  PlusIcon,
-  ReloadIcon,
-  RobotIcon,
-  SearchIcon,
-  ShieldIcon,
-  SyncIcon,
-  TrashIcon,
-  UploadIcon,
-  UserIcon,
-  WarningCircleIcon,
-  WarningIcon,
-} from './icons';
+export { ImageIcon } from './ImageIcon';
+export { InfoIcon } from './InfoIcon';
+export { KeyIcon } from './KeyIcon';
+export { LoginIcon } from './LoginIcon';
+export { LogoutIcon } from './LogoutIcon';
+export { MailIcon } from './MailIcon';
+export { ModuleIcon } from './ModuleIcon';
+export { MonitorIcon } from './MonitorIcon';
+export { MoreIcon } from './MoreIcon';
+export { PlusIcon } from './PlusIcon';
+export { ReloadIcon } from './ReloadIcon';
+export { RobotIcon } from './RobotIcon';
+export { SearchIcon } from './SearchIcon';
+export { ShieldIcon } from './ShieldIcon';
+export { SyncIcon } from './SyncIcon';
+export { TrashIcon } from './TrashIcon';
+export { UploadIcon } from './UploadIcon';
+export { UserIcon } from './UserIcon';
+export { WarningCircleIcon } from './WarningCircleIcon';
+export { WarningIcon } from './WarningIcon';
