@@ -48,7 +48,7 @@ describe('Button', () => {
         'text-on-strong',
         'from-hover-on-strong',
         'to-hover-on-strong',
-        'enabled:hover:bg-linear-to-r',
+        'not-disabled:hover:bg-linear-to-r',
         'disabled:bg-subtle',
         'disabled:text-foreground-muted',
       ],
@@ -60,13 +60,13 @@ describe('Button', () => {
         'text-foreground',
         'from-hover',
         'to-hover',
-        'enabled:hover:bg-linear-to-r',
+        'not-disabled:hover:bg-linear-to-r',
         'disabled:text-foreground-muted',
       ],
     },
     {
       variant: 'ghost',
-      classes: ['text-foreground', 'enabled:hover:bg-hover', 'disabled:text-foreground-muted'],
+      classes: ['text-foreground', 'not-disabled:hover:bg-hover', 'disabled:text-foreground-muted'],
     },
   ] as const)('$variant 변형의 색 토큰을 쓴다', ({ variant, classes }) => {
     render(<Button variant={variant}>버튼</Button>);
