@@ -32,7 +32,7 @@ it('화면 전체를 main으로 덮고, 창은 scrim 위 가운데에 글래스 
   const box = screen.getByRole('heading', { level: 1 }).parentElement;
 
   expect(main).toHaveClass('min-h-dvh', 'items-center', 'justify-center', 'bg-scrim');
-  expect(box).toHaveClass('max-w-132', 'gap-4', 'p-6', 'bg-glass-fill', 'border-glass-line');
+  expect(box).toHaveClass('max-w-132', 'gap-4', 'p-6', 'bg-glass-fill', 'inset-ring-glass-line');
 });
 
 it('className을 창에 더한다', () => {

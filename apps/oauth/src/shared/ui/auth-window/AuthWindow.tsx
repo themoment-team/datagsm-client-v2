@@ -17,7 +17,7 @@ export const AuthWindow = ({ title, children, className }: AuthWindowProps) => (
   <main className="flex min-h-dvh items-center justify-center bg-scrim p-4">
     <section
       className={cn(
-        'flex w-full max-w-132 flex-col gap-4 overflow-clip rounded border border-glass-line bg-glass-fill p-6 text-foreground backdrop-blur-lg',
+        'flex w-full max-w-132 flex-col gap-4 overflow-clip rounded bg-glass-fill p-6 text-foreground inset-ring inset-ring-glass-line backdrop-blur-lg',
         className,
       )}
     >
