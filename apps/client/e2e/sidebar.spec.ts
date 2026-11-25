@@ -32,3 +32,21 @@ test('계정 메뉴의 로그아웃은 POST /api/logout을 제출하는 버튼�
   ).toBeVisible();
   await expect(page.locator('form[action="/api/logout"][method="post"]')).toHaveCount(1);
 });
+
+test('페이지는 화면 높이로 고정되고 사이드바는 Figma 폭(272)으로 제자리에 있다', async ({
+  page,
+}) => {
+  // 지원하는 가장 좁은 화면: 15.6인치 FHD, 125% 배율
+  await page.setViewportSize({ width: 1536, height: 750 });
+  await page.goto(SHELL_PAGE);
+
+  const sidebar = page.getByRole('complementary');
+  await expect(sidebar).toHaveCSS('width', '272px');
+  await expect(sidebar).toHaveCSS('height', '750px');
+
+  const pageOverflow = await page.evaluate(() => ({
+    y: document.scrollingElement!.scrollHeight - window.innerHeight,
+    x: document.scrollingElement!.scrollWidth - window.innerWidth,
+  }));
+  expect(pageOverflow).toEqual({ y: 0, x: 0 });
+});
