@@ -19,6 +19,28 @@ it('제목을 h1로, 그 위에 Brand를, 아래에 children을 그린다', () =
   expect(heading.compareDocumentPosition(body)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
 });
 
+it('description을 제목 바로 아래 흐린 본문으로, children을 그 아래에 그린다', () => {
+  render(
+    <AuthWindow title="서비스 정보를 불러오지 못했습니다" description="잠시 뒤 다시 시도하세요.">
+      <button type="button">다시 시도</button>
+    </AuthWindow>,
+  );
+
+  const heading = screen.getByRole('heading', { level: 1 });
+  const description = screen.getByText('잠시 뒤 다시 시도하세요.');
+
+  expect(description.tagName).toBe('P');
+  expect(description).toHaveClass('text-body-16-regular', 'text-foreground-muted');
+  expect(heading.nextElementSibling).toBe(description);
+  expect(description.nextElementSibling).toBe(screen.getByRole('button', { name: '다시 시도' }));
+});
+
+it('description이 없으면 본문 문단을 그리지 않는다', () => {
+  render(<AuthWindow title="로그인" />);
+
+  expect(screen.getByRole('heading', { level: 1 }).nextElementSibling).toBeNull();
+});
+
 it('Brand는 창 안쪽 여백에 맞추려고 좌우 여백 없이 그린다', () => {
   render(<AuthWindow title="로그인" />);
 

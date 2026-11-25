@@ -73,12 +73,16 @@ export const ConsentPage = (props: ConsentPageProps) => {
       );
     case 'unavailable':
       return (
-        <AuthWindow title="서비스 정보를 불러오지 못했습니다">
-          <p className="text-body-16-regular text-foreground-muted">
-            잠시 뒤 다시 시도하세요.
-            <br />
-            문제가 계속되면 서버 장애일 수 있습니다. 기술문서나 서버 상태를 확인하세요.
-          </p>
+        <AuthWindow
+          title="서비스 정보를 불러오지 못했습니다"
+          description={
+            <>
+              잠시 뒤 다시 시도하세요.
+              <br />
+              문제가 계속되면 서버 장애일 수 있습니다. 기술문서나 서버 상태를 확인하세요.
+            </>
+          }
+        >
           {/* 다른 앱으로 가는 이동이라 Link가 아닌 <a>에 버튼 모양만 입힌다. */}
           <div className="flex gap-2">
             <a
@@ -98,13 +102,16 @@ export const ConsentPage = (props: ConsentPageProps) => {
       );
     case 'invalid':
       return (
-        <AuthWindow title="잘못된 접근입니다">
-          <p className="text-body-16-regular text-foreground-muted">
-            잘못되었거나 만료된 접근입니다.
-            <br />
-            서비스에서 다시 로그인하세요.
-          </p>
-        </AuthWindow>
+        <AuthWindow
+          title="잘못된 접근입니다"
+          description={
+            <>
+              잘못되었거나 만료된 접근입니다.
+              <br />
+              서비스에서 다시 로그인하세요.
+            </>
+          }
+        />
       );
   }
 };
