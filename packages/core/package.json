@@ -19,6 +19,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@base-ui/react": "catalog:",
     "@tanstack/react-query": "catalog:",
     "axios": "catalog:",
     "class-variance-authority": "catalog:",
