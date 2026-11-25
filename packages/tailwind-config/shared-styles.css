@@ -92,6 +92,11 @@
   --text-badge-11--line-height: 0.875rem;
   --text-badge-11--letter-spacing: -0.02em;
   --text-badge-11--font-weight: 500;
+  /* WF/Brand의 "DATA GSM" 글자(Pretendard Bold 16, 줄 높이 160%, 자간 0). Figma 텍스트 스타일에는 없는 값이다. */
+  --text-brand-16: 1rem;
+  --text-brand-16--line-height: 1.6;
+  --text-brand-16--letter-spacing: 0em;
+  --text-brand-16--font-weight: 700;
   /* 코드 글자는 font-mono와 함께 쓴다(font-mono text-code-12). */
   --text-code-12: 0.75rem;
   --text-code-12--line-height: 1.125rem;
