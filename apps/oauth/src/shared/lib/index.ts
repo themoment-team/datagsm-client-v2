@@ -1,0 +1,1 @@
+export { withSubjectParticle } from './withSubjectParticle';
