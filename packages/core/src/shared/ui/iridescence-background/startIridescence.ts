@@ -72,7 +72,9 @@ export const startIridescence = (canvas: HTMLCanvasElement): (() => void) | null
     light: gl.getUniformLocation(program, 'light'),
   };
 
-  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // 동작 줄이기 설정은 페이지를 떠나지 않고도 바뀔 수 있어 변경을 따라간다.
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  let still = reducedMotion.matches;
   let clock = still ? STILL_TIME : 0;
   let last = performance.now();
   let frame = 0;
@@ -125,7 +127,7 @@ export const startIridescence = (canvas: HTMLCanvasElement): (() => void) | null
   });
   intersectionObserver.observe(canvas);
 
-  // next-themes가 <html data-theme>를 바꾸면 그 색으로 다시 그린다.
+  // 테마가 바뀌어 <html data-theme>이 달라지면 그 색으로 다시 그린다.
   const themeObserver = new MutationObserver(requestDraw);
   themeObserver.observe(document.documentElement, { attributeFilter: ['data-theme'] });
 
@@ -134,11 +136,23 @@ export const startIridescence = (canvas: HTMLCanvasElement): (() => void) | null
   };
   document.addEventListener('visibilitychange', handleVisibility);
 
-  const handleContextLost = (event: Event) => {
-    event.preventDefault();
+  // 켜지면 지금 장면에서 멈추고, 꺼지면 멈춘 시각부터 다시 움직인다.
+  const handleMotionChange = () => {
+    still = reducedMotion.matches;
+    cancelAnimationFrame(frame);
+    frame = 0;
+    requestDraw();
+  };
+  reducedMotion.addEventListener('change', handleMotionChange);
+
+  // 컨텍스트를 잃으면(GPU 압력, 드라이버 재시작 등) 복원하지 않고 canvas를 숨겨 bg-background 단색으로 남긴다.
+  // 복원하려면 program·shader·buffer를 모두 다시 만들어야 하는데, 장식 배경이라 다음 새로고침까지 단색이어도 된다.
+  // 그래서 preventDefault()로 복원을 요청하지 않는다.
+  const handleContextLost = () => {
     lost = true;
     cancelAnimationFrame(frame);
     frame = 0;
+    canvas.style.visibility = 'hidden';
   };
   canvas.addEventListener('webglcontextlost', handleContextLost);
 
@@ -153,6 +167,7 @@ export const startIridescence = (canvas: HTMLCanvasElement): (() => void) | null
     intersectionObserver.disconnect();
     themeObserver.disconnect();
     document.removeEventListener('visibilitychange', handleVisibility);
+    reducedMotion.removeEventListener('change', handleMotionChange);
     canvas.removeEventListener('webglcontextlost', handleContextLost);
     gl.deleteBuffer(buffer);
     gl.deleteProgram(program);

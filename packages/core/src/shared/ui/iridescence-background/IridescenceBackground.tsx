@@ -30,13 +30,20 @@ export const IridescenceBackground = ({ className }: IridescenceBackgroundProps)
     canvas.style.height = '100%';
     container.append(canvas);
 
-    const stop = startIridescence(canvas);
+    // 장식 배경이 실패해도 화면은 보여야 하므로, 예상하지 못한 예외도 단색 배경으로 넘긴다.
+    let stop: (() => void) | null = null;
+    try {
+      stop = startIridescence(canvas);
+    } catch (error) {
+      console.error(error);
+    }
     if (!stop) {
       canvas.remove();
       return;
     }
+    const stopDrawing = stop;
     return () => {
-      stop();
+      stopDrawing();
       canvas.remove();
     };
   }, []);

@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 
-import { render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
 import { IridescenceBackground } from './IridescenceBackground';
@@ -48,11 +48,17 @@ const ObserverStub = vi.fn(function (this: { observe: () => void; disconnect: ()
   observers.push(this as never);
 });
 
-const stubMotion = (reduce: boolean) =>
-  vi.stubGlobal(
-    'matchMedia',
-    vi.fn().mockReturnValue({ matches: reduce, addListener: vi.fn(), removeListener: vi.fn() }),
-  );
+// 동작 줄이기 설정을 흉내 낸다. change 이벤트로 설정이 바뀐 상황도 만들 수 있다.
+const stubMotion = (reduce: boolean) => {
+  const query = Object.assign(new EventTarget(), { matches: reduce });
+  vi.stubGlobal('matchMedia', vi.fn().mockReturnValue(query));
+  return {
+    change: (next: boolean) => {
+      query.matches = next;
+      query.dispatchEvent(new Event('change'));
+    },
+  };
+};
 
 beforeEach(() => {
   observers.length = 0;
@@ -173,4 +179,83 @@ it('셰이더를 만들지 못하면 그리지 않고 컨텍스트를 돌려준�
   expect(startIridescence(document.createElement('canvas'))).toBeNull();
   expect(fake.calls.some((call) => call.name === 'drawArrays')).toBe(false);
   expect(fake.loseContext).toHaveBeenCalledTimes(1);
+});
+
+it('실행 중에 테마가 바뀌면 같은 컨텍스트로 그 톤을 다시 그린다', async () => {
+  const fake = createFakeGl();
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(fake.gl as never);
+  vi.stubGlobal(
+    'requestAnimationFrame',
+    vi.fn((callback: FrameRequestCallback) => {
+      callback(performance.now());
+      return 0;
+    }),
+  );
+  stubMotion(true);
+  const stop = startIridescence(document.createElement('canvas'));
+  const draws = () => fake.calls.filter((call) => call.name === 'drawArrays').length;
+  const before = draws();
+  expect(fake.uniform('light')).toBe(1);
+
+  document.documentElement.dataset.theme = 'dark';
+  await act(() => Promise.resolve());
+
+  expect(draws()).toBeGreaterThan(before);
+  expect(fake.uniform('light')).toBe(0);
+  stop?.();
+});
+
+it('동작 줄이기 설정이 실행 중에 바뀌면 멈추거나 다시 움직인다', () => {
+  const motion = stubMotion(false);
+  const fake = createFakeGl();
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(fake.gl as never);
+  const stop = startIridescence(document.createElement('canvas'));
+  expect(requestAnimationFrame).toHaveBeenCalledTimes(1);
+
+  // 켜지면 예약된 프레임을 취소하고 장면 하나만 다시 그린다.
+  motion.change(true);
+  expect(cancelAnimationFrame).toHaveBeenCalled();
+  const frame = vi.mocked(requestAnimationFrame).mock.calls.at(-1)?.[0];
+  vi.mocked(requestAnimationFrame).mockClear();
+  frame?.(performance.now());
+  expect(requestAnimationFrame).not.toHaveBeenCalled();
+
+  // 꺼지면 다시 다음 프레임을 요청한다.
+  motion.change(false);
+  vi.mocked(requestAnimationFrame).mock.calls.at(-1)?.[0](performance.now());
+  expect(requestAnimationFrame).toHaveBeenCalledTimes(2);
+  stop?.();
+});
+
+it('그리는 중에 컨텍스트를 잃으면 복원을 요청하지 않고 canvas를 숨겨 단색 배경을 남긴다', () => {
+  const fake = createFakeGl();
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(fake.gl as never);
+  const canvas = document.createElement('canvas');
+  const stop = startIridescence(canvas);
+
+  const event = new Event('webglcontextlost', { cancelable: true });
+  canvas.dispatchEvent(event);
+
+  expect(event.defaultPrevented).toBe(false);
+  expect(canvas.style.visibility).toBe('hidden');
+  expect(cancelAnimationFrame).toHaveBeenCalled();
+  stop?.();
+});
+
+it('배경을 시작하다 예외가 나도 화면을 깨뜨리지 않고 단색 배경으로 남긴다', () => {
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+  const fake = createFakeGl();
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(fake.gl as never);
+  vi.stubGlobal(
+    'IntersectionObserver',
+    vi.fn(() => {
+      throw new Error('IntersectionObserver를 지원하지 않습니다.');
+    }),
+  );
+
+  const { container } = render(<IridescenceBackground />);
+
+  expect(container.firstElementChild).toHaveClass('bg-background');
+  expect(container.querySelector('canvas')).toBeNull();
+  expect(console.error).toHaveBeenCalled();
 });
