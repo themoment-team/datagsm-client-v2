@@ -94,6 +94,8 @@
 - 공통 배경은 core `shared/ui/iridescence-background`의 `IridescenceBackground`(WebGL)다. `AppShell`이 깔고, `AppShell`을 쓰지 않는 oauth는 루트 레이아웃에서 깐다. client 랜딩(`/`)만 사이드바와 배경을 쓰지 않는다. 그래서 client는 `AppShell`을 루트 레이아웃이 아니라 `app/(shell)/layout.tsx`에 두고, 랜딩 `app/page.tsx`만 그 밖에 둔다. 새 페이지는 `app/(shell)` 아래에 만든다. 없는 주소는 루트 `app/not-found.tsx`가 받으므로, 404에도 사이드바가 남도록 그 안에서 `ShellLayout`으로 감싼다. 오류 화면은 `app/(shell)/error.tsx`가 받는다.
 - client·docs·status·projects는 core의 `USER_SIDEBAR_ITEMS`를 함께 쓴다. admin은 `apps/admin/src/_app/config`의 관리자 메뉴와 `badge="관리자"`를 넘긴다. 관리자 메뉴는 모두 admin 안 경로라 admin은 `APP_*_URL`을 받지 않는다.
 - 같은 앱 메뉴는 `Link`, 다른 앱 메뉴는 그 앱 주소로 가는 `<a>`다. 다른 앱은 다른 배포라서 `Link`의 앱 안 이동과 prefetch가 동작하지 않는다.
+- 페이지는 화면 높이(`h-dvh`)로 고정되고 페이지 자체는 스크롤하지 않는다. 콘솔 화면의 본문은 core `shared/ui/panel-layout`의 `PanelLayout`(Figma 칸 구성 중 하나를 `layout`으로 고른다)과 `Panel`로 나누고, 칸마다 제목을 포함한 내용이 따로 스크롤된다. 칸 폭은 Figma 1920 값의 비율이고, 1536(15.6인치 FHD, 125% 배율)보다 좁으면 본문만 가로로 스크롤된다. 화면마다 grid나 고정 폭을 따로 쓰지 않는다.
+- 스크롤 영역은 core `shared/ui/scroll-area`의 `ScrollArea`(Base UI 래퍼)로 만든다. 앱에서 `@base-ui/react`나 `overflow-auto`로 직접 만들지 않는다. 안쪽 스크롤 영역 끝에 닿은 휠은 바깥 칸으로 이어지는 것이 의도된 동작이라 `overscroll-behavior`로 막지 않는다.
 
 ## API 연결
 
