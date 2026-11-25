@@ -13,6 +13,7 @@ export const TEXT_STYLES = [
   'label-14',
   'caption-12',
   'badge-11',
+  'brand-16',
   'code-12',
 ];
 
