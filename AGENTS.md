@@ -90,7 +90,7 @@
 ## 레이아웃과 앱 간 이동
 
 - 모든 앱의 레이아웃(왼쪽 사이드바 + 본문)은 core `widgets/app-shell`의 `AppShell`이다. 앱은 `_app/layout`에서 지금 앱(`currentApp`), 앱 주소, 메뉴 목록만 넘긴다.
-- 공통 배경은 core `shared/ui/iridescence-background`의 `IridescenceBackground`(WebGL)다. `AppShell`이 깔고, `AppShell`을 쓰지 않는 oauth는 루트 레이아웃에서 깐다. client 랜딩(`/`)만 사이드바와 배경을 쓰지 않는다. 그래서 client는 `AppShell`을 루트 레이아웃이 아니라 `app/(shell)/layout.tsx`에 두고, 랜딩 `app/page.tsx`만 그 밖에 둔다. 새 페이지는 `app/(shell)` 아래에 만든다. 없는 주소도 사이드바가 있는 404를 보이도록 `app/(shell)/[...notFound]`가 받는다.
+- 공통 배경은 core `shared/ui/iridescence-background`의 `IridescenceBackground`(WebGL)다. `AppShell`이 깔고, `AppShell`을 쓰지 않는 oauth는 루트 레이아웃에서 깐다. client 랜딩(`/`)만 사이드바와 배경을 쓰지 않는다. 그래서 client는 `AppShell`을 루트 레이아웃이 아니라 `app/(shell)/layout.tsx`에 두고, 랜딩 `app/page.tsx`만 그 밖에 둔다. 새 페이지는 `app/(shell)` 아래에 만든다. 없는 주소는 루트 `app/not-found.tsx`가 받으므로, 404에도 사이드바가 남도록 그 안에서 `ShellLayout`으로 감싼다. 오류 화면은 `app/(shell)/error.tsx`가 받는다.
 - client·docs·status·projects는 core의 `USER_SIDEBAR_ITEMS`를 함께 쓴다. admin은 `apps/admin/src/_app/config`의 관리자 메뉴와 `badge="관리자"`를 넘긴다. 관리자 메뉴는 모두 admin 안 경로라 admin은 `APP_*_URL`을 받지 않는다.
 - 같은 앱 메뉴는 `Link`, 다른 앱 메뉴는 그 앱 주소로 가는 `<a>`다. 다른 앱은 다른 배포라서 `Link`의 앱 안 이동과 prefetch가 동작하지 않는다.
 
