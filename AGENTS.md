@@ -82,6 +82,7 @@
 - **API 오류는 `status`로 분기한다.** `ApiError.code`는 서버 오류 코드가 아니라 axios 오류 코드(`ERR_NETWORK`, `ECONNABORTED` 등)이고, 서버 본문의 `code`는 HTTP 상태와 같은 숫자라 담지 않는다. 화면에서는 `error instanceof ApiError`로 좁힌 뒤 `status`로 분기하고 서버 문구는 `message`로 보여 준다. 응답이 없는 실패는 `status: 0`이다. `data-and-forms` 폼 예시처럼 `error.code`를 서버 오류 코드로 보고 필드에 연결하지 않는다.
 - **API 모킹(MSW)은 두지 않는다.** 개발은 `API_BASE_URL`로 실제 DataGSM 개발 서버에 붙는다. 컴포넌트 테스트는 `vi.mock`으로 API 함수를 바꾼다. 스킬의 모킹 관련 절은 이 레포에 해당하지 않는다.
 - **토큰은 `shared-styles.css`만 소유한다.** 앱 `globals.css`에서 `@theme` 값을 덮어쓰지 않는다. 토큰은 Figma DataGSMv2 "WF · 파운데이션"의 Light·Dark 모드를 옮긴 것이고, Tailwind 기본 색 팔레트를 지웠으므로 색은 그 토큰만 쓴다. 기본은 Light이고 Dark 값은 `[data-theme='dark']`가 같은 변수를 덮어쓰므로 `dark:` 변형을 쓰지 않는다. 색 토큰을 더하면 두 곳에 함께 넣는다.
+- **테마 선택은 모든 앱이 쿠키 `theme` 하나를 함께 쓴다.** core `features/theme-toggle`이 관리한다. localStorage는 주소마다 따로라 앱을 오가면 테마가 풀리기 때문이다. 배포에서는 `Domain=datagsm.kr`, 로컬에서는 host-only로 저장한다(쿠키는 포트를 구분하지 않는다). 인증 쿠키는 host-only로 두지만 테마는 민감하지 않은 값이라 범위를 넓혔고, 읽을 때 `light`·`dark` 말고는 무시한다. 루트 layout의 `ThemeProvider`가 그리기 전에 `<html data-theme>`을 맞추는 인라인 스크립트를 넣으므로 `<html>`에 `suppressHydrationWarning`이 필요하다.
 - **간격·모서리·높이 토큰은 만들지 않는다.** Figma 값이 Tailwind 기본 스케일과 같다(예: 14px = `3.5`, 4px 모서리 = `rounded`, 버튼 36px = `h-9`). "없는 토큰은 `@theme`에 먼저 추가"는 색·글자에만 적용한다.
 - **글자는 텍스트 스타일 토큰 하나로 정한다.** `text-title-32`, `text-body-16` 등(코드는 `font-mono text-code-12`)이 크기·줄 높이·자간·굵기를 함께 정한다. `text-2xl`, `font-semibold` 같은 기본 크기·굵기 클래스를 섞지 않는다.
 - **글꼴은 `shared-styles.css`가 불러온다.** Pretendard(`font-sans`)와 JetBrains Mono(`font-mono`)를 npm 패키지의 unicode-range 분할 CSS로 불러온다. 루트 레이아웃이나 `next/font`로 글꼴을 설정하지 않는다. `next/font/local`은 unicode-range로 나누지 못해 Pretendard 전체를 미리 받게 된다.
@@ -90,6 +91,7 @@
 ## 레이아웃과 앱 간 이동
 
 - 모든 앱의 레이아웃(왼쪽 사이드바 + 본문)은 core `widgets/app-shell`의 `AppShell`이다. 앱은 `_app/layout`에서 지금 앱(`currentApp`), 앱 주소, 메뉴 목록만 넘긴다.
+- 공통 배경은 core `shared/ui/iridescence-background`의 `IridescenceBackground`(WebGL)다. `AppShell`이 깔고, `AppShell`을 쓰지 않는 oauth는 루트 레이아웃에서 깐다. client 랜딩(`/`)만 사이드바와 배경을 쓰지 않는다. 그래서 client는 `AppShell`을 루트 레이아웃이 아니라 `app/(shell)/layout.tsx`에 두고, 랜딩 `app/page.tsx`만 그 밖에 둔다. 새 페이지는 `app/(shell)` 아래에 만든다. 없는 주소는 루트 `app/not-found.tsx`가 받으므로, 404에도 사이드바가 남도록 그 안에서 `ShellLayout`으로 감싼다. 오류 화면은 `app/(shell)/error.tsx`가 받는다.
 - client·docs·status·projects는 core의 `USER_SIDEBAR_ITEMS`를 함께 쓴다. admin은 `apps/admin/src/_app/config`의 관리자 메뉴와 `badge="관리자"`를 넘긴다. 관리자 메뉴는 모두 admin 안 경로라 admin은 `APP_*_URL`을 받지 않는다.
 - 같은 앱 메뉴는 `Link`, 다른 앱 메뉴는 그 앱 주소로 가는 `<a>`다. 다른 앱은 다른 배포라서 `Link`의 앱 안 이동과 prefetch가 동작하지 않는다.
 
