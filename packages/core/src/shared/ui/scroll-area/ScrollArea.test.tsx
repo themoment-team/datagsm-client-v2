@@ -28,3 +28,28 @@ it('Viewport가 바깥 틀의 남은 높이를 채워서 max-h만 줘도 그 높
   // 끝에 닿은 휠이 바깥 스크롤 영역으로 이어지도록 스크롤 이어짐을 막지 않는다.
   expect(viewport?.className).not.toMatch(/overscroll/);
 });
+
+it.each([
+  ['vertical', 'overflow-x-hidden!'],
+  ['horizontal', 'overflow-y-hidden!'],
+] as const)('%s만 고르면 다른 축은 스크롤되지 않게 막는다', (orientation, blocked) => {
+  render(
+    <ScrollArea orientation={orientation}>
+      <p>내용</p>
+    </ScrollArea>,
+  );
+
+  expect(screen.getByText('내용').parentElement?.parentElement).toHaveClass(blocked);
+});
+
+it('both면 두 축 모두 스크롤된다', () => {
+  render(
+    <ScrollArea orientation="both">
+      <p>내용</p>
+    </ScrollArea>,
+  );
+
+  const viewport = screen.getByText('내용').parentElement?.parentElement;
+  expect(viewport).not.toHaveClass('overflow-x-hidden!');
+  expect(viewport).not.toHaveClass('overflow-y-hidden!');
+});
