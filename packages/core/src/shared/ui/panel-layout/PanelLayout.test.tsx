@@ -23,21 +23,63 @@ it('화면 높이로 고정되고, 지원하는 가장 좁은 화면(1536)의 �
   expect(container.firstChild).toHaveClass('h-dvh', 'min-w-[1264px]', 'grid-rows-1');
 });
 
-it('Panel은 이름 붙은 구역이고, 제목을 포함한 내용 전체가 칸 안에서 스크롤된다', () => {
+// 내용 상자 → Viewport → ScrollArea 바깥 틀
+const scrollRootOf = (el: HTMLElement) => el.parentElement?.parentElement?.parentElement;
+
+it('머리와 바닥은 스크롤 영역 밖에 고정되고 본문만 스크롤 영역 안에 있다', () => {
   render(
-    <PanelLayout layout="half">
-      <Panel aria-labelledby="title">
-        <h1 id="title">프로젝트 등록</h1>
-        <p>본문</p>
-      </Panel>
-    </PanelLayout>,
+    <Panel
+      aria-labelledby="title"
+      header={<h1 id="title">관련 문서</h1>}
+      footer={<a href="https://docs.datagsm.kr">문서 사이트에서 열기</a>}
+    >
+      <p>본문</p>
+    </Panel>,
   );
 
-  const panel = screen.getByRole('region', { name: '프로젝트 등록' });
-  expect(panel).toHaveClass('min-h-0', 'min-w-0');
+  const panel = screen.getByRole('region', { name: '관련 문서' });
+  expect(panel).toHaveClass('flex', 'flex-col', 'min-h-0', 'min-w-0', 'gap-8', 'py-6');
 
-  // 제목과 본문이 같은 내용 상자(스크롤 영역 안)에 있다.
-  const content = screen.getByRole('heading', { name: '프로젝트 등록' }).parentElement;
-  expect(content).toContainElement(screen.getByText('본문'));
-  expect(content).toHaveClass('flex', 'flex-col', 'gap-8', 'p-6');
+  const body = screen.getByText('본문').parentElement!;
+  const scrollRoot = scrollRootOf(screen.getByText('본문'));
+  expect(body).toHaveClass('px-6');
+  expect(scrollRoot?.parentElement).toBe(panel);
+
+  // 머리, 본문 스크롤 영역, 바닥 순서로 칸 바로 아래에 놓인다.
+  expect([...panel.children]).toEqual([
+    screen.getByRole('heading', { name: '관련 문서' }).parentElement,
+    scrollRoot,
+    screen.getByRole('link', { name: '문서 사이트에서 열기' }).parentElement,
+  ]);
+  expect(scrollRoot).not.toContainElement(screen.getByRole('heading'));
+  expect(scrollRoot).not.toContainElement(screen.getByRole('link'));
+});
+
+it('기본 본문은 내용만큼 차지해서 바닥 버튼이 본문 바로 아래에 오고, 넘치면 줄어들어 스크롤된다', () => {
+  render(
+    <Panel aria-label="학생 상세" footer={<button>수정</button>}>
+      <p>본문</p>
+    </Panel>,
+  );
+
+  const scrollRoot = scrollRootOf(screen.getByText('본문'));
+  expect(scrollRoot).toHaveClass('min-h-0');
+  expect(scrollRoot).not.toHaveClass('flex-1');
+  expect(screen.getByText('본문').parentElement).not.toHaveClass('min-h-full');
+  expect(screen.getByRole('button', { name: '수정' }).parentElement).toHaveClass('shrink-0');
+});
+
+it('fill이면 본문이 남은 높이를 채워서 바닥이 칸 끝에 고정되고, 안의 요소가 남은 높이까지 늘어날 수 있다', () => {
+  render(
+    <Panel
+      aria-label="관련 문서"
+      fill
+      footer={<a href="https://docs.datagsm.kr">문서 사이트에서 열기</a>}
+    >
+      <p>목록</p>
+    </Panel>,
+  );
+
+  expect(scrollRootOf(screen.getByText('목록'))).toHaveClass('min-h-0', 'flex-1');
+  expect(screen.getByText('목록').parentElement).toHaveClass('min-h-full', 'flex', 'flex-col');
 });

@@ -43,19 +43,44 @@ export const PanelLayout = ({ layout, children, className }: PanelLayoutProps) =
 );
 
 interface PanelProps {
+  // 본문. 칸에서 스크롤되는 부분은 여기뿐이다.
   children: React.ReactNode;
+  // 위에 고정되는 부분. 제목 줄(PanelTitle)과 필요하면 그 아래 검색창을 넣는다. 여러 개면 간격 32로 쌓인다.
+  header?: React.ReactNode;
+  // 본문 아래 부분. 수정·삭제 같은 버튼 줄을 넣는다. 스크롤되지 않는다.
+  footer?: React.ReactNode;
+  // 본문이 남은 높이를 모두 차지하게 한다. 그러면 바닥은 본문 길이와 상관없이 칸 끝에 고정된다.
+  // 관련 문서 칸('문서 사이트에서 열기'), 높이를 재서 행 수를 정하는 관리자 목록 표(안에서 flex-1)가 쓴다.
+  fill?: boolean;
   // 칸 바깥(section)에 붙는다.
   className?: string;
   'aria-label'?: string;
   'aria-labelledby'?: string;
 }
 
-// PanelLayout의 칸 하나다. 제목까지 포함한 내용 전체가 이 칸 안에서 스크롤된다.
-// 안쪽 여백 24와 세로 간격 32는 Figma 화면의 모든 칸이 같은 값이다.
-export const Panel = ({ children, className, ...labelProps }: PanelProps) => (
-  <section className={cn('min-h-0 min-w-0', className)} {...labelProps}>
-    <ScrollArea className="h-full" contentClassName="flex flex-col gap-8 p-6">
+// PanelLayout의 칸 하나다. 머리는 위에 고정되고 본문만 스크롤된다 (Figma 1046:41776, 디자이너 확인).
+// 바닥은 본문 바로 아래에 온다. 본문이 넘치면 본문이 줄어들며 스크롤되고 바닥은 칸 끝에 남는다 (Figma 칸 78개).
+// fill이면 본문이 늘 남은 높이를 채워서 바닥이 처음부터 칸 끝에 있다.
+// 안쪽 여백 24와 머리·본문·바닥 사이 간격 32는 모든 칸이 같은 값이다.
+// 본문 스크롤 영역은 칸 폭 전체를 써서 막대가 오른쪽 여백 안(끝에서 12px)에 온다.
+export const Panel = ({
+  children,
+  header,
+  footer,
+  fill = false,
+  className,
+  ...labelProps
+}: PanelProps) => (
+  <section className={cn('flex min-h-0 min-w-0 flex-col gap-8 py-6', className)} {...labelProps}>
+    {header && <div className="flex shrink-0 flex-col gap-8 px-6">{header}</div>}
+    <ScrollArea
+      scrollbarInset="panel"
+      className={fill ? 'flex-1' : undefined}
+      // 본문 안 간격은 화면마다 다르므로(Figma 8, 24 등) 정하지 않는다.
+      contentClassName={cn('flex flex-col px-6', fill && 'min-h-full')}
+    >
       {children}
     </ScrollArea>
+    {footer && <div className="shrink-0 px-6">{footer}</div>}
   </section>
 );
