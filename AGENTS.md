@@ -94,7 +94,9 @@
 - 공통 배경은 core `shared/ui/iridescence-background`의 `IridescenceBackground`(WebGL)다. `AppShell`이 깔고, `AppShell`을 쓰지 않는 oauth는 루트 레이아웃에서 깐다. client 랜딩(`/`)만 사이드바와 배경을 쓰지 않는다. 그래서 client는 `AppShell`을 루트 레이아웃이 아니라 `app/(shell)/layout.tsx`에 두고, 랜딩 `app/page.tsx`만 그 밖에 둔다. 새 페이지는 `app/(shell)` 아래에 만든다. 없는 주소는 루트 `app/not-found.tsx`가 받으므로, 404에도 사이드바가 남도록 그 안에서 `ShellLayout`으로 감싼다. 오류 화면은 `app/(shell)/error.tsx`가 받는다.
 - client·docs·status·projects는 core의 `USER_SIDEBAR_ITEMS`를 함께 쓴다. admin은 `apps/admin/src/_app/config`의 관리자 메뉴와 `badge="관리자"`를 넘긴다. 관리자 메뉴는 모두 admin 안 경로라 admin은 `APP_*_URL`을 받지 않는다.
 - 같은 앱 메뉴는 `Link`, 다른 앱 메뉴는 그 앱 주소로 가는 `<a>`다. 다른 앱은 다른 배포라서 `Link`의 앱 안 이동과 prefetch가 동작하지 않는다.
-- 페이지는 화면 높이(`h-dvh`)로 고정되고 페이지 자체는 스크롤하지 않는다. 콘솔 화면의 본문은 core `shared/ui/panel-layout`의 `PanelLayout`(Figma 칸 구성 중 하나를 `layout`으로 고른다)과 `Panel`로 나누고, 칸마다 제목을 포함한 내용이 따로 스크롤된다. 칸 폭은 Figma 1920 값의 비율이고, 1536(15.6인치 FHD, 125% 배율)보다 좁으면 본문만 가로로 스크롤된다. 화면마다 grid나 고정 폭을 따로 쓰지 않는다.
+- 페이지는 화면 높이(`h-dvh`)로 고정되고 페이지 자체는 스크롤하지 않는다. 콘솔 화면의 본문은 core `shared/ui/panel-layout`의 `PanelLayout`(Figma 칸 구성 중 하나를 `layout`으로 고른다)과 `Panel`로 나눈다. 칸은 머리(`header`: 제목 줄, 검색창)가 위에 고정되고 본문만 스크롤된다. 제목 줄은 `PanelTitle`(제목, 옆 배지 `adornment`, 오른쪽 버튼 `actions`)로 만든다. 바닥(`footer`: 수정·삭제 같은 버튼 줄)은 본문 바로 아래에 오고, 본문이 넘치면 본문이 스크롤되며 바닥은 칸 끝에 남는다. `fill`이면 본문이 남은 높이를 채워 바닥이 늘 칸 끝에 있다. 관련 문서 칸('문서 사이트에서 열기')과 높이로 행 수를 정하는 관리자 목록 표(본문 안에서 `flex-1`)가 `fill`을 쓴다. 칸 폭은 Figma 1920 값의 비율이고, 1536(15.6인치 FHD, 125% 배율)보다 좁으면 본문만 가로로 스크롤된다. 화면마다 grid나 고정 폭을 따로 쓰지 않는다.
+- 표는 종류에 따라 스크롤이 다르다(디자이너 확인). 늘어나는 목록(권한 범위, 리다이렉트 URL, 부원 등)은 머리줄을 두고 본문을 `ScrollArea`로 최대 높이 280 안에서 스크롤한다. 항목 수가 정해진 정보 표(학적, 계정, 상세)는 스크롤 없이 모두 펼친다. 관리자 목록 표는 칸을 채우고 페이지 번호로 넘긴다. 문서 안 표는 문서 본문과 함께 스크롤된다.
+- 관리자 목록 표는 `Panel fill` 본문 안에서 `flex-1`로 늘리고, 그 높이로 한 페이지 행 수(`size`)를 계산한다(Figma 1080 화면 기준 17행). 20 같은 고정 크기를 쓰지 않는다. 페이지 번호는 `footer`가 아니라 본문 안 표 바로 아래(간격 8)에 둔다. `footer`는 수정·삭제처럼 칸 전체에 대한 버튼 자리다.
 - 스크롤 영역은 core `shared/ui/scroll-area`의 `ScrollArea`(Base UI 래퍼)로 만든다. 앱에서 `@base-ui/react`나 `overflow-auto`로 직접 만들지 않는다. 안쪽 스크롤 영역 끝에 닿은 휠은 바깥 칸으로 이어지는 것이 의도된 동작이라 `overscroll-behavior`로 막지 않는다.
 
 ## API 연결
