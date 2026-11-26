@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@datagsm/core/features/theme-toggle';
 import { IridescenceBackground } from '@datagsm/core/shared/ui/iridescence-background';
+import { Toaster } from '@datagsm/core/shared/ui/toast';
 import type { Metadata } from 'next';
 
 import { TanStackProvider } from '@/_app/providers';
@@ -23,6 +24,7 @@ export const RootLayout = ({
           {/* oauth는 AppShell을 쓰지 않아 공통 배경을 여기서 깐다. */}
           <IridescenceBackground />
           <TanStackProvider>{children}</TanStackProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
