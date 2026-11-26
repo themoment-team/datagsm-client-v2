@@ -102,6 +102,13 @@
   --text-code-12--line-height: 1.125rem;
   --text-code-12--letter-spacing: -0.02em;
   --text-code-12--font-weight: 500;
+
+  /* 효과 스타일. Figma 효과 스타일을 이름 그대로 옮겼다(backdrop-blur-glass 등).
+     Figma GLASS는 굴절이 들어간 효과라 CSS 블러로는 비슷하게만 낼 수 있다. 반경을 블러 값으로 옮긴 근사치이니
+     칸·토스트에 적용할 때 화면을 보고 값을 맞춘다. */
+  --blur-glass: 36px; /* WF/Glass(GLASS 36). 칸 배경 */
+  --blur-glass-toast: 16px; /* WF/Glass toast(GLASS 16). 토스트 */
+  --blur-table: 12px; /* WF/Table blur(배경 블러 12). 표 */
 }
 
 /* 스크롤바·폼 컨트롤 같은 브라우저 기본 UI도 모드에 맞춘다.

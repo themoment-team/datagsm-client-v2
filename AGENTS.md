@@ -83,7 +83,7 @@
 - **API 모킹(MSW)은 두지 않는다.** 개발은 `API_BASE_URL`로 실제 DataGSM 개발 서버에 붙는다. 컴포넌트 테스트는 `vi.mock`으로 API 함수를 바꾼다. 스킬의 모킹 관련 절은 이 레포에 해당하지 않는다.
 - **토큰은 `shared-styles.css`만 소유한다.** 앱 `globals.css`에서 `@theme` 값을 덮어쓰지 않는다. 토큰은 Figma DataGSMv2 "WF · 파운데이션"의 Light·Dark 모드를 옮긴 것이고, Tailwind 기본 색 팔레트를 지웠으므로 색은 그 토큰만 쓴다. 기본은 Light이고 Dark 값은 `[data-theme='dark']`가 같은 변수를 덮어쓰므로 `dark:` 변형을 쓰지 않는다. 색 토큰을 더하면 두 곳에 함께 넣는다.
 - **테마 선택은 모든 앱이 쿠키 `theme` 하나를 함께 쓴다.** core `features/theme-toggle`이 관리한다. localStorage는 주소마다 따로라 앱을 오가면 테마가 풀리기 때문이다. 배포에서는 `Domain=datagsm.kr`, 로컬에서는 host-only로 저장한다(쿠키는 포트를 구분하지 않는다). 인증 쿠키는 host-only로 두지만 테마는 민감하지 않은 값이라 범위를 넓혔고, 읽을 때 `light`·`dark` 말고는 무시한다. 루트 layout의 `ThemeProvider`가 그리기 전에 `<html data-theme>`을 맞추는 인라인 스크립트를 넣으므로 `<html>`에 `suppressHydrationWarning`이 필요하다.
-- **간격·모서리·높이 토큰은 만들지 않는다.** Figma 값이 Tailwind 기본 스케일과 같다(예: 14px = `3.5`, 4px 모서리 = `rounded`, 버튼 36px = `h-9`). "없는 토큰은 `@theme`에 먼저 추가"는 색·글자에만 적용한다.
+- **간격·모서리·높이 토큰은 만들지 않는다.** Figma 값이 Tailwind 기본 스케일과 같다(예: 14px = `3.5`, 4px 모서리 = `rounded`, 버튼 36px = `h-9`). "없는 토큰은 `@theme`에 먼저 추가"는 색·글자·효과(블러)에만 적용한다. Figma 효과 스타일은 `--blur-*`로 옮겼다(`backdrop-blur-glass` 등).
 - **글자는 텍스트 스타일 토큰 하나로 정한다.** `text-title-32`, `text-body-16` 등(코드는 `font-mono text-code-12`)이 크기·줄 높이·자간·굵기를 함께 정한다. `text-2xl`, `font-semibold` 같은 기본 크기·굵기 클래스를 섞지 않는다.
 - **글꼴은 `shared-styles.css`가 불러온다.** Pretendard(`font-sans`)와 JetBrains Mono(`font-mono`)를 npm 패키지의 unicode-range 분할 CSS로 불러온다. 루트 레이아웃이나 `next/font`로 글꼴을 설정하지 않는다. `next/font/local`은 unicode-range로 나누지 못해 Pretendard 전체를 미리 받게 된다.
 - **별도 UI 패키지를 만들지 않는다.** 도메인 없는 공용 UI는 core `shared/ui`에 컴포넌트별 폴더로 둔다. 팀 디자인 시스템(themoment-design-system)이 준비되면 그때 옮긴다.
@@ -142,7 +142,7 @@
 - **`.env.local`이 "변수 없이도 된다"는 확인을 오염시킨다.** Next는 셸에서 변수를 지워도 `.env.local`을 읽는다. 로컬 빌드 통과는 그 변수가 필요 없다는 증거가 아니다. 단위 테스트와 CI(env 파일 없음)로 확인한다.
 - **E2E 포트가 고정이다.** `playwright.config.ts`가 포트를 고정하고 `reuseExistingServer: false`라서 같은 포트에 dev 서버가 떠 있으면 모든 E2E가 "already used"로 실패한다. 실행 전에 `lsof -nP -iTCP:3000-3005 -sTCP:LISTEN`으로 확인하고, 다른 사람이 띄운 서버는 끄지 않는다.
 - **한 페이지만 쓰는 slice는 `lint:fsd`가 실패한다.** steiger의 `insignificant-slice` 경고가 `--fail-on-warnings`로 오류가 된다. 한 페이지만 쓰는 코드는 그 페이지의 세그먼트(`_pages/<page>/{api,model,config,ui}`)에 두고, 두 번째 소비처가 생길 때 entities나 core로 옮긴다. `apps/status/src/_pages/home`이 그 예다.
-- **새 `--text-*` 토큰은 core `shared/lib/cn.ts` 목록에도 넣는다.** tailwind-merge가 모르는 `text-<이름>`을 글자색으로 보고 다른 `text-*`와 병합할 때 지운다. `cn.test.ts`가 `shared-styles.css`와 목록이 어긋나면 실패한다.
+- **새 `--text-*`·`--blur-*` 토큰은 core `shared/lib/cn.ts` 목록에도 넣는다.** tailwind-merge가 모르는 `text-<이름>`을 글자색으로 보고 다른 `text-*`와 병합할 때 지우고, 모르는 `backdrop-blur-<이름>`은 기본 블러 클래스와 겹쳐 남긴다. `cn.test.ts`가 `shared-styles.css`와 목록이 어긋나면 실패한다.
 - **외부 주소로 가는 next.config rewrite는 proxy가 붙인 `Set-Cookie`를 버린다.** 그래서 client·admin의 `/backend/*`는 `proxy.ts`가 직접 rewrite한다. 이 경로를 next.config rewrite로 되돌리면 갱신한 토큰이 브라우저에 저장되지 않는다.
 - **같은 refresh token으로 동시에 갱신하면 인가 서버가 토큰을 지운다.** 재사용으로 판단하기 때문이다. 갱신은 반드시 core `oauth.ts`의 `refreshTokens`로 해서 한 번으로 합친다. 합치기는 서버 인스턴스 하나 안에서만 되므로 인스턴스가 여럿이면 드물게 다시 로그인하게 된다.
 - **요청 때마다 외부를 호출하는 서버 컴포넌트는 `await connection()`이 필요하다.** 없으면 `next build`가 prerender하면서 빌드 중에 외부를 호출하고 그 결과를 굳힌다.
