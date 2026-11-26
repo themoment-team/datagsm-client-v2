@@ -83,3 +83,18 @@ it('fill이면 본문이 남은 높이를 채워서 바닥이 칸 끝에 고정�
   expect(scrollRootOf(screen.getByText('목록'))).toHaveClass('min-h-0', 'flex-1');
   expect(screen.getByText('목록').parentElement).toHaveClass('min-h-full', 'flex', 'flex-col');
 });
+
+it('칸 이름이 없으면 타입 검사에서 막힌다', () => {
+  // @ts-expect-error aria-label이나 aria-labelledby 중 하나는 반드시 넘긴다.
+  const unnamed = <Panel>본문</Panel>;
+  // @ts-expect-error 둘을 함께 넘기지 않는다.
+  const doubleNamed = <Panel {...{ 'aria-label': '칸', 'aria-labelledby': 'title' }}>본문</Panel>;
+  render(
+    <>
+      {unnamed}
+      {doubleNamed}
+    </>,
+  );
+
+  expect(screen.getAllByText('본문')).toHaveLength(2);
+});

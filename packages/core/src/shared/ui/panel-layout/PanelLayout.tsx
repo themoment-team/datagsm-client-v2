@@ -42,7 +42,7 @@ export const PanelLayout = ({ layout, children, className }: PanelLayoutProps) =
   <div className={cn(panelLayoutVariants({ layout }), className)}>{children}</div>
 );
 
-interface PanelProps {
+interface PanelBaseProps {
   // 본문. 칸에서 스크롤되는 부분은 여기뿐이다.
   children: React.ReactNode;
   // 위에 고정되는 부분. 제목 줄(PanelTitle)과 필요하면 그 아래 검색창을 넣는다. 여러 개면 간격 32로 쌓인다.
@@ -54,9 +54,15 @@ interface PanelProps {
   fill?: boolean;
   // 칸 바깥(section)에 붙는다.
   className?: string;
-  'aria-label'?: string;
-  'aria-labelledby'?: string;
 }
+
+// 칸 이름은 반드시 하나를 받는다. 이름 없는 section은 랜드마크로 노출되지 않아 보조기기가 칸을 구분하지 못한다.
+// 보통은 PanelTitle의 id를 aria-labelledby로 넘기고, 제목이 없는 칸만 aria-label을 쓴다.
+type PanelLabelProps =
+  | { 'aria-labelledby': string; 'aria-label'?: never }
+  | { 'aria-label': string; 'aria-labelledby'?: never };
+
+type PanelProps = PanelBaseProps & PanelLabelProps;
 
 // PanelLayout의 칸 하나다. 머리는 위에 고정되고 본문만 스크롤된다 (Figma 1046:41776, 디자이너 확인).
 // 바닥은 본문 바로 아래에 온다. 본문이 넘치면 본문이 줄어들며 스크롤되고 바닥은 칸 끝에 남는다 (Figma 칸 78개).
