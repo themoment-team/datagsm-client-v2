@@ -1,7 +1,6 @@
+import { cn } from '@datagsm/core/shared/lib';
 import { cva, type VariantProps } from 'class-variance-authority';
 import type { ComponentProps } from 'react';
-
-import { cn } from '../../lib';
 
 // Figma DataGSMv2 "WF/Badge"(Style)를 옮겼다.
 // - Neutral: 일반 상태. Error: 장애·만료됨 같은 오류 상태. Code: 권한 범위·이벤트 이름 같은 코드 값.

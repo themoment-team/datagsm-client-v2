@@ -1,7 +1,7 @@
 import { type ReactNode, useId } from 'react';
 
-import { cn } from '../../lib';
-import { WarningIcon } from '../icon';
+import { cn } from '@datagsm/core/shared/lib';
+import { WarningIcon } from '@datagsm/core/shared/ui/icon';
 
 // FormField가 입력에 붙일 연결 props. 입력 요소에 그대로 펼친다.
 interface FormFieldControlProps {

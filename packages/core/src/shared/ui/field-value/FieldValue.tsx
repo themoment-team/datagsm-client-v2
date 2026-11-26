@@ -1,7 +1,6 @@
+import { cn } from '@datagsm/core/shared/lib';
 import { cva, type VariantProps } from 'class-variance-authority';
 import type { ReactNode } from 'react';
-
-import { cn } from '../../lib';
 
 // Figma DataGSMv2 "WF/Field value"(Type)를 옮겼다. 상세 카드 같은 곳의 읽기 전용 "항목 + 값" 한 쌍이다.
 // - 항목: label-14, foreground-muted. 항목과 값 사이 8.

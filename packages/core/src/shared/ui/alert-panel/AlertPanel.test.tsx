@@ -1,7 +1,7 @@
+import { Button } from '@datagsm/core/shared/ui/button';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Button } from '../button';
 import { AlertPanel } from './AlertPanel';
 
 describe('AlertPanel', () => {

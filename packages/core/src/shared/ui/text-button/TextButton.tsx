@@ -1,9 +1,8 @@
 import Link from 'next/link';
 
+import { cn } from '@datagsm/core/shared/lib';
 import { cva } from 'class-variance-authority';
 import type { ComponentProps } from 'react';
-
-import { cn } from '../../lib';
 
 // Figma DataGSMv2 "WF/Link"(State=Default·Hover, 설명 "글자 버튼은 밑줄")를 옮겼다.
 // - 글자 label-14, 글자색 wf/text, 밑줄 굵기·위치는 글꼴 값(from-font)을 따른다.

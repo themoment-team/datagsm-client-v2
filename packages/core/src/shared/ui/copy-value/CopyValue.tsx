@@ -1,8 +1,8 @@
 'use client';
 
-import { cn } from '../../lib';
-import { Button } from '../button';
-import { CopyIcon } from '../icon';
+import { cn } from '@datagsm/core/shared/lib';
+import { Button } from '@datagsm/core/shared/ui/button';
+import { CopyIcon } from '@datagsm/core/shared/ui/icon';
 
 interface CopyValueProps {
   value: string;

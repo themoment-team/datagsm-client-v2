@@ -1,6 +1,5 @@
+import { cn } from '@datagsm/core/shared/lib';
 import type { ComponentProps } from 'react';
-
-import { cn } from '../../lib';
 
 type SkeletonProps = ComponentProps<'div'>;
 

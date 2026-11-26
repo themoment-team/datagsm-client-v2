@@ -1,6 +1,5 @@
+import { cn } from '@datagsm/core/shared/lib';
 import type { ReactNode } from 'react';
-
-import { cn } from '../../../shared/lib';
 
 interface MfaStepLayoutProps {
   children: ReactNode;

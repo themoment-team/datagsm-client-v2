@@ -1,9 +1,9 @@
 import { type ReactNode, useId } from 'react';
 
-import { cn } from '../../lib';
-import { Badge } from '../badge';
-import { Button } from '../button';
-import { CloseIcon } from '../icon';
+import { cn } from '@datagsm/core/shared/lib';
+import { Badge } from '@datagsm/core/shared/ui/badge';
+import { Button } from '@datagsm/core/shared/ui/button';
+import { CloseIcon } from '@datagsm/core/shared/ui/icon';
 
 interface AlertPanelProps {
   title: string;

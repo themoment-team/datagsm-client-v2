@@ -1,5 +1,5 @@
-import { cn } from '../../lib';
-import { Badge } from '../badge';
+import { cn } from '@datagsm/core/shared/lib';
+import { Badge } from '@datagsm/core/shared/ui/badge';
 
 interface HelpTitleProps {
   synced: boolean;

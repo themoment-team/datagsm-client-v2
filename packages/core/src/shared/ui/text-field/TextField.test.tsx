@@ -1,10 +1,10 @@
 import { type ChangeEvent, useState } from 'react';
 
+import { Button } from '@datagsm/core/shared/ui/button';
+import { TextButton } from '@datagsm/core/shared/ui/text-button';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Button } from '../button';
-import { TextButton } from '../text-button';
 import { TextField } from './TextField';
 
 describe('TextField', () => {

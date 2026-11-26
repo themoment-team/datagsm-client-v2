@@ -1,7 +1,6 @@
+import { cn } from '@datagsm/core/shared/lib';
 import { cva, type VariantProps } from 'class-variance-authority';
 import type { ComponentProps } from 'react';
-
-import { cn } from '../../lib';
 
 // Figma DataGSMv2 "WF/Info title"(Type × State)을 옮겼다.
 // 도움말 문서가 연결된 제목이다. 따로 「정보」 버튼을 두지 않고 제목을 누르면 관련 문서를 연다.

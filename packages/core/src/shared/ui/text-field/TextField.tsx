@@ -1,7 +1,7 @@
 import { type ComponentProps, type ReactNode, useId } from 'react';
 
-import { cn } from '../../lib';
-import { FormField } from '../form-field';
+import { cn } from '@datagsm/core/shared/lib';
+import { FormField } from '@datagsm/core/shared/ui/form-field';
 
 interface TextFieldProps extends ComponentProps<'input'> {
   label?: ReactNode;

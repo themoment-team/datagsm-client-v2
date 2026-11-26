@@ -1,6 +1,5 @@
+import { cn } from '@datagsm/core/shared/lib';
 import type { ComponentProps } from 'react';
-
-import { cn } from '../../lib';
 
 // aria-label을 선택 속성에서 필수 속성으로 바꾼다. 아이콘만 있어 이름이 없으면 스크린 리더가 읽을 것이 없다.
 interface IconButtonProps extends Omit<ComponentProps<'button'>, 'aria-label'> {

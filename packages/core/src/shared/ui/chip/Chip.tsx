@@ -1,7 +1,6 @@
+import { cn } from '@datagsm/core/shared/lib';
+import { CloseIcon } from '@datagsm/core/shared/ui/icon';
 import type { ReactNode } from 'react';
-
-import { cn } from '../../lib';
-import { CloseIcon } from '../icon';
 
 interface ChipProps {
   children: ReactNode;

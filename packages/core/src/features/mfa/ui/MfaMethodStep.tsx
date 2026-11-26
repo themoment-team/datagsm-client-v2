@@ -1,7 +1,8 @@
 import { useId } from 'react';
 
-import { Button } from '../../../shared/ui/button';
-import { FingerprintIcon, MailIcon } from '../../../shared/ui/icon';
+import { Button } from '@datagsm/core/shared/ui/button';
+import { FingerprintIcon, MailIcon } from '@datagsm/core/shared/ui/icon';
+
 import { MfaStepLayout } from './MfaStepLayout';
 
 interface MfaMethodStepProps {

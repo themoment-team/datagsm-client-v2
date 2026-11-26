@@ -1,6 +1,5 @@
+import { cn } from '@datagsm/core/shared/lib';
 import type { ReactNode, SVGProps } from 'react';
-
-import { cn } from '../../lib';
 
 export type IconProps = Omit<SVGProps<SVGSVGElement>, 'children'>;
 

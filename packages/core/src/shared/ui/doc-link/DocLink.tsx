@@ -1,7 +1,6 @@
+import { cn } from '@datagsm/core/shared/lib';
+import { ChevronRightIcon } from '@datagsm/core/shared/ui/icon';
 import type { ComponentProps } from 'react';
-
-import { cn } from '../../lib';
-import { ChevronRightIcon } from '../icon';
 
 interface DocLinkProps extends ComponentProps<'a'> {
   href: string;

@@ -1,7 +1,6 @@
+import { cn } from '@datagsm/core/shared/lib';
+import { FingerprintIcon } from '@datagsm/core/shared/ui/icon';
 import type { ReactNode } from 'react';
-
-import { cn } from '../../../shared/lib';
-import { FingerprintIcon } from '../../../shared/ui/icon';
 
 interface FingerprintStatusProps {
   status: 'waiting' | 'failed';

@@ -1,7 +1,6 @@
+import { cn } from '@datagsm/core/shared/lib';
+import { InfoIcon, WarningIcon } from '@datagsm/core/shared/ui/icon';
 import type { ComponentProps } from 'react';
-
-import { cn } from '../../lib';
-import { InfoIcon, WarningIcon } from '../icon';
 
 // Figma DataGSMv2 "WF/Notice"(Kind = Info·Warning)를 옮겼다.
 // 두 Kind는 아이콘만 다르고 칠·간격·글자색은 같아서 cva 변형 없이 아이콘만 고른다.

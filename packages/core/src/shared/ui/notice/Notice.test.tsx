@@ -1,8 +1,8 @@
+import { InfoIcon, WarningIcon } from '@datagsm/core/shared/ui/icon';
 import { render, screen } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { InfoIcon, WarningIcon } from '../icon';
 import { Notice } from './Notice';
 
 // 아이콘 컴포넌트가 그리는 path로 어떤 아이콘인지 확인한다.

@@ -1,5 +1,6 @@
-import { cn } from '../../../shared/lib';
-import { ClockIcon } from '../../../shared/ui/icon';
+import { cn } from '@datagsm/core/shared/lib';
+import { ClockIcon } from '@datagsm/core/shared/ui/icon';
+
 import { formatRemainingTime } from '../lib/formatRemainingTime';
 
 interface SessionTimerProps {

@@ -1,8 +1,8 @@
+import { ChevronLeftIcon } from '@datagsm/core/shared/ui/icon';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { FormEvent } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { ChevronLeftIcon } from '../icon';
 import { IconButton } from './IconButton';
 
 describe('IconButton', () => {

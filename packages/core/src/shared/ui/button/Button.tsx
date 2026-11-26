@@ -1,7 +1,6 @@
+import { cn } from '@datagsm/core/shared/lib';
 import { cva, type VariantProps } from 'class-variance-authority';
 import type { ComponentProps } from 'react';
-
-import { cn } from '../../lib';
 
 // Figma DataGSMv2 "WF/Button"(Style × State)을 옮겼다.
 // - 크기: 높이 36, 좌우 14, 아이콘·글자 간격 8, 글자 label-14. 다른 크기와 폭(폼 끝 버튼의 FILL은 w-full)은 className으로 덮어쓴다.

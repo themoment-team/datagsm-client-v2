@@ -2,10 +2,11 @@
 
 import { type FormEvent, useState } from 'react';
 
-import { formatRemainingTime, SessionTimer } from '../../../entities/auth-session';
-import { Button } from '../../../shared/ui/button';
-import { TextButton } from '../../../shared/ui/text-button';
-import { TextField } from '../../../shared/ui/text-field';
+import { formatRemainingTime, SessionTimer } from '@datagsm/core/entities/auth-session';
+import { Button } from '@datagsm/core/shared/ui/button';
+import { TextButton } from '@datagsm/core/shared/ui/text-button';
+import { TextField } from '@datagsm/core/shared/ui/text-field';
+
 import { MfaStepLayout } from './MfaStepLayout';
 
 // idle은 Figma "이메일 코드"·"이메일 코드 입력"이다. 둘은 입력칸이 비었는지만 달라서

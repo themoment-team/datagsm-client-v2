@@ -1,8 +1,7 @@
+import { cn } from '@datagsm/core/shared/lib';
+import { FormField } from '@datagsm/core/shared/ui/form-field';
+import { ChevronDownIcon } from '@datagsm/core/shared/ui/icon';
 import type { ComponentProps, ReactNode } from 'react';
-
-import { cn } from '../../lib';
-import { FormField } from '../form-field';
-import { ChevronDownIcon } from '../icon';
 
 interface SelectFieldProps extends ComponentProps<'select'> {
   label?: ReactNode;

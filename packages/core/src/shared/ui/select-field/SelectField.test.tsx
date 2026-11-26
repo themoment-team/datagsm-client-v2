@@ -1,9 +1,9 @@
 import { type ChangeEvent, useState } from 'react';
 
+import { TextButton } from '@datagsm/core/shared/ui/text-button';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { TextButton } from '../text-button';
 import { SelectField } from './SelectField';
 
 const GRADES = (

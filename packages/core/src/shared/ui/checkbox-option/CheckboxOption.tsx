@@ -1,8 +1,7 @@
+import { cn } from '@datagsm/core/shared/lib';
+import { CheckIcon } from '@datagsm/core/shared/ui/icon';
 import { cva, type VariantProps } from 'class-variance-authority';
 import type { ComponentProps, ReactNode } from 'react';
-
-import { cn } from '../../lib';
-import { CheckIcon } from '../icon';
 
 // Figma DataGSMv2 "WF/Checkbox option"(State × Padding)을 옮겼다.
 // - 권한 범위·구독 이벤트·동의처럼 체크 칸 하나와 설명 글을 한 줄로 묶은 선택지다. 목록 안 간격(8)은 쓰는 곳이 정한다.

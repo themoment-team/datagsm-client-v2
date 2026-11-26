@@ -1,7 +1,7 @@
 import { type ComponentProps, type ReactNode, useId } from 'react';
 
-import { cn } from '../../lib';
-import { Switch } from '../switch';
+import { cn } from '@datagsm/core/shared/lib';
+import { Switch } from '@datagsm/core/shared/ui/switch';
 
 interface SwitchFieldProps extends Omit<ComponentProps<'input'>, 'type' | 'role' | 'children'> {
   label: ReactNode;

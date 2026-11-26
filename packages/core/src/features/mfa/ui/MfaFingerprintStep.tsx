@@ -1,5 +1,6 @@
-import { Button } from '../../../shared/ui/button';
-import { MailIcon } from '../../../shared/ui/icon';
+import { Button } from '@datagsm/core/shared/ui/button';
+import { MailIcon } from '@datagsm/core/shared/ui/icon';
+
 import { FingerprintStatus } from './FingerprintStatus';
 import { MfaStepLayout } from './MfaStepLayout';
 
