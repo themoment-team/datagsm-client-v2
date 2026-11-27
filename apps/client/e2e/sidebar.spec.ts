@@ -32,3 +32,39 @@ test('계정 메뉴의 로그아웃은 POST /api/logout을 제출하는 버튼�
   ).toBeVisible();
   await expect(page.locator('form[action="/api/logout"][method="post"]')).toHaveCount(1);
 });
+
+test('페이지는 화면 높이로 고정되고 사이드바는 Figma 폭(272)으로 제자리에 있다', async ({
+  page,
+}) => {
+  // 지원하는 가장 좁은 화면: 15.6인치 FHD, 125% 배율
+  await page.setViewportSize({ width: 1536, height: 750 });
+  await page.goto(SHELL_PAGE);
+
+  // 레이아웃 상자로 폭·높이와 위치(왼쪽 위에 붙어 있는지)를 함께 본다.
+  const box = await page.getByRole('complementary').boundingBox();
+  expect(box).toMatchObject({ x: 0, y: 0, width: 272, height: 750 });
+
+  const pageOverflow = await page.evaluate(() => ({
+    y: document.scrollingElement!.scrollHeight - window.innerHeight,
+    x: document.scrollingElement!.scrollWidth - window.innerWidth,
+  }));
+  expect(pageOverflow).toEqual({ y: 0, x: 0 });
+});
+
+test('셸 안 화면은 본문 높이만큼만 채워서 본문이 스크롤되지 않는다', async ({ page }) => {
+  await page.setViewportSize({ width: 1536, height: 750 });
+  await page.goto(SHELL_PAGE);
+
+  // 404 화면의 main이 본문을 꼭 채운다. 100vh로 채우면 모바일에서 h-dvh보다 커져 본문이 스크롤된다.
+  const main = await page.getByRole('main').boundingBox();
+  expect(main?.height).toBe(750);
+
+  const bodyOverflow = await page
+    .getByRole('main')
+    .evaluate(
+      (el) =>
+        el.parentElement!.parentElement!.scrollHeight -
+        el.parentElement!.parentElement!.clientHeight,
+    );
+  expect(bodyOverflow).toBe(0);
+});

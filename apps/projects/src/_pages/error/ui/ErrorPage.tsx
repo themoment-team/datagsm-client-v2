@@ -17,7 +17,7 @@ export const ErrorPage = ({ error, retry }: ErrorPageProps) => {
       : undefined;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4 p-8 text-center">
+    <main className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
       <h1 className="text-2xl font-semibold">문제가 발생했습니다</h1>
       <p>잠시 후 다시 시도하거나 홈으로 이동해 주세요.</p>
       {digest && <p className="text-sm break-all">오류 코드: {digest}</p>}
