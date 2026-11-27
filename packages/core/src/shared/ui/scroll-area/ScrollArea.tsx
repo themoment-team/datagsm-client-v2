@@ -50,6 +50,8 @@ const Scrollbar = ({
 // 높이는 바깥 틀이 정하고 내용 상자(Viewport)가 남은 높이를 채운다. 그래서 max-h만 줘도 그 높이에서 스크롤된다.
 // Base UI Viewport는 인라인 스타일로 두 축 모두 overflow: scroll이고 Root에는 축을 정하는 prop이 없다.
 // 그대로 두면 세로만 쓰는 영역도 내용이 넓으면 막대 없이 가로로 밀리므로, 고르지 않은 축을 !important로 막는다.
+// Content도 인라인 스타일로 min-width: fit-content라서 세로 영역에서는 긴 URL·코드 블록만큼 넓어져 잘리고 truncate가 듣지 않는다.
+// 그래서 세로 영역은 내용 상자를 영역 폭에 맞춘다(min-w-0!). 가로로 스크롤되는 영역은 이 동작이 있어야 넘친 폭을 잰다.
 export const ScrollArea = ({
   children,
   className,
@@ -65,7 +67,11 @@ export const ScrollArea = ({
         orientation === 'horizontal' && 'overflow-y-hidden!',
       )}
     >
-      <BaseScrollArea.Content className={contentClassName}>{children}</BaseScrollArea.Content>
+      <BaseScrollArea.Content
+        className={cn(orientation === 'vertical' && 'min-w-0!', contentClassName)}
+      >
+        {children}
+      </BaseScrollArea.Content>
     </BaseScrollArea.Viewport>
     {orientation !== 'horizontal' && <Scrollbar orientation="vertical" inset={scrollbarInset} />}
     {orientation !== 'vertical' && <Scrollbar orientation="horizontal" inset={scrollbarInset} />}

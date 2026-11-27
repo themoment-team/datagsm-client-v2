@@ -53,3 +53,24 @@ it('both면 두 축 모두 스크롤된다', () => {
   expect(viewport).not.toHaveClass('overflow-x-hidden!');
   expect(viewport).not.toHaveClass('overflow-y-hidden!');
 });
+
+it('세로 영역은 내용 상자를 영역 폭에 맞춰 긴 내용이 잘리지 않고 줄바꿈·말줄임이 된다', () => {
+  render(
+    <ScrollArea>
+      <p>내용</p>
+    </ScrollArea>,
+  );
+
+  // Base UI Content의 인라인 min-width: fit-content를 덮는다.
+  expect(screen.getByText('내용').parentElement).toHaveClass('min-w-0!');
+});
+
+it('가로로 스크롤되는 영역은 내용 상자가 넘친 폭만큼 넓어질 수 있다', () => {
+  render(
+    <ScrollArea orientation="both">
+      <p>내용</p>
+    </ScrollArea>,
+  );
+
+  expect(screen.getByText('내용').parentElement).not.toHaveClass('min-w-0!');
+});
