@@ -16,6 +16,9 @@ interface ScrollAreaProps {
   // inner: 4px. 표 본문, 선택 목록처럼 내용 바로 옆에 붙는 스크롤 영역 (Figma 1402:58107)
   // panel: 12px. 칸 본문. 칸의 오른쪽 여백 24 안에 들어가 내용과 8px 떨어진다 (Figma 1046:41776)
   scrollbarInset?: 'inner' | 'panel';
+  // 스크롤 영역의 이름. 주면 스크롤되는 상자가 이름 있는 영역(region)이 되어 보조기기에서 찾을 수 있다.
+  // 키보드 포커스(tabIndex)는 Base UI가 내용이 넘칠 때 스스로 준다.
+  label?: string;
 }
 
 // Figma DataGSMv2 "WF/Scrollbar"(node 1366:479). 폭 4, 모서리 2, 트랙 wf/line, 막대 wf/text-muted.
@@ -58,6 +61,7 @@ export const ScrollArea = ({
   contentClassName,
   orientation = 'vertical',
   scrollbarInset = 'inner',
+  label,
 }: ScrollAreaProps) => (
   <BaseScrollArea.Root className={cn('flex min-h-0 flex-col', className)}>
     <BaseScrollArea.Viewport
@@ -66,6 +70,7 @@ export const ScrollArea = ({
         orientation === 'vertical' && 'overflow-x-hidden!',
         orientation === 'horizontal' && 'overflow-y-hidden!',
       )}
+      {...(label && { role: 'region', 'aria-label': label })}
     >
       <BaseScrollArea.Content
         className={cn(orientation === 'vertical' && 'min-w-0!', contentClassName)}

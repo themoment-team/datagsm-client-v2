@@ -24,6 +24,7 @@ export const AppShell = ({ children, ...sidebarProps }: AppShellProps) => {
         orientation="both"
         className="min-w-0 flex-1"
         contentClassName="flex min-h-full flex-col"
+        label="본문"
       >
         {children}
       </ScrollArea>

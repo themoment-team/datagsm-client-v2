@@ -74,3 +74,13 @@ it('가로로 스크롤되는 영역은 내용 상자가 넘친 폭만큼 넓어
 
   expect(screen.getByText('내용').parentElement).not.toHaveClass('min-w-0!');
 });
+
+it('label을 주면 스크롤 영역이 이름 있는 region이 된다', () => {
+  render(
+    <ScrollArea label="본문">
+      <p>내용</p>
+    </ScrollArea>,
+  );
+
+  expect(screen.getByRole('region', { name: '본문' })).toContainElement(screen.getByText('내용'));
+});
