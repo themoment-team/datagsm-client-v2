@@ -10,6 +10,8 @@ it('독립 문서에 안전한 오류 화면과 digest를 렌더하고 재시도
 
   expect(document.documentElement).toHaveAttribute('lang', 'ko');
   expect(document.body).toContainElement(screen.getByRole('main'));
+  // 셸이 없으므로 body가 화면 높이를 채워 안내가 세로 가운데에 온다.
+  expect(document.body).toHaveClass('flex', 'min-h-dvh', 'flex-col');
   expect(
     screen.getByRole('heading', { level: 1, name: '문제가 발생했습니다' }),
   ).toBeInTheDocument();
