@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { expect, it } from 'vitest';
 
-import { cn, TEXT_STYLES } from './cn';
+import { BLUR_STYLES, cn, TEXT_STYLES } from './cn';
 
 it('cn이 충돌하는 클래스를 병합한다', () => {
   expect(cn('px-2 py-1', false, { 'px-4': true }, ['text-sm', 'text-lg'])).toBe(
@@ -13,6 +13,11 @@ it('cn이 충돌하는 클래스를 병합한다', () => {
 it('텍스트 스타일 토큰을 글자 크기로 보고 글자색과는 병합하지 않는다', () => {
   expect(cn('text-title-32 text-foreground')).toBe('text-title-32 text-foreground');
   expect(cn('text-sm', 'text-title-32')).toBe('text-title-32');
+});
+
+it('효과 블러 토큰을 같은 블러 클래스와 병합한다', () => {
+  expect(cn('backdrop-blur-md', 'backdrop-blur-glass')).toBe('backdrop-blur-glass');
+  expect(cn('backdrop-blur-glass', 'backdrop-blur-table')).toBe('backdrop-blur-table');
 });
 
 // 공통 CSS의 토큰 이름과 cn의 목록이 어긋나면 위 병합이 다시 틀어진다.
@@ -28,4 +33,5 @@ it('cn의 토큰 목록이 공통 CSS의 @theme와 같다', () => {
       .filter((name) => !name.includes('--'));
 
   expect(names('text')).toEqual(TEXT_STYLES);
+  expect(names('blur')).toEqual(BLUR_STYLES);
 });

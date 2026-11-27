@@ -3,7 +3,8 @@ import { extendTailwindMerge } from 'tailwind-merge';
 
 // tailwind-merge는 @theme에 더한 이름을 모르면 잘못 병합한다.
 // 예: 모르는 text-title-32를 글자색으로 보고 text-foreground와 함께 쓰면 하나를 지운다.
-// @datagsm/tailwind-config/shared-styles.css의 --text-* 이름을 바꾸면 여기도 함께 고친다(cn.test.ts가 비교한다).
+// 모르는 backdrop-blur-glass는 backdrop-blur-md와 함께 써도 앞의 것을 지우지 않는다.
+// @datagsm/tailwind-config/shared-styles.css의 --text-*, --blur-* 이름을 바꾸면 여기도 함께 고친다(cn.test.ts가 비교한다).
 export const TEXT_STYLES = [
   'title-32',
   'title-24',
@@ -17,10 +18,13 @@ export const TEXT_STYLES = [
   'code-12',
 ];
 
+export const BLUR_STYLES = ['glass', 'glass-toast', 'table'];
+
 const twMerge = extendTailwindMerge({
   extend: {
     theme: {
       text: TEXT_STYLES,
+      blur: BLUR_STYLES,
     },
   },
 });

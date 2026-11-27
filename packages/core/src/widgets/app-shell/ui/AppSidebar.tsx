@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 
 import { LogoutButton } from '../../../features/logout';
 import type { AppUrls } from '../../../shared/config';
+import { ScrollArea } from '../../../shared/ui/scroll-area';
 import { getSidebarItemHref, isSidebarItemActive } from '../lib/sidebarLink';
 import type { SidebarItem } from '../model/sidebarItem';
 
@@ -60,36 +61,44 @@ export const AppSidebar = ({
   const pathname = usePathname();
 
   return (
-    <aside className="sticky top-0 flex h-screen w-72 shrink-0 flex-col px-5 py-8">
-      <div className="flex items-center justify-between gap-2 px-4">
-        <p>DATA GSM</p>
-        {badge && <span>{badge}</span>}
-      </div>
-      <nav aria-label="주 메뉴" className="mt-10 flex flex-col gap-1">
-        {items.map((item) => (
-          <SidebarLink
-            key={`${item.app}${item.path}`}
-            item={item}
-            currentApp={currentApp}
-            appUrls={appUrls}
-            pathname={pathname}
-          />
-        ))}
-      </nav>
-      <nav aria-label="계정 메뉴" className="mt-auto flex flex-col gap-1">
-        {footerItems.map((item) => (
-          <SidebarLink
-            key={`${item.app}${item.path}`}
-            item={item}
-            currentApp={currentApp}
-            appUrls={appUrls}
-            pathname={pathname}
-          />
-        ))}
-        {idpLogoutUrl && (
-          <LogoutButton idpLogoutUrl={idpLogoutUrl} className="flex items-center gap-3 px-4 py-3" />
-        )}
-      </nav>
+    // 폭 272(w-68)는 Figma WF/Sidebar 값이다. PanelLayout의 최소 폭이 이 폭을 기준으로 계산되어 있다.
+    // 화면 높이가 메뉴보다 낮을 때(크게 확대했을 때 등)는 사이드바 안에서 스크롤된다.
+    // 브라우저 기본 스크롤바는 폭을 차지하고 디자인과 달라서 공용 ScrollArea를 쓴다.
+    <aside className="flex h-full w-68 shrink-0 flex-col">
+      <ScrollArea className="flex-1" contentClassName="flex min-h-full flex-col px-5 py-8">
+        <div className="flex items-center justify-between gap-2 px-4">
+          <p>DATA GSM</p>
+          {badge && <span>{badge}</span>}
+        </div>
+        <nav aria-label="주 메뉴" className="mt-10 flex flex-col gap-1">
+          {items.map((item) => (
+            <SidebarLink
+              key={`${item.app}${item.path}`}
+              item={item}
+              currentApp={currentApp}
+              appUrls={appUrls}
+              pathname={pathname}
+            />
+          ))}
+        </nav>
+        <nav aria-label="계정 메뉴" className="mt-auto flex flex-col gap-1">
+          {footerItems.map((item) => (
+            <SidebarLink
+              key={`${item.app}${item.path}`}
+              item={item}
+              currentApp={currentApp}
+              appUrls={appUrls}
+              pathname={pathname}
+            />
+          ))}
+          {idpLogoutUrl && (
+            <LogoutButton
+              idpLogoutUrl={idpLogoutUrl}
+              className="flex items-center gap-3 px-4 py-3"
+            />
+          )}
+        </nav>
+      </ScrollArea>
     </aside>
   );
 };
