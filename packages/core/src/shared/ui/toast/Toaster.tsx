@@ -34,7 +34,7 @@ const ToastList = () => {
       key={item.id}
       toast={item}
       swipeDirection="up"
-      className="absolute inset-x-0 top-0 mx-auto flex w-fit max-w-full translate-x-(--toast-swipe-movement-x) translate-y-(--offset-y) items-center gap-3 rounded border border-glass-line bg-toast-fill p-4 text-foreground transition-opacity duration-300 ease-out select-none [--offset-y:calc(var(--toast-offset-y)+var(--toast-index)*0.5rem+var(--toast-swipe-movement-y))] after:absolute after:inset-x-0 after:top-full after:h-2 data-ending-style:opacity-0 data-limited:opacity-0 data-starting-style:opacity-0 data-swiping:transition-none motion-safe:transition-[opacity,translate] motion-safe:data-starting-style:-translate-y-full"
+      className="absolute inset-x-0 top-0 mx-auto flex w-fit max-w-full translate-x-(--toast-swipe-movement-x) translate-y-(--offset-y) items-center gap-3 rounded border border-glass-line bg-toast-fill p-4 text-foreground backdrop-blur-glass-toast transition-opacity duration-300 ease-out select-none [--offset-y:calc(var(--toast-offset-y)+var(--toast-index)*0.5rem+var(--toast-swipe-movement-y))] after:absolute after:inset-x-0 after:top-full after:h-2 data-ending-style:opacity-0 data-limited:opacity-0 data-starting-style:opacity-0 data-swiping:transition-none motion-safe:transition-[opacity,translate] motion-safe:data-starting-style:-translate-y-full"
     >
       {item.data?.icon ?? <CheckCircleIcon />}
       <div className="flex min-w-0 flex-col">
@@ -48,6 +48,8 @@ const ToastList = () => {
 // Figma DataGSMv2 "WF/Toast"(node 745:2147)를 Base UI Toast로 옮겼다. 모든 앱의 루트 layout에 한 번 둔다.
 // - 위치: 화면 위 가운데, 위 여백 24. 폭은 내용에 맞추고 화면 좌우 16을 넘지 않게 줄바꿈한다.
 // - 모양: 안쪽 여백 16, 아이콘·글자 간격 12, 모서리 4, 선 glass-line, 칠 toast-fill.
+//   배경 흐림은 Figma 효과 스타일 WF/Glass toast를 backdrop-blur-glass-toast로 옮겼다.
+//   지금 toast-fill은 두 모드 모두 불투명이라 흐림이 보이지 않고, 칠에 투명도가 생기면 드러난다.
 //   글자는 제목 label-14(foreground), 내용 caption-12(foreground-muted). 아이콘은 16px이고 기본은 check-circle이다.
 // - 여러 개: 새 토스트가 맨 위에 오고 앞의 토스트는 아래로 8 간격을 두고 밀린다. 한 번에 3개까지 보이고(Base UI 기본),
 //   넘친 오래된 토스트는 숨긴다. 토스트 사이 8도 마우스가 머문 것으로 보도록 ::after로 메운다.
