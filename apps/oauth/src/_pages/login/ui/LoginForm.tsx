@@ -12,6 +12,7 @@ import { EMAIL_DOMAIN, type LoginRequest, LoginSchema } from '../model/loginSche
 export interface LoginFormProps {
   sessionRemainingSeconds: number;
   error?: string;
+  submitting?: boolean;
   signUpHref: string;
   resetPasswordHref: string;
   onSubmit: (values: LoginRequest) => void;
@@ -20,9 +21,12 @@ export interface LoginFormProps {
 // Figma "WF/OAuth modal"의 form(입력칸 두 개, 간격 8) → session → footer(전체폭 로그인 버튼, 글자 링크 두 개)다.
 // 셋을 form 하나로 묶고 창과 같은 16 간격을 다시 준다.
 // Error 상태(로그인 실패)는 Figma대로 비밀번호 칸에만 오류 선과 문구를 둔다. 빈 값 오류가 있으면 그 문구가 먼저다.
+// 제출 중(submitting)은 두 번 보내지 않도록 로그인 버튼을 막고 라벨을 바꾼다. 기본 제출 버튼이 disabled면
+// 브라우저가 Enter 암시적 제출도 하지 않으므로(HTML 명세) 따로 막지 않는다.
 export const LoginForm = ({
   sessionRemainingSeconds,
   error,
+  submitting = false,
   signUpHref,
   resetPasswordHref,
   onSubmit,
@@ -59,8 +63,8 @@ export const LoginForm = ({
       </div>
       <SessionTimer remainingSeconds={sessionRemainingSeconds} />
       <div className="flex flex-col gap-4">
-        <Button type="submit" className="w-full">
-          로그인
+        <Button type="submit" className="w-full" disabled={submitting}>
+          {submitting ? '로그인하는 중…' : '로그인'}
         </Button>
         <div className="flex gap-4">
           <TextLink href={signUpHref}>회원가입</TextLink>

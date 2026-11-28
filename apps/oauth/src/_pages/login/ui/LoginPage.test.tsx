@@ -76,6 +76,19 @@ it('값을 채워 제출하면 도메인을 붙인 email과 비밀번호로 onSu
   expect(onSubmit.mock.calls[0]?.[0]).toEqual({ email: 's25008@gsm.hs.kr', password: 'secret' });
 });
 
+it('submitting이면 로그인 버튼을 막고 문구를 바꾸며, 눌러도 onSubmit을 부르지 않는다', async () => {
+  const { onSubmit } = renderLoginPage({ submitting: true });
+
+  fireEvent.change(emailInput(), { target: { value: 's25008' } });
+  fireEvent.change(passwordInput(), { target: { value: 'secret' } });
+  const button = screen.getByRole('button', { name: '로그인하는 중…' });
+  expect(button).toBeDisabled();
+  fireEvent.click(button);
+
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  expect(onSubmit).not.toHaveBeenCalled();
+});
+
 it('error를 넘기면 비밀번호 칸에 오류 문구를 알림으로 보인다', () => {
   renderLoginPage({ error: '이메일과 비밀번호를 확인하세요' });
 
