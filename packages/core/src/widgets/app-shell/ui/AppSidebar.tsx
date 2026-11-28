@@ -85,7 +85,10 @@ export const AppSidebar = ({
         <div className="flex flex-col gap-1">
           {/* 관리자 배지는 Figma "WF/Admin sidebar"처럼 브랜드 바로 옆(8)에 붙는다. */}
           <div className="flex items-center gap-2 pb-3">
-            <Brand />
+            {/* 로고는 지금 앱의 홈('/')으로 간다. 글자 "DATA GSM"이 링크 이름이 된다. */}
+            <Link href="/" className="rounded">
+              <Brand />
+            </Link>
             {badge && <Badge>{badge}</Badge>}
           </div>
           <nav aria-label="주 메뉴" className="flex flex-col gap-1">

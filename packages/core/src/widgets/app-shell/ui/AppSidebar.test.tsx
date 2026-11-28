@@ -99,6 +99,13 @@ it('주소를 모르는 앱으로 가는 메뉴가 있으면 바로 알린다', 
   ).toThrow("사이드바 메뉴 '프로젝트'의 앱(projects) 주소가 없습니다.");
 });
 
+it('로고는 지금 앱의 홈으로 연결한다', () => {
+  pathname.value = '/api-keys';
+  renderSidebar('client');
+
+  expect(screen.getByRole('link', { name: 'DATA GSM' })).toHaveAttribute('href', '/');
+});
+
 it('badge를 넘기면 로고 옆에 표시하고, 넘기지 않으면 표시하지 않는다', () => {
   const { rerender } = render(
     <AppSidebar currentApp="admin" appUrls={{}} items={[]} footerItems={[]} badge="관리자" />,
