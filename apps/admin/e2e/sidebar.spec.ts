@@ -10,10 +10,12 @@ test('관리자 사이드바가 관리자 배지와 관리자 메뉴를 보여 �
 
   await expect(nav.getByRole('link')).toHaveText([
     '학생 관리',
+    '정보 변경 심사',
     '계정 관리',
     '선생님 승인',
     '동아리 관리',
     '프로젝트 관리',
+    '프로젝트 심사',
     'API 키 관리',
   ]);
   await expect(nav.getByRole('link', { name: '프로젝트 관리' })).toHaveAttribute(

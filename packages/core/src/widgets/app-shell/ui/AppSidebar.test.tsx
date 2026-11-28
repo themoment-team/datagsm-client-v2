@@ -35,6 +35,10 @@ it('같은 앱 메뉴는 앱 안 경로로, 다른 앱 메뉴는 그 앱 주소�
   const nav = screen.getByRole('navigation', { name: '주 메뉴' });
 
   expect(within(nav).getByRole('link', { name: 'API 키' })).toHaveAttribute('href', '/api-keys');
+  expect(within(nav).getByRole('link', { name: 'AI 하네스' })).toHaveAttribute(
+    'href',
+    '/ai-harness',
+  );
   expect(within(nav).getByRole('link', { name: '문서' })).toHaveAttribute(
     'href',
     'https://docs.datagsm.kr',
@@ -71,6 +75,14 @@ it('지금 경로의 메뉴를 선택된 상태로 표시한다', () => {
   expect(screen.getByRole('link', { name: '이벤트' })).not.toHaveAttribute('aria-current');
 });
 
+it('메뉴 아이콘은 스크린 리더에서 숨기고 글자가 메뉴 이름이 된다', () => {
+  renderSidebar('client');
+
+  const link = screen.getByRole('link', { name: 'API 키' });
+
+  expect(link.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+});
+
 it('앱의 루트 메뉴는 그 앱 안 어느 경로에서도 선택된다', () => {
   pathname.value = '/guides/oauth';
   renderSidebar('docs');
@@ -89,6 +101,13 @@ it('주소를 모르는 앱으로 가는 메뉴가 있으면 바로 알린다', 
       />,
     ),
   ).toThrow("사이드바 메뉴 '프로젝트'의 앱(projects) 주소가 없습니다.");
+});
+
+it('로고는 지금 앱의 홈으로 연결한다', () => {
+  pathname.value = '/api-keys';
+  renderSidebar('client');
+
+  expect(screen.getByRole('link', { name: 'DATA GSM' })).toHaveAttribute('href', '/');
 });
 
 it('badge를 넘기면 로고 옆에 표시하고, 넘기지 않으면 표시하지 않는다', () => {
