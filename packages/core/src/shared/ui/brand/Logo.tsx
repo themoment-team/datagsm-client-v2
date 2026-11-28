@@ -1,6 +1,5 @@
+import { cn } from '@datagsm/core/shared/lib';
 import type { SVGProps } from 'react';
-
-import { cn } from '../../lib';
 
 export type LogoProps = Omit<SVGProps<SVGSVGElement>, 'children'>;
 

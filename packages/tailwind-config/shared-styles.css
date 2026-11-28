@@ -32,8 +32,7 @@
   /* 토스트는 화면과 반대 모드로 보인다. 토스트 요소에 반대 모드의 data-theme을 붙여
      배경 toast-fill과 글자 foreground를 그 모드 값으로 쓴다(라이트 화면 = 검은 토스트, 다크 화면 = 흰 토스트).
      그래서 토스트 색을 고칠 때는 화면 모드가 아니라 반대 모드 값을 바꾼다.
-     지금은 Dark 값만 [data-theme='dark']로 덮어쓰므로 다크 화면 안에서 Light로 고정하려면
-     토스트를 만들 때 Light 값을 되돌리는 [data-theme='light'] 규칙이 필요하다. */
+     다크 화면 안의 토스트는 아래 [data-theme='light'] 블록이 Light 값을 되돌려 흰 토스트가 된다(core shared/ui/toast). */
   --color-toast-fill: #ffffff; /* wf/toast-fill */
 
   /* 상태 */
@@ -150,4 +149,38 @@
   --color-foreground-muted: #a3a6ab;
   --color-on-strong: #292b2f;
   --color-error: #d95757;
+}
+
+/* 다크 화면 안의 한 영역을 Light로 고정할 때 쓴다(화면과 반대 모드로 보이는 토스트 영역).
+   @theme의 Light 색 값을 그대로 되돌린다. @theme 색을 바꾸면 여기도 함께 바꾼다
+   (core shared/ui/toast의 Toaster.test.tsx가 이름과 값을 비교한다). 색만 넣는다. */
+[data-theme='light'] {
+  color-scheme: light;
+
+  --color-background: #f4f4f4;
+  --color-surface: #ffffff;
+  --color-subtle: #ededed;
+  --color-table-head: #e8ebf0;
+  --color-selected: #dcdcdc;
+  --color-row-selected: #dcdcdc;
+  --color-strong: #292b2f;
+  --color-table-fill: #ffffff66;
+  --color-background-overlay: #ffffff33;
+  --color-glass-fill: #ffffff7a;
+  --color-modal-fill: #000000;
+  --color-scrim: #ffffff8f;
+  --color-scrim-card: #ffffff99;
+  --color-toast-fill: #ffffff;
+
+  --color-hover: #0000000f;
+  --color-hover-on-strong: #ffffff29;
+  --color-row-hover: #00000008;
+
+  --color-line: #d0d0d0;
+  --color-glass-line: #d0d0d0cc;
+
+  --color-foreground: #1e1e1e;
+  --color-foreground-muted: #6e6e6e;
+  --color-on-strong: #ffffff;
+  --color-error: #f84c4c;
 }

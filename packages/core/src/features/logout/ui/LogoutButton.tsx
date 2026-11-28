@@ -2,7 +2,8 @@
 
 import { type FormEvent, useState } from 'react';
 
-import { LOGOUT_PATH } from '../../../shared/auth';
+import { LOGOUT_PATH } from '@datagsm/core/shared/auth';
+
 import { endIdpSession } from '../api/endIdpSession';
 
 interface LogoutButtonProps {

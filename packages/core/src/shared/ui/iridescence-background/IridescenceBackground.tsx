@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 
-import { cn } from '../../lib';
+import { cn } from '@datagsm/core/shared/lib';
+
 import { startIridescence } from './startIridescence';
 
 interface IridescenceBackgroundProps {

@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@datagsm/core/features/theme-toggle';
 import { toAppUrls } from '@datagsm/core/shared/config';
+import { Toaster } from '@datagsm/core/shared/ui/toast';
 import {
   AppShell,
   USER_SIDEBAR_FOOTER_ITEMS,
@@ -36,6 +37,7 @@ export const RootLayout = ({
               {children}
             </AppShell>
           </TanStackProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

@@ -1,6 +1,5 @@
 import { ScrollArea as BaseScrollArea } from '@base-ui/react/scroll-area';
-
-import { cn } from '../../lib';
+import { cn } from '@datagsm/core/shared/lib';
 
 type ScrollOrientation = 'vertical' | 'horizontal' | 'both';
 

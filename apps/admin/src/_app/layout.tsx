@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@datagsm/core/features/theme-toggle';
 import { buildIdpLogoutUrl } from '@datagsm/core/shared/auth/server';
+import { Toaster } from '@datagsm/core/shared/ui/toast';
 import { AppShell } from '@datagsm/core/widgets/app-shell';
 import type { Metadata } from 'next';
 
@@ -36,6 +37,7 @@ export const RootLayout = ({
               {children}
             </AppShell>
           </TanStackProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

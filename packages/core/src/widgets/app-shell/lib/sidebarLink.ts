@@ -1,4 +1,5 @@
-import type { AppUrls } from '../../../shared/config';
+import type { AppUrls } from '@datagsm/core/shared/config';
+
 import type { SidebarItem } from '../model/sidebarItem';
 
 type CurrentApp = SidebarItem['app'];

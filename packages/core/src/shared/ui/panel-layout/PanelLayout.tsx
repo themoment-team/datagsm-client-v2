@@ -1,7 +1,6 @@
+import { cn } from '@datagsm/core/shared/lib';
+import { ScrollArea } from '@datagsm/core/shared/ui/scroll-area';
 import { cva, type VariantProps } from 'class-variance-authority';
-
-import { cn } from '../../lib';
-import { ScrollArea } from '../scroll-area';
 
 // 칸 폭은 Figma 1920 화면(사이드바 272 + 본문 1648)의 값을 비율(fr)로 옮긴 것이다. 화면이 좁아지면 같은 비율로 준다.
 // minmax(0, …)는 긴 글자가 칸을 넓히지 못하게 한다.

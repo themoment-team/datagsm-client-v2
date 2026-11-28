@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
-import type { OauthEnv } from '../config';
+import type { OauthEnv } from '@datagsm/core/shared/config';
+
 import {
   CALLBACK_PATH,
   clearTokenCookies,

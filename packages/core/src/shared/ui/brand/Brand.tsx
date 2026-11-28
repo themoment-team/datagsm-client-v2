@@ -1,6 +1,6 @@
+import { cn } from '@datagsm/core/shared/lib';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { cn } from '../../lib';
 import { Logo } from './Logo';
 
 const brandVariants = cva('flex items-center gap-4 overflow-clip py-3 text-foreground', {

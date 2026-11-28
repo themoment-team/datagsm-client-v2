@@ -1,4 +1,5 @@
 import { ThemeProvider } from '@datagsm/core/features/theme-toggle';
+import { Toaster } from '@datagsm/core/shared/ui/toast';
 import type { Metadata } from 'next';
 
 import { TanStackProvider } from '@/_app/providers';
@@ -22,6 +23,7 @@ export const RootLayout = ({
           {/* 사이드바와 공통 배경은 app/(shell)의 ShellLayout이 깐다. 랜딩(/)은 그 밖에 있어 둘 다 없다.
               오류·404 화면도 사이드바가 남도록 (shell)/error.tsx와 루트 not-found.tsx가 ShellLayout을 쓴다. */}
           <TanStackProvider>{children}</TanStackProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
