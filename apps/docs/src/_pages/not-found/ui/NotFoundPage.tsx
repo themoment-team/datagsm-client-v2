@@ -1,12 +1,11 @@
-import Link from 'next/link';
+import { NotFoundPane } from '@datagsm/core/shared/ui/not-found';
 
-export const NotFoundPage = () => (
-  <main className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
-    <p className="text-sm">404</p>
-    <h1 className="text-2xl font-semibold">페이지를 찾을 수 없습니다</h1>
-    <p>주소를 확인하거나 홈으로 이동해 주세요.</p>
-    <Link className="rounded-md border px-4 py-2 underline" href="/">
-      홈으로 이동
-    </Link>
-  </main>
+interface NotFoundPageProps {
+  // client 앱 주소(APP_CLIENT_URL, 끝의 / 없음). 서버의 app/not-found.tsx가 env에서 꺼내 넘긴다.
+  clientUrl: string;
+}
+
+// Figma "케이스 / 공통 · 없는 페이지 (404)"(1760:46552). 애플리케이션은 client 앱 화면이라 그 주소로 보낸다.
+export const NotFoundPage = ({ clientUrl }: NotFoundPageProps) => (
+  <NotFoundPane homeLabel="애플리케이션으로 이동" homeHref={`${clientUrl}/applications`} />
 );

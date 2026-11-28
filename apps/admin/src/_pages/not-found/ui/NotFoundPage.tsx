@@ -1,12 +1,6 @@
-import Link from 'next/link';
+import { NotFoundPane } from '@datagsm/core/shared/ui/not-found';
 
+// Figma "관리자 / 없는 페이지 (404)"(1760:46678). 관리자의 첫 메뉴인 학생 관리로 보낸다.
 export const NotFoundPage = () => (
-  <main className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
-    <p className="text-sm">404</p>
-    <h1 className="text-2xl font-semibold">페이지를 찾을 수 없습니다</h1>
-    <p>주소를 확인하거나 홈으로 이동해 주세요.</p>
-    <Link className="rounded-md border px-4 py-2 underline" href="/">
-      홈으로 이동
-    </Link>
-  </main>
+  <NotFoundPane homeLabel="학생 관리로 이동" homeHref="/students" />
 );
