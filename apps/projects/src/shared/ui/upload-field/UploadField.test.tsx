@@ -92,6 +92,19 @@ describe('UploadField', () => {
     expect(onSelectFile).toHaveBeenCalledWith(file);
   });
 
+  // 범위 밖 값이나 NaN이 aria-valuenow와 막대 폭에 그대로 들어가지 않게 0~100으로 묶는다.
+  it.each([
+    [150, '100'],
+    [-20, '0'],
+    [Number.NaN, '0'],
+  ])('진행률 %s는 %s로 묶는다', (progress, expected) => {
+    renderField({ progress });
+    const bar = screen.getByRole('progressbar');
+
+    expect(bar).toHaveAttribute('aria-valuenow', expected);
+    expect(bar.firstElementChild).toHaveStyle({ width: `${expected}%` });
+  });
+
   it('Filled에서 onRemove가 없으면 지우기를 그리지 않는다', () => {
     renderField({ previewUrl: PREVIEW });
 

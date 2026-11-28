@@ -77,6 +77,8 @@ export const UploadField = ({
   const state: UploadFieldState =
     progress !== undefined ? 'uploading' : error ? 'error' : previewUrl ? 'filled' : 'empty';
   const message = state === 'error' ? error : hint;
+  // 진행률은 0~100으로 묶는다. 범위 밖 값이나 NaN이 aria-valuenow와 막대 폭에 그대로 들어가지 않게 한다.
+  const progressValue = Number.isFinite(progress) ? Math.min(100, Math.max(0, progress ?? 0)) : 0;
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -141,10 +143,10 @@ export const UploadField = ({
       aria-label="올리는 중"
       aria-valuemin={0}
       aria-valuemax={100}
-      aria-valuenow={progress}
+      aria-valuenow={progressValue}
       className="h-1 w-full overflow-hidden rounded bg-subtle"
     >
-      <div className="h-full rounded bg-foreground-muted" style={{ width: `${progress}%` }} />
+      <div className="h-full rounded bg-foreground-muted" style={{ width: `${progressValue}%` }} />
     </div>
   );
 
