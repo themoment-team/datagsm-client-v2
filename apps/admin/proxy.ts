@@ -11,10 +11,12 @@ export const config = {
   matcher: [
     '/backend/:path*',
     '/students/:path*',
+    '/info-change-reviews/:path*',
     '/accounts/:path*',
     '/teacher-approvals/:path*',
     '/clubs/:path*',
     '/projects/:path*',
+    '/project-reviews/:path*',
     '/api-keys/:path*',
   ],
 };
