@@ -92,6 +92,26 @@ describe('UploadField', () => {
     expect(onSelectFile).toHaveBeenCalledWith(file);
   });
 
+  // 오류 문구가 role="alert"로 새로 읽히도록 안내 문구와 다른 노드로 바꿔 넣는다.
+  it('안내 문구가 오류로 바뀌면 다른 노드의 alert로 바뀐다', () => {
+    const { rerender } = renderField();
+    const hint = screen.getByText(HINT);
+
+    rerender(
+      <UploadField
+        label="아이콘"
+        hint={HINT}
+        error="형식이 맞지 않습니다"
+        onSelectFile={vi.fn()}
+      />,
+    );
+    const alert = screen.getByRole('alert');
+
+    expect(alert).toHaveTextContent('형식이 맞지 않습니다');
+    expect(alert).not.toBe(hint);
+    expect(hint).not.toBeInTheDocument();
+  });
+
   // 범위 밖 값이나 NaN이 aria-valuenow와 막대 폭에 그대로 들어가지 않게 0~100으로 묶는다.
   it.each([
     [150, '100'],

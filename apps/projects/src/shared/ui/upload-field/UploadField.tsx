@@ -214,8 +214,11 @@ export const UploadField = ({
           {buttons}
         </>
       )}
+      {/* 안내 문구와 오류 문구는 key를 달리 준다. 같은 <p>에 role="alert"만 붙이면 화면 리더가 알리지 않을 수 있어
+          오류 문구가 새 노드로 들어가게 한다(FormField와 같다). */}
       {message && (
         <p
+          key={state === 'error' ? 'error' : 'hint'}
           id={messageId}
           role={state === 'error' ? 'alert' : undefined}
           className={cn(
