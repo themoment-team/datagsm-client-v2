@@ -1,4 +1,4 @@
-import type { OauthEnv } from '../config';
+import type { OauthEnv } from '@datagsm/core/shared/config';
 
 // 인가 서버(https://docs.datagsm.kr/oauth)와 주고받는 요청을 모아 둔다.
 

@@ -1,4 +1,4 @@
-import type { AppId } from '../../../shared/config';
+import type { AppId } from '@datagsm/core/shared/config';
 
 export interface SidebarItem {
   label: string;

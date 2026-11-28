@@ -1,4 +1,4 @@
-import { cn } from '../../lib';
+import { cn } from '@datagsm/core/shared/lib';
 
 interface PanelTitleProps {
   // 제목 글자.

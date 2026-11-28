@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { LogoutButton } from '../../../features/logout';
-import type { AppUrls } from '../../../shared/config';
-import { ScrollArea } from '../../../shared/ui/scroll-area';
+import { LogoutButton } from '@datagsm/core/features/logout';
+import type { AppUrls } from '@datagsm/core/shared/config';
+import { ScrollArea } from '@datagsm/core/shared/ui/scroll-area';
+
 import { getSidebarItemHref, isSidebarItemActive } from '../lib/sidebarLink';
 import type { SidebarItem } from '../model/sidebarItem';
 

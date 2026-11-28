@@ -78,6 +78,7 @@
 스킬 본문이나 예시가 아래와 다르면 아래를 따른다.
 
 - **core가 제공하는 것은 앱에서 다시 내보내지 않는다.** `ApiError`, `ApiResponse`, `getQueryClient` 등은 쓰는 곳에서 `@datagsm/core/...`로 바로 가져온다. 앱의 `@/shared/api`는 앱마다 값이 다른 것(`get`·`post` 등 HTTP 메서드, axios 인스턴스, `authRoutes`)만 내보낸다. 스킬 예시의 `import { ApiError, getQueryClient } from '@/shared/api'`는 이 레포에서 쓰지 않는다.
+- **core 안의 import는 같은 단위 안만 상대 경로다.** 같은 slice(entities·features·widgets)나 같은 shared 단위(`shared/ui/<컴포넌트>`, `shared/lib`, `shared/auth` 등 `index.ts`가 있는 폴더) 안은 상대 경로로, 다른 slice·단위는 `@datagsm/core/<layer>/<단위>`로 가져오고 `@/`는 쓰지 않는다. core는 각 앱이 자기 tsconfig로 컴파일해 `@/`가 앱 `src`로 풀리고, 패키지 경로는 core `package.json` exports가 각 `index.ts`만 열어 공개 API를 강제하기 때문이다. 같은 단위 안에서 자기 `index.ts`를 거치면 순환 import가 생길 수 있다.
 - **응답은 감싸져 온다.** DataGSM 서버 응답은 `{ status, code, message, data }`이고 `status`는 `"200 OK"` 같은 문자열이다. 응답 타입은 `ApiResponse<T>`, `data`가 없는 메시지 응답(삭제 등)은 `ApiMessageResponse`로 적는다(`get<ApiResponse<User>>(url)`). 예외: 엑셀 내보내기(`/v1/*/exports/excel`)는 파일을 그대로 줘서 `get<Blob>(url, { responseType: 'blob' })`, 반환값이 없는 API는 본문 없는 204라 `post<void>`로 받는다.
 - **API 오류는 `status`로 분기한다.** `ApiError.code`는 서버 오류 코드가 아니라 axios 오류 코드(`ERR_NETWORK`, `ECONNABORTED` 등)이고, 서버 본문의 `code`는 HTTP 상태와 같은 숫자라 담지 않는다. 화면에서는 `error instanceof ApiError`로 좁힌 뒤 `status`로 분기하고 서버 문구는 `message`로 보여 준다. 응답이 없는 실패는 `status: 0`이다. `data-and-forms` 폼 예시처럼 `error.code`를 서버 오류 코드로 보고 필드에 연결하지 않는다.
 - **API 모킹(MSW)은 두지 않는다.** 개발은 `API_BASE_URL`로 실제 DataGSM 개발 서버에 붙는다. 컴포넌트 테스트는 `vi.mock`으로 API 함수를 바꾼다. 스킬의 모킹 관련 절은 이 레포에 해당하지 않는다.

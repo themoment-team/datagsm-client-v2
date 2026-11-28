@@ -1,7 +1,7 @@
+import { IridescenceBackground } from '@datagsm/core/shared/ui/iridescence-background';
+import { ScrollArea } from '@datagsm/core/shared/ui/scroll-area';
 import type { ComponentProps } from 'react';
 
-import { IridescenceBackground } from '../../../shared/ui/iridescence-background';
-import { ScrollArea } from '../../../shared/ui/scroll-area';
 import { AppSidebar } from './AppSidebar';
 
 type AppShellProps = ComponentProps<typeof AppSidebar> & {
