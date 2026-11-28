@@ -83,7 +83,10 @@ export const MfaEmailStep = ({
           autoFocus
           value={code}
           onChange={(event) => setCode(event.target.value)}
-          disabled={verifying}
+          // disabled로 막으면 포커스가 body로 빠지고 불일치로 돌아와도 돌아오지 않는다.
+          // 그래서 인증하는 중에는 readOnly로 값만 막고 포커스는 입력칸에 둔다.
+          readOnly={verifying}
+          aria-busy={verifying || undefined}
           error={ERROR_MESSAGES[status]}
           // 코드가 만료되면 남은 시간을 지운다(Figma 코드 만료).
           trailing={expired ? undefined : formatRemainingTime(codeRemainingSeconds)}
@@ -96,7 +99,9 @@ export const MfaEmailStep = ({
             {verifying ? '인증하는 중' : '인증'}
           </Button>
           <div className="flex gap-4">
-            <TextButton onClick={handleResend}>코드 다시 받기</TextButton>
+            <TextButton disabled={verifying} onClick={handleResend}>
+              코드 다시 받기
+            </TextButton>
             {onSelectFingerprint && (
               <TextButton onClick={onSelectFingerprint}>지문으로 인증</TextButton>
             )}

@@ -70,20 +70,43 @@ describe('MfaEmailStep', () => {
     expect(onSubmitCode).toHaveBeenCalledExactlyOnceWith('25095814');
   });
 
-  it('인증하는 중에는 입력칸과 버튼을 막고 버튼 글을 바꾸며 값은 남긴다', () => {
-    const { rerenderWith, onSubmitCode } = renderStep();
+  it('인증하는 중에는 입력칸을 읽기 전용으로, 버튼과 코드 다시 받기를 막고 버튼 글을 바꾸며 값은 남긴다', () => {
+    const { rerenderWith, onSubmitCode, onResendCode } = renderStep();
     fireEvent.change(codeInput(), { target: { value: '25095814' } });
 
     rerenderWith({ status: 'verifying', codeRemainingSeconds: 270 });
 
-    expect(codeInput()).toBeDisabled();
+    expect(codeInput()).toHaveAttribute('readonly');
+    expect(codeInput()).toHaveAttribute('aria-busy', 'true');
     expect(codeInput()).toHaveValue('25095814');
     expect(screen.getByRole('button', { name: '인증하는 중' })).toBeDisabled();
     expect(screen.getByText('04:30')).toBeInTheDocument();
 
+    const resend = screen.getByRole('button', { name: '코드 다시 받기' });
+    expect(resend).toBeDisabled();
+    fireEvent.click(resend);
     submitForm();
 
     expect(onSubmitCode).not.toHaveBeenCalled();
+    expect(onResendCode).not.toHaveBeenCalled();
+    expect(codeInput()).toHaveValue('25095814');
+  });
+
+  it('인증하는 중에도 입력칸 포커스를 지키고, 불일치로 돌아오면 바로 고쳐 쓸 수 있다', () => {
+    const { rerenderWith } = renderStep();
+    fireEvent.change(codeInput(), { target: { value: '25095841' } });
+    expect(codeInput()).toHaveFocus();
+
+    rerenderWith({ status: 'verifying' });
+
+    expect(codeInput()).not.toBeDisabled();
+    expect(codeInput()).toHaveFocus();
+
+    rerenderWith({ status: 'mismatch' });
+
+    expect(codeInput()).toHaveFocus();
+    expect(codeInput()).not.toHaveAttribute('readonly');
+    expect(codeInput()).not.toHaveAttribute('aria-busy');
   });
 
   it('코드 불일치는 오류를 alert로 보여 주고 값과 남은 시간을 남기며 다시 제출할 수 있다', () => {
