@@ -99,3 +99,24 @@ it("[data-theme='light'] 블록이 @theme의 색 토큰을 같은 값으로 되�
   expect(light.length).toBeGreaterThan(0);
   expect(colors(block("[data-theme='light']"))).toEqual(light);
 });
+
+// 아이콘을 빠뜨린 실패 알림이 체크 표시로 보이지 않게 toast.error는 기본 아이콘이 warning-circle이다.
+it('toast.error는 기본 아이콘이 warning-circle이고 toast는 check-circle이다', async () => {
+  render(<Toaster />);
+
+  act(() => {
+    toast('저장했습니다');
+    toast.error('삭제하지 못했습니다');
+  });
+
+  // 실패 알림은 priority high라 Base UI가 alertdialog로 그리고, 일반 알림은 dialog다.
+  await screen.findAllByText('삭제하지 못했습니다');
+  const failure = getViewport().querySelector<HTMLElement>('[role="alertdialog"]')!;
+  const success = getViewport().querySelector<HTMLElement>('[role="dialog"]')!;
+  // WF/icon/warning-circle은 느낌표 세로선(M8 4.6665V8.6665)으로, check-circle은 체크선(M4.6665 8.33317)으로 시작한다.
+  expect(failure).toHaveTextContent('삭제하지 못했습니다');
+  expect(failure.innerHTML).toContain('M8 4.6665V8.6665');
+  expect(failure.innerHTML).not.toContain('M4.6665 8.33317');
+  expect(success).toHaveTextContent('저장했습니다');
+  expect(success.innerHTML).toContain('M4.6665 8.33317');
+});
