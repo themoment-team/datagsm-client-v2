@@ -33,6 +33,8 @@ interface FormFieldProps {
 //   비활성이어도 정보 링크는 누를 수 있어야 하므로 라벨만 foreground-muted로 바꾼다.
 // - 입력 모양은 쓰는 쪽(TextField, SelectField)이 children으로 그린다. children은 함수이고
 //   받은 id·aria-describedby·aria-invalid를 입력에 펼친다. 그래서 register 결과도 입력에 그대로 붙일 수 있다.
+// - 안내 문구와 오류 문구는 key를 달리 준다. 같은 <p>에 role="alert"만 붙이면 화면 리더가 알리지 않을 수 있어
+//   오류 문구가 새 노드로 들어가게 한다.
 // 서버 컴포넌트에서도 쓸 수 있게 'use client' 없이 useId로만 연결한다.
 export const FormField = ({
   id,
@@ -78,6 +80,7 @@ export const FormField = ({
       {message &&
         (hasError ? (
           <p
+            key="error"
             id={messageId}
             role="alert"
             className="flex items-center gap-1 text-label-14 text-error"
@@ -86,7 +89,7 @@ export const FormField = ({
             <span className="min-w-0 flex-1">{message}</span>
           </p>
         ) : (
-          <p id={messageId} className="text-label-14 text-foreground-muted">
+          <p key="hint" id={messageId} className="text-label-14 text-foreground-muted">
             {message}
           </p>
         ))}

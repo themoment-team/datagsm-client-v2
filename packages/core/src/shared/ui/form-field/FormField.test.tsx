@@ -30,6 +30,28 @@ describe('FormField', () => {
     expect(screen.getByRole('alert')).toHaveClass('text-error');
   });
 
+  it('hint가 error로 바뀌면 오류 문구를 같은 노드가 아닌 새 alert 노드로 그린다', () => {
+    const { rerender } = render(
+      <FormField label="이름" hint="실명을 적으세요">
+        {(control) => <input {...control} />}
+      </FormField>,
+    );
+    const hint = screen.getByText('실명을 적으세요');
+
+    rerender(
+      <FormField label="이름" hint="실명을 적으세요" error="이름을 적어 주세요">
+        {(control) => <input {...control} />}
+      </FormField>,
+    );
+    const alert = screen.getByRole('alert');
+
+    expect(alert).not.toBe(hint);
+    expect(hint).not.toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: '이름' })).toHaveAccessibleDescription(
+      '이름을 적어 주세요',
+    );
+  });
+
   it('label 없이 info만 있어도 라벨 행을 그리고, 둘 다 없으면 그리지 않는다', () => {
     const { container, rerender } = render(
       <FormField info={<a href="/help">정보</a>}>{(control) => <input {...control} />}</FormField>,
