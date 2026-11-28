@@ -1,12 +1,8 @@
 import { cn } from '@datagsm/core/shared/lib';
 import { CheckIcon } from '@datagsm/core/shared/ui/icon';
 import { ScrollArea } from '@datagsm/core/shared/ui/scroll-area';
-import type { ReactNode } from 'react';
 
-interface Scope {
-  id: string;
-  label: ReactNode;
-}
+import type { Scope } from '../model/scope';
 
 interface ScopeListProps {
   scopes: Scope[];

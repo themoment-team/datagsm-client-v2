@@ -1,4 +1,4 @@
-import { ScopeList } from '@/entities/scope';
+import { type Scope, ScopeList } from '@/entities/scope';
 import { withSubjectParticle } from '@/shared/lib';
 import { AuthWindow } from '@/shared/ui/auth-window';
 
@@ -6,7 +6,7 @@ import { LoginForm, type LoginFormProps } from './LoginForm';
 
 interface LoginPageProps extends LoginFormProps {
   clientName: string;
-  scopes: { id: string; label: string }[];
+  scopes: Scope[];
 }
 
 // Figma DataGSMv2 "WF/OAuth modal" State=Default(권한 요청·로그인)·Error(로그인 실패)다.

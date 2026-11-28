@@ -2,9 +2,8 @@ import { SessionTimer } from '@datagsm/core/entities/auth-session';
 import { cn } from '@datagsm/core/shared/lib';
 import { Button, buttonVariants } from '@datagsm/core/shared/ui/button';
 import { Skeleton } from '@datagsm/core/shared/ui/skeleton';
-import type { ComponentProps } from 'react';
 
-import { ScopeList } from '@/entities/scope';
+import { type Scope, ScopeList } from '@/entities/scope';
 import { withSubjectParticle } from '@/shared/lib';
 import { AuthWindow } from '@/shared/ui/auth-window';
 
@@ -13,7 +12,7 @@ type ConsentPageProps =
   | {
       status: 'ready';
       clientName: string;
-      scopes: ComponentProps<typeof ScopeList>['scopes'];
+      scopes: Scope[];
       sessionRemainingSeconds: number;
       approving?: boolean;
       onApprove: () => void;
