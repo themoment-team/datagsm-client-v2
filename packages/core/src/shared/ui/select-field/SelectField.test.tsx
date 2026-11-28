@@ -118,6 +118,23 @@ describe('SelectField', () => {
     expect(container.querySelector('.h-12')).toHaveClass('border-error', 'inset-ring-error');
   });
 
+  it('오류 상태에서도 포커스하면 error 선 바깥에 strong outline을 그린다', () => {
+    const { container } = render(
+      <SelectField label="학년" error="학년을 골라 주세요">
+        {GRADES}
+      </SelectField>,
+    );
+    const box = container.querySelector('.h-12');
+
+    expect(box).toHaveClass(
+      'border-error',
+      'focus-within:outline-2',
+      'focus-within:outline-offset-2',
+      'focus-within:outline-strong',
+    );
+    expect(box).not.toHaveClass('focus-within:border-strong');
+  });
+
   it('React Hook Form register처럼 넘긴 name·onChange·onBlur·ref가 select에 닿는다', () => {
     const ref = vi.fn();
     const onChange = vi.fn();

@@ -59,6 +59,19 @@ describe('TextField', () => {
     expect(container.querySelector('.h-12')).toHaveClass('border-error', 'inset-ring-error');
   });
 
+  it('오류 상태에서도 포커스하면 error 선 바깥에 strong outline을 그린다', () => {
+    const { container } = render(<TextField label="인증 코드" error="인증 코드가 맞지 않습니다" />);
+    const box = container.querySelector('.h-12');
+
+    expect(box).toHaveClass(
+      'border-error',
+      'focus-within:outline-2',
+      'focus-within:outline-offset-2',
+      'focus-within:outline-strong',
+    );
+    expect(box).not.toHaveClass('focus-within:border-strong');
+  });
+
   it('쓰는 곳에서 넘긴 aria-describedby를 지우지 않고 앞에 둔다', () => {
     render(
       <>

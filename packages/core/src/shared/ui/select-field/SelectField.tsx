@@ -1,5 +1,5 @@
 import { cn } from '@datagsm/core/shared/lib';
-import { FormField } from '@datagsm/core/shared/ui/form-field';
+import { fieldBoxVariants, FormField } from '@datagsm/core/shared/ui/form-field';
 import { ChevronDownIcon } from '@datagsm/core/shared/ui/icon';
 import type { ComponentProps, ReactNode } from 'react';
 
@@ -20,6 +20,7 @@ interface SelectFieldProps extends ComponentProps<'select'> {
 //   select가 칸 전체를 덮어 화살표를 눌러도 열린다. 화살표 자리(16 + 간격 8)만큼 오른쪽 여백을 더 둔다.
 // - State는 select 상태로 그리고 TextField와 같다. Default: placeholder가 골라져 있으면 foreground-muted.
 //   Focus: 선 strong 2px. Disabled: 면 subtle, 라벨·값 foreground-muted. Error(Figma는 Text에만 있다): 선 error 2px.
+//   선과 포커스 표시(오류 중 바깥 outline 포함)는 TextField와 같은 form-field의 fieldBoxVariants가 정한다.
 // - placeholder option도 :disabled라서 비활성 면은 has-disabled가 아니라 select:disabled로 고른다.
 // - placeholder가 있고 value·defaultValue가 없으면 defaultValue를 ""로 둔다. 비활성 option은 브라우저가 기본으로 고르지 않기 때문이다.
 // 서버 컴포넌트에서도 쓸 수 있게 'use client' 없이 쓴다.
@@ -56,10 +57,8 @@ export const SelectField = ({
       {(control) => (
         <div
           className={cn(
-            'grid h-12 grid-cols-1 rounded border text-foreground-muted has-[select:disabled]:bg-subtle',
-            hasError
-              ? 'border-error inset-ring-1 inset-ring-error'
-              : 'border-line focus-within:border-strong focus-within:inset-ring-1 focus-within:inset-ring-strong',
+            fieldBoxVariants({ invalid: hasError }),
+            'grid h-12 grid-cols-1 text-foreground-muted has-[select:disabled]:bg-subtle',
           )}
         >
           <select

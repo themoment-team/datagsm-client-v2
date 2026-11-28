@@ -1,7 +1,7 @@
 import { type ComponentProps, type ReactNode, useId } from 'react';
 
 import { cn } from '@datagsm/core/shared/lib';
-import { FormField } from '@datagsm/core/shared/ui/form-field';
+import { fieldBoxVariants, FormField } from '@datagsm/core/shared/ui/form-field';
 
 interface TextFieldProps extends ComponentProps<'input'> {
   label?: ReactNode;
@@ -24,8 +24,8 @@ interface TextFieldProps extends ComponentProps<'input'> {
 // - State는 prop이 아니라 input 상태로 그린다.
 //   Filled: 값은 foreground, placeholder는 foreground-muted. Focus: focus-within으로 선이 strong 2px.
 //   Disabled: 면 subtle, 라벨·값 foreground-muted. Error: 선 error 2px, 오류 문구와 경고 아이콘은 error.
-// - 2px 선은 1px border에 1px inset ring을 더해 그린다. border 폭을 바꾸면 글자가 1px 밀리기 때문이다.
-// - Figma에 Error + Focus 조합이 없어 오류 중에는 포커스해도 error 선을 유지한다.
+// - 선과 포커스 표시는 SelectField와 같아 form-field의 fieldBoxVariants가 정한다.
+//   오류 중에는 error 선을 두고 포커스를 바깥 outline으로 보인다(Figma에 Error + Focus 조합이 없어 디자이너 확인 필요).
 // 서버 컴포넌트에서도 쓸 수 있게 'use client' 없이 useId로만 연결한다.
 // className은 바깥 래퍼에, 나머지 props(name·value·onChange·ref 등)는 input에 넘긴다.
 // React Hook Form의 register 결과를 그대로 펼칠 수 있다: <TextField {...register('email')} label="이메일" />
@@ -62,10 +62,8 @@ export const TextField = ({
         <div className="flex items-center gap-2">
           <div
             className={cn(
-              'flex h-12 min-w-0 flex-1 cursor-text items-center gap-2 rounded border px-4 text-body-16-regular text-foreground-muted has-disabled:cursor-not-allowed has-disabled:bg-subtle',
-              hasError
-                ? 'border-error inset-ring-1 inset-ring-error'
-                : 'border-line focus-within:border-strong focus-within:inset-ring-1 focus-within:inset-ring-strong',
+              fieldBoxVariants({ invalid: hasError }),
+              'flex h-12 min-w-0 flex-1 cursor-text items-center gap-2 px-4 text-body-16-regular text-foreground-muted has-disabled:cursor-not-allowed has-disabled:bg-subtle',
             )}
           >
             <input
