@@ -14,6 +14,7 @@ export const config = {
     '/clients/:path*',
     '/api-keys/:path*',
     '/events/:path*',
+    '/ai-harness/:path*',
     '/me/:path*',
   ],
 };

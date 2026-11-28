@@ -35,6 +35,10 @@ it('같은 앱 메뉴는 앱 안 경로로, 다른 앱 메뉴는 그 앱 주소�
   const nav = screen.getByRole('navigation', { name: '주 메뉴' });
 
   expect(within(nav).getByRole('link', { name: 'API 키' })).toHaveAttribute('href', '/api-keys');
+  expect(within(nav).getByRole('link', { name: 'AI 하네스' })).toHaveAttribute(
+    'href',
+    '/ai-harness',
+  );
   expect(within(nav).getByRole('link', { name: '문서' })).toHaveAttribute(
     'href',
     'https://docs.datagsm.kr',
