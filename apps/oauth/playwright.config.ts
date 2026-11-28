@@ -25,6 +25,7 @@ export default defineConfig({
     url: baseURL,
     env: {
       API_BASE_URL: apiBaseURL,
+      APP_CLIENT_URL: 'http://localhost:3000',
     },
     reuseExistingServer: false,
     timeout: 180 * 1000,
