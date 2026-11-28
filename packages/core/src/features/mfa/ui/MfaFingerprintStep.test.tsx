@@ -76,6 +76,36 @@ describe('MfaFingerprintStep', () => {
     expect(onRetry).toHaveBeenCalledOnce();
   });
 
+  it('마운트하면 상태 상자로 포커스를 옮긴다(방법 고르기 버튼이 사라지므로)', () => {
+    renderStep({ status: 'waiting' });
+    const box = screen.getByRole('status').parentElement;
+
+    expect(box).toHaveAttribute('tabindex', '-1');
+    expect(box).toHaveFocus();
+  });
+
+  it('다시 시도를 눌러 대기로 바뀌어도 포커스를 상태 상자로 옮긴다', () => {
+    const { rerenderWith, onRetry } = renderStep({ status: 'failed' });
+    const retry = screen.getByRole('button', { name: '다시 시도' });
+    retry.focus();
+    fireEvent.click(retry);
+    expect(onRetry).toHaveBeenCalledOnce();
+
+    rerenderWith({ status: 'waiting' });
+
+    expect(screen.queryByRole('button', { name: '다시 시도' })).toBeNull();
+    expect(screen.getByRole('status').parentElement).toHaveFocus();
+  });
+
+  it('대기에서 실패로 바뀌면 포커스를 상태 상자로 옮겨 다시 시도 바로 앞에 둔다', () => {
+    const { rerenderWith } = renderStep({ status: 'waiting' });
+    screen.getByRole('button', { name: '이메일로 인증' }).focus();
+
+    rerenderWith({ status: 'failed' });
+
+    expect(screen.getByRole('alert').parentElement).toHaveFocus();
+  });
+
   it('className을 바깥 요소에 덧붙인다', () => {
     const { container } = renderStep({ status: 'waiting', className: 'mt-6' });
 
