@@ -71,6 +71,14 @@ it('지금 경로의 메뉴를 선택된 상태로 표시한다', () => {
   expect(screen.getByRole('link', { name: '이벤트' })).not.toHaveAttribute('aria-current');
 });
 
+it('메뉴 아이콘은 스크린 리더에서 숨기고 글자가 메뉴 이름이 된다', () => {
+  renderSidebar('client');
+
+  const link = screen.getByRole('link', { name: 'API 키' });
+
+  expect(link.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+});
+
 it('앱의 루트 메뉴는 그 앱 안 어느 경로에서도 선택된다', () => {
   pathname.value = '/guides/oauth';
   renderSidebar('docs');
