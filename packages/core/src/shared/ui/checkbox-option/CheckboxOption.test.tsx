@@ -17,6 +17,33 @@ describe('CheckboxOption', () => {
     expect(checkbox).not.toBeChecked();
   });
 
+  it('접근 이름은 label만이고 scope·description 보조 줄은 설명으로 연결한다', () => {
+    render(<CheckboxOption label="급식 읽기" scope="neis:read" description="급식 메뉴" />);
+    const checkbox = screen.getByRole('checkbox');
+
+    expect(checkbox).toHaveAccessibleName('급식 읽기');
+    expect(checkbox).toHaveAccessibleDescription('neis:read 급식 메뉴');
+  });
+
+  it('보조 줄이 없으면 aria-describedby를 붙이지 않는다', () => {
+    render(<CheckboxOption label="개인정보 처리방침에 동의합니다" />);
+    const checkbox = screen.getByRole('checkbox');
+
+    expect(checkbox).toHaveAccessibleName('개인정보 처리방침에 동의합니다');
+    expect(checkbox).not.toHaveAttribute('aria-describedby');
+  });
+
+  it('쓰는 곳에서 넘긴 aria-describedby를 지우지 않고 앞에 둔다', () => {
+    render(
+      <>
+        <p id="extra">추가 설명</p>
+        <CheckboxOption label="급식 읽기" description="급식 메뉴" aria-describedby="extra" />
+      </>,
+    );
+
+    expect(screen.getByRole('checkbox')).toHaveAccessibleDescription('추가 설명 급식 메뉴');
+  });
+
   it('체크 칸 밖의 글자를 눌러도 체크가 바뀐다', () => {
     render(<CheckboxOption label="동아리 정보 읽기" scope="club:read" description="동아리 이름" />);
 
