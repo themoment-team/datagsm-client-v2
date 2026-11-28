@@ -26,6 +26,8 @@ test('콘솔 밖의 없는 주소는 사이드바 없는 카드 404를 서버 HT
   await expect(page.getByText('404', { exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'DataGSM으로 이동' })).toHaveAttribute('href', '/');
   await expect(page.getByRole('navigation', { name: '주 메뉴' })).toHaveCount(0);
+  // 사이드바는 없어도 공통 배경(WebGL canvas)은 하나 깔린다.
+  await expect(page.locator('[aria-hidden="true"]:has(> canvas)')).toHaveCount(1);
 });
 
 test('로그인하지 않으면 콘솔 경로의 없는 주소도 먼저 로그인으로 보낸다', async ({ request }) => {

@@ -1,5 +1,7 @@
 import { connection } from 'next/server';
 
+import { IridescenceBackground } from '@datagsm/core/shared/ui/iridescence-background';
+
 import { ShellLayout } from '@/_app/shell-layout';
 import { LandingNotFoundPage, NotFoundPage, NotFoundSwitch } from '@/_pages/not-found';
 
@@ -18,7 +20,13 @@ const NotFound = async () => {
           <NotFoundPage />
         </ShellLayout>
       }
-      landing={<LandingNotFoundPage />}
+      landing={
+        <>
+          {/* 루트 레이아웃은 랜딩 때문에 공통 배경을 깔지 않는다. 카드 404는 셸 밖이라 배경을 여기서 깐다. */}
+          <IridescenceBackground />
+          <LandingNotFoundPage />
+        </>
+      }
     />
   );
 };
