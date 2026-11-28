@@ -25,7 +25,7 @@ jobs:
       STATUS_OPENAPI_BASE_URL: http://localhost:8082
       STATUS_OAUTH_AUTHORIZATION_BASE_URL: http://localhost:8083
       STATUS_OAUTH_RESOURCE_BASE_URL: http://localhost:8084
-      # 사이드바에서 다른 앱으로 이동할 주소다.
+      # 사이드바와 404에서 다른 앱으로 이동할 주소다. oauth는 APP_CLIENT_URL만 쓴다.
       APP_CLIENT_URL: http://localhost:3000
       APP_DOCS_URL: http://localhost:3002
       APP_STATUS_URL: http://localhost:3003
