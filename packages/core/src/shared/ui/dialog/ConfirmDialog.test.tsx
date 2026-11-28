@@ -134,3 +134,19 @@ it('처리하는 동안(pending) 확인 버튼을 막는다', async () => {
   fireEvent.click(confirm);
   expect(onConfirm).not.toHaveBeenCalled();
 });
+
+it('처리하는 동안(pending) 취소·닫기·ESC로 닫히지 않는다', async () => {
+  const onCancel = vi.fn();
+  render(<ConfirmExample onCancel={onCancel} pending />);
+
+  const { dialog } = await openConfirm();
+  const cancel = within(dialog).getByRole('button', { name: '취소' });
+
+  expect(cancel).toBeDisabled();
+  fireEvent.click(cancel);
+  expect(within(dialog).queryByRole('button', { name: '닫기' })).not.toBeInTheDocument();
+  fireEvent.keyDown(document.activeElement ?? document.body, { key: 'Escape' });
+
+  expect(onCancel).not.toHaveBeenCalled();
+  expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+});
