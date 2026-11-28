@@ -8,7 +8,7 @@ interface IconBaseProps extends IconProps {
 }
 
 // 아이콘은 Figma DataGSMv2 "WF/Icons"(node 681:1814)를 옮긴 것이고, 원본은 16px 선 아이콘이다.
-// 아이콘을 더하거나 고칠 때는 Figma에서 path를 가져와 기존 아이콘 파일 형식 그대로 <이름>Icon.tsx를 만들고 index.ts에서 내보낸다.
+// 아이콘을 더하거나 고칠 때는 Figma에서 path를 가져와 icons.tsx에 기존 아이콘 형식 그대로 추가하고 index.ts에서 내보낸다.
 // Icon은 모든 아이콘이 함께 쓰는 틀이다. 크기는 기본 16px(size-4)이고 className으로 바꾼다.
 // 색은 currentColor라서 text-foreground-muted 같은 글자색 클래스를 따르고, Light·Dark 전환도 토큰으로 바뀐다.
 // 선 굵기 1.14286은 Figma WF/icon 원본 값이다. 쓰는 곳에서 strokeWidth로 바꿀 수 있지만,
